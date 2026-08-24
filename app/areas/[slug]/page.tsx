@@ -51,7 +51,7 @@ export default async function LocationPage({ params }: Props) {
               { name: location.suburb, path: `/areas/${location.slug}/` },
             ]}
           />
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-label text-brand-600">
             {location.region}
           </p>
           {/* One H1, and it names the suburb correctly. The live pages render

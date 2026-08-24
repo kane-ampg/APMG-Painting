@@ -43,7 +43,7 @@ function FieldShell({ label, name, errors, hint, required, children }: FieldShel
       <label htmlFor={id} className="text-sm font-semibold text-ink">
         {label}
         {required ? (
-          <span className="ml-1 text-signal-600" aria-hidden="true">
+          <span className="ml-1 text-brand-600" aria-hidden="true">
             *
           </span>
         ) : (

@@ -19,6 +19,10 @@ export const services: readonly Service[] = [
       'Timber staining',
       'Textured finishes',
     ],
+    image: {
+      src: '/images/work/interior-door-wall-roller.webp',
+      alt: 'An APMG painter rolling the wall beside a glazed door with an extension pole, in a building still in use',
+    },
   },
   {
     slug: 'exterior-painting',
@@ -38,6 +42,10 @@ export const services: readonly Service[] = [
       'Fences and outbuildings',
       'Multi-level building exteriors',
     ],
+    image: {
+      src: '/images/work/exterior-render-drop-sheets.webp',
+      alt: 'Two APMG painters coating a rendered house exterior, drop sheets down and a ladder set at the window head',
+    },
   },
   {
     slug: 'office-painting',
@@ -57,6 +65,10 @@ export const services: readonly Service[] = [
       'After-hours and staged programmes',
       'Colour consultation',
     ],
+    image: {
+      src: '/images/work/office-roller-occupied.webp',
+      alt: 'An APMG painter rolling a wall with an extension pole in an occupied office, floors sheeted and desks left in place',
+    },
   },
   {
     slug: 'protective-coatings',
@@ -76,6 +88,10 @@ export const services: readonly Service[] = [
       'Line marking and safety colours',
       'Surface assessment and specification',
     ],
+    image: {
+      src: '/images/work/ewp-tilt-panel-cutting-in.webp',
+      alt: 'An APMG painter working from a boom lift, harnessed, cutting in the line between white and green panels on a warehouse wall',
+    },
   },
   {
     slug: 'property-maintenance',
@@ -94,6 +110,10 @@ export const services: readonly Service[] = [
       'Flooring',
       'Making good and minor repairs',
     ],
+    image: {
+      src: '/images/work/fascia-gutter-ladder.webp',
+      alt: 'An APMG tradesperson on a ladder working along the fascia and gutter line of a weatherboard house',
+    },
   },
 ] as const;
 

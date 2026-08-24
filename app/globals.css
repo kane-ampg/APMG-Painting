@@ -36,7 +36,153 @@
 }
 
 @layer components {
+  /* Fraunces ships here at 600 and 700 only. Anything using the display face
+     must resolve to one of them; 600 is the default and `font-bold` opts into
+     700. Without this, headings inherit 400 and the browser substitutes. */
+  .font-display {
+    font-weight: 600;
+  }
+
+  /*
+   * The homepage fold. Sized to exactly the space left under the sticky header
+   * — h-16 (sm:h-20) plus its 1px bottom rule — so the hero occupies one
+   * viewport and no more.
+   *
+   * `svh` is the real value: on phones it is the height with the browser chrome
+   * showing, so the fold's bottom edge can never start off-screen. The `vh`
+   * declaration above each one is the fallback for engines without the unit,
+   * and `min-height` rather than `height` means unusually large text grows the
+   * section instead of clipping it.
+   */
+  /*
+   * The homepage fold: exactly one viewport, never more.
+   *
+   * `height`, not `min-height`. The section has to end precisely where the
+   * screen does, so the strip along its bottom edge sits *on* the fold and the
+   * next section begins at the seam — that edge is the cue that there is more
+   * page. A `min-height` let a long line of copy push the fold past the
+   * screen, which is the one thing this section may not do.
+   *
+   * `svh` is the small viewport height, so a mobile browser collapsing its URL
+   * bar cannot make the fold taller than the screen it is measured against.
+   * The `vh` line above it is the fallback for anything that does not know the
+   * unit; the second declaration simply wins where it is understood.
+   *
+   * Subtracted: the sticky header, plus its 1px bottom border. The interior
+   * absorbs the rest — `short:` and `tight:` in tailwind.config.ts tighten the
+   * type and padding on laptop and small-phone heights, and the photographic
+   * band drops out entirely when there is no honest room for it.
+   */
+  .hero-viewport {
+    height: calc(100vh - 4rem - 1px);
+    height: calc(100svh - 4rem - 1px);
+  }
+
+  @media (min-width: 640px) {
+    .hero-viewport {
+      height: calc(100vh - 5rem - 1px);
+      height: calc(100svh - 5rem - 1px);
+    }
+  }
+
   .skip-link {
     @apply absolute left-4 top-4 z-[100] -translate-y-24 rounded-md bg-brand-700 px-4 py-2 text-sm font-semibold text-white transition-transform focus:translate-y-0;
+  }
+}
+
+/*
+ * ---------------------------------------------------------------------------
+ * Page transitions
+ * ---------------------------------------------------------------------------
+ *
+ * Outside every @layer on purpose. These are document-level pseudo-elements,
+ * not utilities, and nothing should be able to out-specify them by accident.
+ *
+ * The shape of the animation: the outgoing page fades where it stands, the
+ * incoming page fades in and rises 8px behind it. Only the *incoming* page
+ * moves. A translated outgoing snapshot is the usual source of the artefact
+ * where a long page appears to lurch, because the browser captures it at its
+ * full document height and the scroll position has already been reset to the
+ * top by the time it animates. Fading it in place cannot go wrong — at the
+ * first frame the snapshot is pixel-identical to what was already on screen.
+ *
+ * Durations are asymmetric and deliberately short. The old page leaves in
+ * 140ms so it stops competing for attention; the new one arrives over 280ms,
+ * starting once the old one is most of the way gone. Total ~360ms, which reads
+ * as one movement rather than as a wait.
+ */
+
+/* The transition overlay swallows clicks for as long as it runs. Hand them
+   back to the live page underneath — 360ms of a dead header is worse than a
+   click landing a frame early. */
+::view-transition {
+  pointer-events: none;
+}
+
+/*
+ * The header, footer and chat button live in the layout, outside the animated
+ * boundary, so they are all part of the `root` snapshot. Nothing about them
+ * changes between routes, so `root` is switched over instantly instead of
+ * being cross-faded.
+ *
+ * `display: none` on the old snapshot rather than `animation: none` is what
+ * makes this safe. Left visible, the old chrome would show through the holes
+ * the extracted page content leaves in the new snapshot — on a route where the
+ * page height changes, that puts a ghost of the old footer in the middle of
+ * the screen for the length of the transition.
+ */
+::view-transition-group(root) {
+  animation: none;
+}
+::view-transition-old(root) {
+  display: none;
+}
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-old(.page-exit) {
+  animation: 140ms cubic-bezier(0.4, 0, 1, 1) both apmg-page-out;
+}
+
+::view-transition-new(.page-enter) {
+  animation:
+    280ms cubic-bezier(0, 0, 0.2, 1) 100ms both apmg-page-in,
+    360ms cubic-bezier(0, 0, 0.2, 1) both apmg-page-rise;
+}
+
+@keyframes apmg-page-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes apmg-page-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes apmg-page-rise {
+  from {
+    transform: translateY(8px);
+  }
+}
+
+/*
+ * Motion sensitivity. WCAG 2.3.3 (Animation from Interactions) is AAA, but a
+ * whole-page transition is exactly the kind of motion it exists for, and the
+ * cost of honouring it is nil: with the durations zeroed the browser falls back
+ * to its own default, which is to swap the pages instantly.
+ *
+ * The global `0.01ms` override higher up this file cannot reach these — it
+ * matches elements, and view transition pseudo-elements are not in the tree.
+ */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-delay: 0s !important;
+    animation-duration: 0s !important;
   }
 }

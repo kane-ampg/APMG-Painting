@@ -31,6 +31,12 @@ export type Service = {
   summary: string;
   body: readonly string[];
   includes: readonly string[];
+  /**
+   * The card photograph. Work in progress, not a finished room — a service card
+   * has to say what the work looks like, and process shots do that. Optional
+   * because a service added before its photograph exists must still render.
+   */
+  image?: { src: string; alt: string };
 };
 
 export type Sector = {
@@ -44,6 +50,18 @@ export type Sector = {
   intro: string;
   /** What makes this sector operationally different. The reason the page exists. */
   considerations: readonly { heading: string; body: string }[];
+  /**
+   * What the work involves in this sector, at length.
+   *
+   * General painting and building knowledge — substrates, preparation,
+   * sequencing, coating behaviour. Deliberately NOT a claim about APMG's
+   * record in the sector: that is `projectSlugs`, and it is empty for most of
+   * these. Depth here is what gives the page a reason to be indexed; the
+   * evidence block below it is what stops the depth reading as experience.
+   */
+  body: readonly string[];
+  /** Sector-specific questions. Distinct from the site-wide sets in faqs.ts. */
+  faqs: readonly Faq[];
   /** Slugs of projects that evidence this sector. Empty means no proof yet. */
   projectSlugs: readonly string[];
   /** Live-site URL preserved during migration. */
@@ -113,6 +131,30 @@ export type Location = {
   /** Why this page is or is not indexable. Kept for the client review. */
   indexabilityReason: string;
   legacyPath: string;
+};
+
+/**
+ * A first-party review.
+ *
+ * `verified` means the reviewer has agreed to it being reproduced on the site
+ * under this attribution. Same rule as accreditations: only verified entries
+ * render or reach structured data. A third-party widget's aggregate is not a
+ * substitute — see content/reviews.ts.
+ */
+export type Review = {
+  id: string;
+  /** 1-5. */
+  rating: number;
+  quote: string;
+  attribution: string;
+  organisation?: string;
+  /** ISO date the review was given. Required — undated reviews age invisibly. */
+  date: string;
+  /** Which service the review relates to, for filtering onto the right page. */
+  audience: Audience;
+  /** Where it originally appeared, e.g. 'Google Business Profile'. */
+  source: string;
+  verified: boolean;
 };
 
 export type Faq = {

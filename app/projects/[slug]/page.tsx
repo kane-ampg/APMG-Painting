@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import { CtaBand, RelatedLinks, TestimonialBlock } from '@/components/sections';
-import { Container, Placeholder, Section, SectionHeading } from '@/components/ui';
+import { Container, mediaZoom, Placeholder, Section, SectionHeading } from '@/components/ui';
 import { JsonLd } from '@/components/seo/json-ld';
 import { projectSchema } from '@/lib/schema';
 import { getProject, projects } from '@/content/projects';
@@ -72,7 +72,7 @@ export default async function ProjectPage({ params }: Props) {
               { name: project.title, path: `/projects/${project.slug}/` },
             ]}
           />
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-label text-brand-600">
             {project.location}
           </p>
           <h1 className="max-w-4xl font-display text-4xl leading-tight tracking-tight sm:text-5xl">
@@ -82,14 +82,14 @@ export default async function ProjectPage({ params }: Props) {
       </Section>
 
       {cover && (
-        <div className="relative aspect-[16/9] w-full bg-paper-sunken sm:aspect-[21/9]">
+        <div className="group relative aspect-[16/9] w-full overflow-hidden bg-paper-sunken sm:aspect-[21/9]">
           <Image
             src={cover.src}
             alt={cover.alt}
             fill
             priority
             sizes="100vw"
-            className="object-cover"
+            className={`object-cover ${mediaZoom}`}
           />
         </div>
       )}
@@ -138,7 +138,7 @@ export default async function ProjectPage({ params }: Props) {
 
             <aside className="flex flex-col gap-6 lg:border-l lg:border-paper-edge lg:pl-8">
               <div>
-                <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">
+                <h2 className="mb-4 text-xs font-semibold uppercase tracking-label text-ink-muted">
                   Project summary
                 </h2>
                 <dl className="flex flex-col gap-3 text-sm">
@@ -202,14 +202,17 @@ export default async function ProjectPage({ params }: Props) {
             <SectionHeading className="mb-6">Gallery</SectionHeading>
             <ul className="grid gap-4 sm:grid-cols-2">
               {gallery.map((image) => (
-                <li key={image.src} className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                <li
+                  key={image.src}
+                  className="group relative aspect-[4/3] overflow-hidden rounded-lg"
+                >
                   <Image
                     src={image.src}
                     alt={image.alt}
                     fill
                     loading="lazy"
                     sizes="(min-width: 640px) 45vw, 100vw"
-                    className="object-cover"
+                    className={`object-cover ${mediaZoom}`}
                   />
                 </li>
               ))}

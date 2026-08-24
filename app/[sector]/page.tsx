@@ -5,6 +5,7 @@ import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import {
   ContentBlock,
   CtaBand,
+  FaqList,
   Hero,
   ProjectGrid,
   RelatedLinks,
@@ -12,7 +13,7 @@ import {
 } from '@/components/sections';
 import { Card, Container, Placeholder, Prose, Section, SectionHeading } from '@/components/ui';
 import { JsonLd } from '@/components/seo/json-ld';
-import { serviceSchema } from '@/lib/schema';
+import { faqSchema, serviceSchema } from '@/lib/schema';
 import { sectors } from '@/content/sectors';
 import { getProject } from '@/content/projects';
 
@@ -66,6 +67,7 @@ export default async function SectorPage({ params }: Props) {
           path: sector.legacyPath,
         })}
       />
+      <JsonLd data={faqSchema(sector.faqs)} />
 
       <Hero
         eyebrow="Commercial painting"
@@ -103,7 +105,15 @@ export default async function SectorPage({ params }: Props) {
         </Container>
       </Section>
 
-      <Section tone="sunken">
+      <ContentBlock tone="sunken" heading="What the work involves">
+        <Prose>
+          {sector.body.map((paragraph) => (
+            <p key={paragraph.slice(0, 48)}>{paragraph}</p>
+          ))}
+        </Prose>
+      </ContentBlock>
+
+      <Section tone="paper">
         <Container>
           <SectionHeading className="mb-6">Evidence</SectionHeading>
           {projects.length > 0 ? (
@@ -115,6 +125,10 @@ export default async function SectorPage({ params }: Props) {
           )}
         </Container>
       </Section>
+
+      <ContentBlock tone="sunken" heading={`${sector.shortTitle} painting questions`}>
+        <FaqList items={sector.faqs} />
+      </ContentBlock>
 
       <ContentBlock heading="Related">
         <Prose className="mb-6">

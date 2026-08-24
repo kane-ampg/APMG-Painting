@@ -3,6 +3,8 @@ import { Inter, Fraunces } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
+import { QuoteChat } from '@/components/chat/quote-chat';
+import { ScrollReveal } from '@/components/motion/scroll-reveal';
 import { JsonLd } from '@/components/seo/json-ld';
 import { localBusinessSchema, organizationSchema } from '@/lib/schema';
 import { isSandbox, site, siteUrl } from '@/lib/site';
@@ -47,18 +49,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <JsonLd data={organizationSchema()} />
         <JsonLd data={localBusinessSchema()} />
 
-        {isSandbox && (
-          <p className="bg-signal-500 px-4 py-2 text-center text-xs font-semibold text-white">
-            Preview build — not the live site. Content is under review and enquiries are not
-            delivered.
-          </p>
-        )}
-
         <Header />
         <main id="main" className="flex-1">
           {children}
         </main>
         <Footer />
+
+        {/*
+          Outside <main> and last in the DOM: an assistive-technology user
+          reaches the page's own content first, and the panel is additive — the
+          full forms on /contact-us/ remain the primary, no-JavaScript route.
+        */}
+        <QuoteChat />
+
+        <ScrollReveal />
       </body>
     </html>
   );

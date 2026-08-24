@@ -29,7 +29,7 @@ export default function NotFound() {
   return (
     <Section tone="paper">
       <Container width="narrow">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-label text-brand-600">
           Page not found
         </p>
         <h1 className="font-display text-4xl tracking-tight sm:text-5xl">That page is not here</h1>

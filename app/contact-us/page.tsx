@@ -25,7 +25,7 @@ export default function ContactPage() {
 
           <dl className="mt-8 grid gap-6 sm:grid-cols-3">
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">
+              <dt className="text-xs font-semibold uppercase tracking-label text-ink-muted">
                 Phone
               </dt>
               <dd className="mt-1">
@@ -38,7 +38,7 @@ export default function ContactPage() {
               </dd>
             </div>
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">
+              <dt className="text-xs font-semibold uppercase tracking-label text-ink-muted">
                 Email
               </dt>
               <dd className="mt-1">
@@ -48,7 +48,7 @@ export default function ContactPage() {
               </dd>
             </div>
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">
+              <dt className="text-xs font-semibold uppercase tracking-label text-ink-muted">
                 Address
               </dt>
               <dd className="mt-1 text-ink">{formattedAddress}</dd>
@@ -57,33 +57,38 @@ export default function ContactPage() {
         </Container>
       </Section>
 
-      <Section tone="paper" id="commercial">
-        <Container width="narrow">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
-            For organisations
-          </p>
-          <SectionHeading className="mb-3">Request a site assessment</SectionHeading>
-          <p className="mb-8 text-ink-soft">
-            For schools, clinics, aged care, strata, retail, hospitality, offices and industrial
-            sites. The operating-hours question matters more than any other — tell us when we are
-            allowed on site.
-          </p>
-          <CommercialEnquiryForm />
-        </Container>
-      </Section>
+      {/* The header's "Get a quote" lands here: both enquiry forms, one anchor.
+          `#commercial` and `#residential` stay as the deep links from the
+          service pages. */}
+      <div id="quote" className="scroll-mt-16 sm:scroll-mt-20">
+        <Section tone="paper" id="commercial">
+          <Container width="narrow">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-label text-brand-600">
+              For organisations
+            </p>
+            <SectionHeading className="mb-3">Request a site assessment</SectionHeading>
+            <p className="mb-8 text-ink-soft">
+              For schools, clinics, aged care, strata, retail, hospitality, offices and industrial
+              sites. The operating-hours question matters more than any other — tell us when we are
+              allowed on site.
+            </p>
+            <CommercialEnquiryForm />
+          </Container>
+        </Section>
 
-      <Section tone="sunken" id="residential">
-        <Container width="narrow">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
-            For homeowners
-          </p>
-          <SectionHeading className="mb-3">Request a free quote</SectionHeading>
-          <p className="mb-8 text-ink-soft">
-            For houses, apartments and townhouses across Melbourne, inside or out.
-          </p>
-          <ResidentialEnquiryForm />
-        </Container>
-      </Section>
+        <Section tone="sunken" id="residential">
+          <Container width="narrow">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-label text-brand-600">
+              For homeowners
+            </p>
+            <SectionHeading className="mb-3">Request a free quote</SectionHeading>
+            <p className="mb-8 text-ink-soft">
+              For houses, apartments and townhouses across Melbourne, inside or out.
+            </p>
+            <ResidentialEnquiryForm />
+          </Container>
+        </Section>
+      </div>
     </>
   );
 }

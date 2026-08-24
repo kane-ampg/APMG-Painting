@@ -6,13 +6,14 @@ import {
   CtaBand,
   FaqList,
   Hero,
+  ProcessSteps,
   ProjectGrid,
   SectorGrid,
   TrustBar,
 } from '@/components/sections';
-import { Card, Container, Prose, Section, SectionHeading } from '@/components/ui';
+import { Container, Prose, Section, SectionHeading } from '@/components/ui';
 import { JsonLd } from '@/components/seo/json-ld';
-import { serviceSchema } from '@/lib/schema';
+import { faqSchema, serviceSchema } from '@/lib/schema';
 import { sectors } from '@/content/sectors';
 import { featuredProjects } from '@/content/projects';
 import { faqsFor } from '@/content/faqs';
@@ -66,6 +67,9 @@ export default function CommercialPage() {
           path: '/commercial/',
         })}
       />
+      {/* The page already carried the FAQ content; it emitted no FAQPage, so
+          neither rich results nor AI answer engines could extract it. */}
+      <JsonLd data={faqSchema(faqsFor('commercial'))} />
 
       <Hero
         eyebrow="Commercial painting"
@@ -113,17 +117,7 @@ export default function CommercialPage() {
           <p className="mb-8 max-w-prose text-ink-soft">
             Five stages, in order. The documentation exists before anyone picks up a brush.
           </p>
-          <ol className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {PROCESS.map((item, index) => (
-              <Card as="li" key={item.step} className="gap-2">
-                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
-                  Stage {index + 1}
-                </span>
-                <h3 className="font-display text-lg tracking-tight">{item.step}</h3>
-                <p className="text-sm text-ink-soft">{item.body}</p>
-              </Card>
-            ))}
-          </ol>
+          <ProcessSteps steps={PROCESS} />
         </Container>
       </Section>
 

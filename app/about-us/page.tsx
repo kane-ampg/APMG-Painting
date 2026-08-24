@@ -73,7 +73,11 @@ export default function AboutPage() {
               >
                 <span className="font-semibold text-ink">{item.label}</span>
                 <span className="text-sm text-ink-soft">{item.detail}</span>
-                <span className="mt-1 text-xs font-semibold uppercase tracking-wide text-signal-600">
+                <span
+                  className={`mt-1 text-xs font-semibold uppercase tracking-label ${
+                    item.verified ? 'text-ink-muted' : 'text-signal-600'
+                  }`}
+                >
                   {item.verified ? 'Verified' : 'Awaiting certificate'}
                 </span>
               </li>

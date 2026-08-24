@@ -24,6 +24,25 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
         disallow: ['/api/'],
       },
+      {
+        // Named explicitly so a later blanket rule cannot quietly lock the
+        // answer engines out. A blocked crawler cannot cite APMG, and for a
+        // local trade business an AI answer is now a real referral source.
+        userAgent: [
+          'GPTBot',
+          'ChatGPT-User',
+          'OAI-SearchBot',
+          'PerplexityBot',
+          'ClaudeBot',
+          'Claude-User',
+          'anthropic-ai',
+          'Google-Extended',
+          'Applebot-Extended',
+          'Bingbot',
+        ],
+        allow: '/',
+        disallow: ['/api/'],
+      },
     ],
     sitemap: `${siteUrl}/sitemap.xml`,
     host: siteUrl,

@@ -1,9 +1,17 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useId, useRef, useState } from 'react';
 import { mainNav } from './nav-data';
+import { isCurrentPage, isSamePath, navActiveState } from '@/lib/nav/active';
+import { cn } from '@/lib/utils';
 import { site } from '@/lib/site';
+
+/** The menu section the given page sits under, if it is not a top-level item. */
+function activeSection(pathname: string): string | null {
+  return mainNav.find((item) => navActiveState(pathname, item) === 'section')?.label ?? null;
+}
 
 /**
  * Mobile navigation drawer.
@@ -13,11 +21,15 @@ import { site } from '@/lib/site';
  *
  * Accessibility: the trigger is a real button with aria-expanded/aria-controls,
  * Escape closes, focus is trapped only while open, and focus returns to the
- * trigger on close. Sub-menus are disclosure buttons, not hover targets.
+ * trigger on close. Sub-menus are disclosure buttons, not hover targets. The
+ * current page carries `aria-current="page"`, and is marked visually by both a
+ * colour change and a rule down its left edge so the cue survives for anyone
+ * who cannot separate the two colours (WCAG 1.4.1).
  */
 export function MobileMenu() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [expanded, setExpanded] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<string | null>(() => activeSection(pathname));
   const panelId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -64,6 +76,28 @@ export function MobileMenu() {
       document.body.style.overflow = previous;
     };
   }, [open]);
+
+  /*
+   * Open the drawer already showing where you are.
+   *
+   * The section holding the current page is expanded, so someone on
+   * /schools-painting/ opens the menu and finds Commercial already unfolded
+   * with Schools marked — rather than a flat list of six labels, none of which
+   * is the page they are on. Re-run per route so it follows the visitor, and
+   * close the drawer on the way: a navigation the drawer did not initiate (the
+   * back button, a link in the page behind it) would otherwise leave it hanging
+   * over the new page.
+   *
+   * Adjusted during render, not in an effect: the drawer must never be painted
+   * open over the page it just took you to, and an effect runs too late for
+   * that.
+   */
+  const [renderedPath, setRenderedPath] = useState(pathname);
+  if (renderedPath !== pathname) {
+    setRenderedPath(pathname);
+    setOpen(false);
+    setExpanded(activeSection(pathname));
+  }
 
   return (
     <>
@@ -118,57 +152,86 @@ export function MobileMenu() {
 
         <nav aria-label="Main">
           <ul className="flex flex-col gap-1">
-            {mainNav.map((item) => (
-              <li key={item.href}>
-                {item.children ? (
-                  <>
-                    <div className="flex items-center">
-                      <Link
-                        href={item.href}
-                        onClick={() => setOpen(false)}
-                        className="flex-1 rounded-md px-3 py-3 text-base font-semibold text-ink hover:bg-paper-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
-                      >
-                        {item.label}
-                      </Link>
-                      <button
-                        type="button"
-                        aria-expanded={expanded === item.label}
-                        aria-label={`${expanded === item.label ? 'Collapse' : 'Expand'} ${item.label} links`}
-                        onClick={() =>
-                          setExpanded((current) => (current === item.label ? null : item.label))
-                        }
-                        className="rounded-md px-3 py-3 text-ink-muted hover:bg-paper-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
-                      >
-                        <span aria-hidden="true">{expanded === item.label ? '−' : '+'}</span>
-                      </button>
-                    </div>
-                    {expanded === item.label && (
-                      <ul className="mb-2 ml-3 flex flex-col gap-0.5 border-l border-paper-edge pl-3">
-                        {item.children.map((child) => (
-                          <li key={child.href}>
-                            <Link
-                              href={child.href}
-                              onClick={() => setOpen(false)}
-                              className="block rounded-md px-3 py-2 text-sm text-ink-soft hover:bg-paper-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
-                            >
-                              {child.label}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </>
-                ) : (
-                  <Link
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    className="block rounded-md px-3 py-3 text-base font-semibold text-ink hover:bg-paper-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
-                  >
-                    {item.label}
-                  </Link>
-                )}
-              </li>
-            ))}
+            {mainNav.map((item) => {
+              const active = navActiveState(pathname, item);
+              const top = cn(
+                'rounded-md px-3 py-3 text-base font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600',
+                active === 'page' && 'border-l-4 border-brand-600 bg-brand-50 text-brand-700',
+                active === 'section' &&
+                  'border-l-4 border-brand-100 text-brand-700 hover:bg-paper-sunken',
+                !active && 'text-ink hover:bg-paper-sunken',
+              );
+              const isExpanded = expanded === item.label;
+
+              return (
+                <li key={item.href}>
+                  {item.children ? (
+                    <>
+                      <div className="flex items-center">
+                        <Link
+                          href={item.href}
+                          onClick={() => setOpen(false)}
+                          aria-current={active === 'page' ? 'page' : undefined}
+                          className={cn(top, 'flex-1')}
+                        >
+                          {item.label}
+                        </Link>
+                        <button
+                          type="button"
+                          aria-expanded={isExpanded}
+                          aria-label={
+                            (isExpanded ? 'Collapse ' : 'Expand ') + item.label + ' links'
+                          }
+                          onClick={() =>
+                            setExpanded((current) => (current === item.label ? null : item.label))
+                          }
+                          className="rounded-md px-3 py-3 text-ink-muted hover:bg-paper-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
+                        >
+                          <span aria-hidden="true">{isExpanded ? '−' : '+'}</span>
+                        </button>
+                      </div>
+                      {isExpanded && (
+                        <ul className="mb-2 ml-3 flex flex-col gap-0.5 border-l border-paper-edge pl-3">
+                          {item.children.map((child) => {
+                            const isCurrent = isCurrentPage(pathname, child.href);
+                            // The "Overview" child repeats its own section's
+                            // link, which is already marked above it. Styled,
+                            // but not announced as the current page twice.
+                            const announce = isCurrent && !isSamePath(child.href, item.href);
+                            return (
+                              <li key={child.href}>
+                                <Link
+                                  href={child.href}
+                                  onClick={() => setOpen(false)}
+                                  aria-current={announce ? 'page' : undefined}
+                                  className={cn(
+                                    'block rounded-md px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600',
+                                    isCurrent
+                                      ? 'bg-brand-50 font-semibold text-brand-700'
+                                      : 'text-ink-soft hover:bg-paper-sunken',
+                                  )}
+                                >
+                                  {child.label}
+                                </Link>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      onClick={() => setOpen(false)}
+                      aria-current={active === 'page' ? 'page' : undefined}
+                      className={cn(top, 'block')}
+                    >
+                      {item.label}
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
@@ -176,20 +239,20 @@ export function MobileMenu() {
           <Link
             href="/contact-us/#commercial"
             onClick={() => setOpen(false)}
-            className="rounded-md bg-brand-700 px-5 py-3 text-center text-sm font-semibold text-white"
+            className="rounded-md bg-brand-700 px-5 py-3 text-center text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
           >
             Request a site assessment
           </Link>
           <Link
             href="/contact-us/#residential"
             onClick={() => setOpen(false)}
-            className="rounded-md border border-paper-edge px-5 py-3 text-center text-sm font-semibold text-ink"
+            className="rounded-md border border-paper-edge px-5 py-3 text-center text-sm font-semibold text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
           >
             Request a free quote
           </Link>
           <a
             href={site.phone.href}
-            className="py-2 text-center text-sm font-semibold text-brand-700"
+            className="rounded py-2 text-center text-sm font-semibold text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
           >
             {site.phone.display}
           </a>

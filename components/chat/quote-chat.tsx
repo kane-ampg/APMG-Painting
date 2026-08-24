@@ -1,0 +1,726 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useActionState, useEffect, useId, useRef, useState, type FormEvent } from 'react';
+import { submitEnquiry } from '@/app/actions/enquiry';
+import { FormStatus } from '@/components/forms/form-status';
+import { QUOTE_HASH, QUOTE_PATH } from '@/components/navigation/quote-cta';
+import {
+  AUDIENCE_STEP,
+  buildEnquiryFormData,
+  flows,
+  validateField,
+  type ChatField,
+  type ChatStep,
+  type EnquiryFormType,
+} from '@/lib/enquiry/chat-flow';
+import { QUICK_ANSWERS } from '@/lib/enquiry/chat-faqs';
+import { initialEnquiryState } from '@/lib/enquiry/state';
+import { microLabel } from '@/components/ui';
+import { isSandbox, site } from '@/lib/site';
+import { cn } from '@/lib/utils';
+
+/**
+ * The floating quote assistant.
+ *
+ * A second route into the enquiry pipeline for visitors who will not start a
+ * seven-field form but will answer seven questions one at a time. It asks
+ * exactly what the forms ask, validates with the same Zod rules, and posts to
+ * the same Server Action — so it inherits the honeypot, the minimum-completion
+ * check, the rate limit, and the refusal to claim a delivery that did not
+ * happen.
+ *
+ * It is not a chatbot and answers nothing. Generating prose about warranties or
+ * accreditations would contradict the whole premise of this rebuild, where an
+ * unverified claim is not rendered at all.
+ *
+ * The conversation lives in `lib/enquiry/chat-flow.ts` as data, checked against
+ * the schema in a unit test. This file is only the surface.
+ */
+
+/** Below the sticky header (z-40) and the mobile menu (z-50), never over them. */
+const LAYER = 'z-30';
+
+type Turn = { role: 'bot' | 'user'; text: string };
+
+export function QuoteChat() {
+  const pathname = usePathname();
+
+  const [open, setOpen] = useState(false);
+  const [formType, setFormType] = useState<EnquiryFormType | null>(null);
+  const [stepIndex, setStepIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  /** Question-and-answer turns the visitor asked for, before the quote starts. */
+  const [asked, setAsked] = useState<Turn[]>([]);
+  /** The list folds away after the first answer to make room for it. */
+  const [questionsOpen, setQuestionsOpen] = useState(true);
+  const [state, dispatch, pending] = useActionState(submitEnquiry, initialEnquiryState);
+
+  const panelId = useId();
+  const launcherRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const transcriptRef = useRef<HTMLDivElement>(null);
+  const honeypotRef = useRef<HTMLInputElement>(null);
+
+  /**
+   * When the panel opened, for the server's minimum-completion-time check.
+   * A ref, not state: React never needs to render it.
+   */
+  const openedAt = useRef(0);
+
+  const steps: readonly ChatStep[] = formType ? flows[formType].steps : [];
+  const step: ChatStep | undefined = formType ? steps[stepIndex] : AUDIENCE_STEP;
+  const submitted = formType !== null && stepIndex >= steps.length;
+
+  /* --- focus ----------------------------------------------------------- */
+
+  // Each new turn takes focus, so a keyboard or screen-reader user lands on the
+  // thing they are being asked rather than hunting for it.
+  useEffect(() => {
+    if (!open) return;
+    const target =
+      panelRef.current?.querySelector<HTMLElement>('[data-chat-focus]') ?? panelRef.current;
+    // preventScroll: the transcript scrolls itself just below, and the
+    // browser's own scroll-into-view would yank against it mid-animation.
+    target?.focus({ preventScroll: true });
+  }, [open, formType, stepIndex]);
+
+  // A rejected answer pulls focus back to the field that caused it.
+  useEffect(() => {
+    if (Object.keys(errors).length === 0) return;
+    panelRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus({
+      preventScroll: true,
+    });
+  }, [errors]);
+
+  /**
+   * Keep the newest turn in view.
+   *
+   * Scrolling to the bottom is right for a short exchange and wrong for a long
+   * published answer — it lands the visitor on the last line of a paragraph
+   * they have not read. A turn taller than half the viewport is aligned to its
+   * top instead.
+   */
+  useEffect(() => {
+    const node = transcriptRef.current;
+    const latest = node?.lastElementChild;
+    if (!node) return;
+
+    if (latest instanceof HTMLElement && latest.clientHeight > node.clientHeight / 2) {
+      // offsetTop, not getBoundingClientRect: the arriving turn is mid-transform
+      // and its rect would be off by the animation's remaining travel.
+      node.scrollTop = Math.max(0, latest.offsetTop - node.offsetTop - 8);
+      return;
+    }
+    node.scrollTop = node.scrollHeight;
+  }, [formType, stepIndex, submitted, asked]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== 'Escape') return;
+      setOpen(false);
+      launcherRef.current?.focus();
+    }
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [open]);
+
+  /**
+   * Hidden where it would compete with the real thing: the contact page shows
+   * both full forms already.
+   */
+  if (pathname === QUOTE_PATH || pathname === '/contact-us') return null;
+
+  /* --- transitions ----------------------------------------------------- */
+
+  function close() {
+    setOpen(false);
+    launcherRef.current?.focus();
+  }
+
+  function advanceWith(patch: Record<string, string>) {
+    const next = { ...answers, ...patch };
+    setAnswers(next);
+    setErrors({});
+
+    if (stepIndex + 1 >= steps.length) {
+      submit(next);
+      return;
+    }
+    setStepIndex(stepIndex + 1);
+  }
+
+  function submit(finalAnswers: Record<string, string>) {
+    if (!formType) return;
+
+    setStepIndex(steps.length);
+    dispatch(
+      buildEnquiryFormData({
+        formType,
+        answers: finalAnswers,
+        renderedAt: openedAt.current,
+        // Passed through as found, so the server rejects a bot rather than
+        // this component quietly tidying up after one.
+        honeypot: honeypotRef.current?.value ?? '',
+      }),
+    );
+  }
+
+  function choose(field: ChatField, value: string) {
+    if (field.name === 'formType') {
+      setFormType(value as EnquiryFormType);
+      setStepIndex(0);
+      setAnswers({});
+      setErrors({});
+      return;
+    }
+    advanceWith({ [field.name]: value });
+  }
+
+  function ask(question: string, answer: string) {
+    setAsked((previous) => [
+      ...previous,
+      { role: 'user', text: question },
+      { role: 'bot', text: answer },
+    ]);
+    setQuestionsOpen(false);
+  }
+
+  function goBack() {
+    setErrors({});
+
+    if (submitted) {
+      setStepIndex(steps.length - 1);
+      return;
+    }
+    if (stepIndex === 0) {
+      setFormType(null);
+      setAnswers({});
+      return;
+    }
+    setStepIndex(stepIndex - 1);
+  }
+
+  function onStepSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!step || !formType) return;
+
+    const data = new FormData(event.currentTarget);
+    const patch: Record<string, string> = {};
+    const found: Record<string, string> = {};
+
+    for (const field of step.fields) {
+      const value = String(data.get(field.name) ?? '');
+      patch[field.name] = value;
+
+      // The same rule the server will apply, so the two can never disagree.
+      const message = validateField(formType, field.name, value);
+      if (message) found[field.name] = message;
+    }
+
+    if (Object.keys(found).length > 0) {
+      setErrors(found);
+      return;
+    }
+
+    advanceWith(patch);
+  }
+
+  /* --- transcript ------------------------------------------------------ */
+
+  const turns: Turn[] = [{ role: 'bot', text: AUDIENCE_STEP.prompt }, ...asked];
+
+  if (formType) {
+    turns.push({ role: 'user', text: optionLabel(AUDIENCE_STEP.fields[0], formType) });
+
+    for (const done of steps.slice(0, stepIndex)) {
+      turns.push({ role: 'bot', text: done.prompt });
+      turns.push({ role: 'user', text: summarise(done, answers) });
+    }
+
+    if (step) turns.push({ role: 'bot', text: step.prompt });
+  }
+
+  const isChoiceStep = step?.fields.every((f) => f.kind === 'choice' || f.kind === 'confirm');
+
+  /**
+   * Progress through the quote itself: the opening turn plus the branch's
+   * steps. Answered FAQs are not questions APMG asked, so they do not count.
+   * Clamped, because once submitted `stepIndex` sits one past the last step.
+   */
+  const questionCount = formType ? steps.length + 1 : null;
+  const questionNumber = questionCount ? Math.min(stepIndex + 2, questionCount) : 1;
+
+  /**
+   * Identity of the current turn. Used as a React key on the controls, so a tap
+   * remounts them and replays their entry animation rather than swapping the
+   * buttons under the pointer with no transition at all.
+   */
+  const turnKey = submitted ? 'submitted' : formType ? `${formType}:${step?.id}` : 'audience';
+
+  const subtitle = submitted
+    ? 'Your answers'
+    : questionCount
+      ? `Question ${questionNumber} of ${questionCount}`
+      : 'A few quick questions';
+
+  return (
+    <>
+      <button
+        ref={launcherRef}
+        type="button"
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={() => {
+          if (open) {
+            close();
+            return;
+          }
+          // Event handler, so Date.now() here is not an impure render.
+          openedAt.current = Date.now();
+          setOpen(true);
+        }}
+        className={cn(
+          'fixed bottom-5 right-5 flex items-center gap-2 rounded-full bg-brand-600 text-sm font-semibold text-white shadow-lg shadow-ink/25 transition hover:bg-brand-700',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2',
+          open ? 'h-12 w-12 justify-center' : 'py-3 pl-4 pr-5',
+          'active:scale-95',
+          LAYER,
+        )}
+      >
+        {open ? (
+          <>
+            <CloseIcon />
+            <span className="sr-only">Close quote chat</span>
+          </>
+        ) : (
+          <>
+            <ChatIcon />
+            Get a quote
+          </>
+        )}
+      </button>
+
+      {open && (
+        <div
+          ref={panelRef}
+          id={panelId}
+          role="dialog"
+          aria-label="Get a quote"
+          tabIndex={-1}
+          className={cn(
+            'fixed inset-x-0 bottom-0 flex flex-col overflow-hidden border-paper-edge bg-white shadow-2xl',
+            'rounded-t-2xl border-x border-t',
+            'sm:inset-x-auto sm:bottom-24 sm:right-5 sm:w-[23rem] sm:rounded-2xl sm:border',
+            /*
+             * Capped, not free-growing. The transcript lengthens with every
+             * turn, and an uncapped panel climbs behind the sticky header
+             * (z-40 to this panel's z-30) taking its own close button with it.
+             * The height is bounded instead and the transcript scrolls inside.
+             */
+            'max-h-[88dvh] sm:max-h-[min(40rem,calc(100dvh-11rem))]',
+            'animate-sheet-in sm:animate-panel-in',
+            LAYER,
+          )}
+        >
+          <header className="flex items-start justify-between gap-3 bg-ink px-4 py-3 text-white">
+            <div>
+              <h2 className="font-display text-base font-bold">Get a quote</h2>
+              <p className="text-xs text-white/70">{subtitle}</p>
+            </div>
+            <button
+              type="button"
+              onClick={close}
+              className="-mr-1 -mt-1 rounded-md p-1.5 text-white/80 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            >
+              <CloseIcon />
+              <span className="sr-only">Close</span>
+            </button>
+          </header>
+
+          {isSandbox && (
+            <p className="border-b border-signal-400/40 bg-signal-400/15 px-4 py-2 text-xs text-ink-soft">
+              Preview build — enquiries are not delivered. Call {site.phone.display} to reach the
+              team.
+            </p>
+          )}
+
+          <div
+            ref={transcriptRef}
+            role="log"
+            aria-live="polite"
+            aria-label="Conversation"
+            className="flex-1 space-y-2 overflow-y-auto scroll-smooth px-4 py-4"
+          >
+            {turns.map((turn, index) => (
+              <p
+                key={`${index}-${turn.text}`}
+                className={cn(
+                  // w-fit so a bubble hugs its text; a block <p> would
+                  // otherwise stretch to the full 85% whatever it says.
+                  'w-fit max-w-[85%] rounded-2xl px-3 py-2 text-sm',
+                  'animate-turn-in',
+                  turn.role === 'bot'
+                    ? 'bg-paper-sunken text-ink'
+                    : 'ml-auto bg-brand-600 text-white',
+                )}
+              >
+                {turn.text}
+              </p>
+            ))}
+          </div>
+
+          <div className="border-t border-paper-edge bg-white px-4 py-3">
+            <div key={turnKey} className="animate-controls-in">
+              {submitted ? (
+                <div className="flex flex-col gap-3">
+                  {pending ? (
+                    <p className="text-sm text-ink-muted" role="status">
+                      Sending…
+                    </p>
+                  ) : (
+                    <FormStatus
+                      status={state.status}
+                      message={state.message}
+                      delivered={state.delivered}
+                    />
+                  )}
+                  {state.status === 'error' && !pending && (
+                    <BackButton onClick={goBack}>Back to my answers</BackButton>
+                  )}
+                </div>
+              ) : step && isChoiceStep ? (
+                <div className="flex flex-col gap-2">
+                  {step.fields.map((field) => (
+                    <ChoiceButtons
+                      key={field.name}
+                      field={field}
+                      onChoose={(value) => choose(field, value)}
+                    />
+                  ))}
+                  {formType ? (
+                    <BackButton onClick={goBack}>Back</BackButton>
+                  ) : (
+                    <QuickQuestions
+                      onAsk={ask}
+                      expanded={questionsOpen}
+                      onExpand={() => setQuestionsOpen(true)}
+                    />
+                  )}
+                </div>
+              ) : step ? (
+                <form
+                  key={step.id}
+                  onSubmit={onStepSubmit}
+                  className="flex flex-col gap-3"
+                  noValidate
+                >
+                  {step.fields.map((field, index) => (
+                    <ChatTextField
+                      key={field.name}
+                      field={field}
+                      error={errors[field.name]}
+                      defaultValue={answers[field.name] ?? ''}
+                      autoFocus={index === 0}
+                    />
+                  ))}
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="submit"
+                      className="rounded-md bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 active:scale-95"
+                    >
+                      {stepIndex + 1 >= steps.length ? 'Send enquiry' : 'Next'}
+                    </button>
+
+                    {step.fields.every((field) => field.optional) && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          advanceWith(Object.fromEntries(step.fields.map((f) => [f.name, ''])))
+                        }
+                        className="rounded-md px-3 py-2 text-sm font-semibold text-ink-muted transition hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
+                      >
+                        Skip
+                      </button>
+                    )}
+
+                    <BackButton onClick={goBack} className="ml-auto">
+                      Back
+                    </BackButton>
+                  </div>
+                </form>
+              ) : null}
+            </div>
+          </div>
+
+          <footer className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-paper-edge bg-paper-sunken px-4 py-2.5 text-xs text-ink-muted">
+            <span>Prefer not to chat?</span>
+            <a
+              href={site.phone.href}
+              className="font-semibold text-brand-700 underline decoration-brand-600/40 underline-offset-2 hover:decoration-brand-600"
+            >
+              {site.phone.display}
+            </a>
+            <Link
+              href={`${QUOTE_PATH}${QUOTE_HASH}`}
+              onClick={close}
+              className="font-semibold text-ink-soft underline decoration-ink-muted/40 underline-offset-2 hover:decoration-ink-soft"
+            >
+              Full enquiry form
+            </Link>
+          </footer>
+
+          {/*
+            Honeypot. Hidden from sighted users and from assistive tech, so only
+            a bot fills it. Its own id, because the real form's honeypot uses
+            `company_website` and two elements must not share one.
+          */}
+          <div aria-hidden="true" className="absolute left-[-9999px] top-0 h-0 w-0 overflow-hidden">
+            <label htmlFor="quote-chat-company-website">
+              Company website — leave this field empty
+            </label>
+            <input
+              ref={honeypotRef}
+              id="quote-chat-company-website"
+              name="company_website"
+              type="text"
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Pieces                                                               */
+/* ------------------------------------------------------------------ */
+
+function ChoiceButtons({
+  field,
+  onChoose,
+}: {
+  field: ChatField;
+  onChoose: (value: string) => void;
+}) {
+  const options =
+    field.kind === 'confirm'
+      ? [
+          { value: 'true', label: 'Yes, please' },
+          { value: '', label: 'No thanks' },
+        ]
+      : (field.options ?? []);
+
+  return (
+    <div role="group" aria-label={field.label} className="flex flex-col gap-2">
+      {field.hint && <p className="text-xs text-ink-muted">{field.hint}</p>}
+      {options.map((option, index) => (
+        <button
+          key={option.value || option.label}
+          type="button"
+          data-chat-focus={index === 0 ? '' : undefined}
+          onClick={() => onChoose(option.value)}
+          className="rounded-md border border-paper-edge bg-white px-3 py-2.5 text-left text-sm font-semibold text-ink transition hover:border-brand-600 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 active:scale-[0.98]"
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * The five things visitors ask before they are ready to start a quote.
+ *
+ * Offered only on the opening turn: once someone is answering questions, a list
+ * of other questions is noise. Every answer is quoted from the site's published
+ * FAQs — see `lib/enquiry/chat-faqs.ts`.
+ */
+function QuickQuestions({
+  onAsk,
+  expanded,
+  onExpand,
+}: {
+  onAsk: (question: string, answer: string) => void;
+  expanded: boolean;
+  onExpand: () => void;
+}) {
+  if (!expanded) {
+    return (
+      <button
+        type="button"
+        onClick={onExpand}
+        className="mt-1 animate-controls-in self-start border-t border-paper-edge pt-3 text-sm font-semibold text-ink-muted underline decoration-paper-edge underline-offset-2 transition hover:text-ink hover:decoration-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
+      >
+        Ask something else
+      </button>
+    );
+  }
+
+  return (
+    <div className="mt-1 animate-controls-in border-t border-paper-edge pt-3">
+      <p className={cn(microLabel, 'mb-2 text-ink-muted')}>Or ask us something</p>
+      <div className="flex flex-col gap-1">
+        {QUICK_ANSWERS.map((entry) => (
+          <button
+            key={entry.question}
+            type="button"
+            onClick={() => onAsk(entry.question, entry.answer)}
+            className="rounded-md px-2 py-1.5 text-left text-sm text-ink-soft underline decoration-paper-edge underline-offset-2 transition hover:bg-paper-sunken hover:text-ink hover:decoration-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
+          >
+            {entry.question}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * A labelled text control. Same contract as `components/forms/fields.tsx`: a
+ * real visible label bound by id, errors in text and bound by aria-describedby,
+ * never colour alone.
+ */
+function ChatTextField({
+  field,
+  error,
+  defaultValue,
+  autoFocus,
+}: {
+  field: ChatField;
+  error?: string;
+  defaultValue: string;
+  autoFocus?: boolean;
+}) {
+  const id = useId();
+  const errorId = `${id}-error`;
+  const hintId = `${id}-hint`;
+
+  const describedBy =
+    [field.hint ? hintId : null, error ? errorId : null].filter(Boolean).join(' ') || undefined;
+
+  const shared = {
+    id,
+    name: field.name,
+    defaultValue,
+    autoComplete: field.autoComplete,
+    'aria-invalid': error ? (true as const) : undefined,
+    'aria-describedby': describedBy,
+    ...(autoFocus ? { 'data-chat-focus': '' } : {}),
+    className: cn(
+      'w-full rounded-md border bg-white px-3 py-2 text-base text-ink',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600',
+      error ? 'border-red-700' : 'border-paper-edge',
+    ),
+  };
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={id} className="text-sm font-semibold text-ink">
+        {field.label}
+      </label>
+
+      {field.hint && (
+        <p id={hintId} className="text-xs text-ink-muted">
+          {field.hint}
+        </p>
+      )}
+
+      {field.kind === 'textarea' ? (
+        <textarea rows={3} {...shared} />
+      ) : (
+        <input type={field.inputType ?? 'text'} {...shared} />
+      )}
+
+      {error && (
+        <p id={errorId} className="text-sm font-medium text-red-700">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function BackButton({
+  onClick,
+  children,
+  className,
+}: {
+  onClick: () => void;
+  children: string;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'rounded-md px-3 py-2 text-sm font-semibold text-ink-muted transition hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600',
+        className,
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Transcript helpers                                                   */
+/* ------------------------------------------------------------------ */
+
+function optionLabel(field: ChatField | undefined, value: string): string {
+  return field?.options?.find((option) => option.value === value)?.label ?? value;
+}
+
+/** How an answered turn reads back in the transcript. */
+function summarise(step: ChatStep, answers: Readonly<Record<string, string>>): string {
+  return step.fields
+    .map((field) => {
+      const value = answers[field.name] ?? '';
+
+      if (field.kind === 'confirm') return value === 'true' ? 'Yes, please' : 'No thanks';
+      if (value === '') return field.optional ? 'Skipped' : '';
+      if (field.kind === 'choice') return optionLabel(field, value);
+      return value;
+    })
+    .filter(Boolean)
+    .join(' · ');
+}
+
+/* ------------------------------------------------------------------ */
+/* Icons                                                               */
+/* ------------------------------------------------------------------ */
+
+function ChatIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className="h-5 w-5">
+      <path
+        d="M4 4.75h12a1.25 1.25 0 0 1 1.25 1.25v6.5A1.25 1.25 0 0 1 16 13.75h-5.5L6.75 16.5v-2.75H4A1.25 1.25 0 0 1 2.75 12.5V6A1.25 1.25 0 0 1 4 4.75Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className="h-5 w-5">
+      <path
+        d="m5.5 5.5 9 9m0-9-9 9"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}

@@ -1,12 +1,21 @@
 import type { Metadata } from 'next';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
-import { ContentBlock, CtaBand, Hero, ProjectGrid, TrustBar } from '@/components/sections';
+import {
+  ContentBlock,
+  CtaBand,
+  FaqList,
+  FeatureGrid,
+  Hero,
+  ProjectGrid,
+  TrustBar,
+} from '@/components/sections';
 import { Container, Prose, Section, SectionHeading } from '@/components/ui';
 import { JsonLd } from '@/components/seo/json-ld';
-import { serviceSchema } from '@/lib/schema';
+import { faqSchema, serviceSchema } from '@/lib/schema';
 import { getService } from '@/content/services';
 import { getProject } from '@/content/projects';
+import { officeFaqs } from '@/content/faqs';
 
 /**
  * Office painting.
@@ -26,6 +35,45 @@ export const metadata: Metadata = buildMetadata({
 const service = getService('office-painting');
 const ndis = getProject('ndis-commercial-painting');
 
+/**
+ * Trade content for the office page — general workplace-repaint knowledge, not
+ * a claim about APMG. The page was 305 words and had no chance of ranking for
+ * its own target query on depth alone.
+ */
+const AROUND = [
+  'An office repaint is scoped by how much of the floor can be released at once, not by floor area. A single open floor handed over for a weekend moves fast. The same area released as four zones across four weekends is the same amount of painting spread over four times the elapsed period, with four sets of set-up and pack-down inside it. Both are legitimate; they cost differently, and the difference should be visible before the choice is made.',
+  'The equipment is rarely the problem — the personal effects are. Monitors, docks and cabling are straightforward to cover or move, but desks carrying papers, mugs, plants and framed photographs cannot be cleared by a painting crew without someone eventually asking where something went. A floor where staff have cleared their own desks before the programme starts runs measurably faster than one where they have not.',
+  'Comms rooms, floor boxes and data cabling are treated as exclusion zones unless the IT team says otherwise. So are anything sprinkler-related and any device on a ceiling. Marking those out at the site assessment is quicker than discovering them at eleven at night with masking already up.',
+  'Low-VOC systems are standard for occupied workplaces, but ventilation is what actually clears a floor before staff return. That ventilation window is a real constraint on the programme, and it is one of the main reasons larger floors are done across a weekend rather than overnight.',
+];
+
+const OFFICE_SURFACES = [
+  {
+    heading: 'Walls in circulation routes',
+    body: 'Corridors, lift lobbies and the walls beside desks take chair, bag and trolley contact. A washable system in those runs and a standard finish elsewhere gets more life from the same budget than specifying the whole floor up.',
+  },
+  {
+    heading: 'Ceiling grid and exposed services',
+    body: 'Grid, ductwork and conduit spray well. Acoustic tiles are a judgement call, because coating them can reduce their acoustic performance — on a floor where that matters, replacing tiles and coating the grid is usually the better answer.',
+  },
+  {
+    heading: 'Doors, frames and joinery',
+    body: 'These are the surfaces people actually touch, and they are what a visiting client notices. They take a harder-wearing system and more preparation time per square metre than any wall on the floor.',
+  },
+  {
+    heading: 'Kitchens, bathrooms and end-of-trip',
+    body: 'Wet and high-traffic amenities are specified for moisture and frequent commercial cleaning, not as an extension of the office wall system.',
+  },
+  {
+    heading: 'Patching and making good',
+    body: 'Removed signage, old fixings, previous partition lines and cable penetrations all have to be made good before coating, and on a floor that has had several tenancies this is often the largest preparation item.',
+  },
+  {
+    heading: 'Make-good at lease end',
+    body: 'A make-good scope is written against the lease, not against taste. Establishing exactly what the lease requires before quoting prevents both over-scoping and a failed handover inspection.',
+  },
+];
+
 export default function OfficePaintersPage() {
   return (
     <>
@@ -37,6 +85,7 @@ export default function OfficePaintersPage() {
           path: '/office-painters/',
         })}
       />
+      <JsonLd data={faqSchema(officeFaqs)} />
 
       <Hero
         eyebrow="Commercial painting"
@@ -74,7 +123,7 @@ export default function OfficePaintersPage() {
             </p>
           </Prose>
           <div>
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-label text-ink-muted">
               Includes
             </h3>
             <ul className="flex flex-col gap-2 text-sm text-ink-soft">
@@ -99,6 +148,29 @@ export default function OfficePaintersPage() {
           </Container>
         </Section>
       )}
+
+      <ContentBlock tone="sunken" heading="What an office repaint has to work around">
+        <Prose>
+          {AROUND.map((paragraph) => (
+            <p key={paragraph.slice(0, 48)}>{paragraph}</p>
+          ))}
+        </Prose>
+      </ContentBlock>
+
+      <ContentBlock heading="The surfaces in an office fit-out">
+        <Prose className="mb-8">
+          <p>
+            An office is not one surface repeated. These take different systems and different
+            amounts of preparation time, and a quote that treats them as one number is hiding
+            something.
+          </p>
+        </Prose>
+        <FeatureGrid items={OFFICE_SURFACES} />
+      </ContentBlock>
+
+      <ContentBlock tone="sunken" heading="Office painting questions">
+        <FaqList items={officeFaqs} />
+      </ContentBlock>
 
       <CtaBand
         heading="Repainting your workplace?"

@@ -4,8 +4,11 @@ import {
   localBusinessSchema,
   organizationSchema,
   projectSchema,
+  serviceSchema,
 } from '@/lib/schema';
 import { getProject } from '@/content/projects';
+import { locations } from '@/content/locations';
+import { site } from '@/lib/site';
 
 describe('structured data', () => {
   it('never emits an aggregateRating', () => {
@@ -29,6 +32,54 @@ describe('structured data', () => {
   it('scopes the service area to Melbourne', () => {
     expect(JSON.stringify(localBusinessSchema())).toContain('Melbourne');
     expect(JSON.stringify(localBusinessSchema())).not.toMatch(/Australia[- ]wide|nationwide/i);
+  });
+
+  it('declares the specific trade, not just the parent category', () => {
+    // "HomeAndConstructionBusiness" also covers plumbers and roofers. The
+    // painting-specific type is what makes the entity unambiguous.
+    expect(localBusinessSchema()['@type']).toContain('HousePainter');
+  });
+
+  it('names every suburb it publishes a page for in areaServed', () => {
+    const served = JSON.stringify(localBusinessSchema().areaServed);
+    // "painters <suburb>" is the query a local trade can actually win, so
+    // each suburb has to appear as its own served area rather than being
+    // flattened into a single "Melbourne" node.
+    for (const location of locations) {
+      expect(served).toContain(location.suburb);
+    }
+    expect(served).toContain('Victoria');
+  });
+
+  it('omits geo, hours and Google Business Profile until they are confirmed', () => {
+    // These three are the highest-value local signals on the site, which is
+    // exactly why a guessed value is dangerous: a wrong latitude moves the
+    // business, invented hours tell people to call an empty office, and a
+    // wrong sameAs claims an entity APMG does not own. Structure ships now,
+    // values ship when APMG supplies them.
+    const schema = localBusinessSchema();
+
+    expect(site.coords).toBeNull();
+    expect(site.openingHours).toBeNull();
+    expect(site.social.google).toBeNull();
+
+    expect(schema.geo).toBeUndefined();
+    expect(schema.openingHoursSpecification).toBeUndefined();
+    expect(JSON.stringify(schema.areaServed)).not.toContain('GeoCircle');
+    expect(schema.sameAs).not.toContain(null);
+  });
+
+  it('offers the same service area on a service as on the business', () => {
+    // A service page claiming a narrower area than the business is a
+    // contradiction, and Google resolves it against you.
+    const service = serviceSchema({
+      name: 'Interior painting',
+      description: 'Interior work in occupied spaces.',
+      path: '/commercial/',
+    });
+    expect(JSON.stringify(service.areaServed)).toEqual(
+      JSON.stringify(localBusinessSchema().areaServed),
+    );
   });
 
   it('numbers breadcrumb positions from one, in order', () => {

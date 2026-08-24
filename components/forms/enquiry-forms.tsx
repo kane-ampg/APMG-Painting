@@ -5,8 +5,15 @@ import { useFormStatus } from 'react-dom';
 import { submitEnquiry } from '@/app/actions/enquiry';
 import { initialEnquiryState } from '@/lib/enquiry/state';
 import { CheckboxField, Honeypot, SelectField, TextAreaField, TextField } from './fields';
+import { FormStatus } from './form-status';
+import {
+  COMMERCIAL_PROPERTY_TYPES,
+  COMMERCIAL_TIMEFRAMES,
+  RESIDENTIAL_PROPERTY_TYPES,
+  RESIDENTIAL_TIMEFRAMES,
+  RESIDENTIAL_WORK_TYPES,
+} from '@/lib/enquiry/options';
 import { Button } from '@/components/ui';
-import { site } from '@/lib/site';
 
 /**
  * Both enquiry forms.
@@ -47,67 +54,6 @@ function SubmitButton({ children }: { children: string }) {
     </Button>
   );
 }
-
-function FormStatus({
-  status,
-  message,
-  delivered,
-}: {
-  status: 'idle' | 'success' | 'error';
-  message?: string;
-  delivered?: boolean;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (status !== 'idle') ref.current?.focus();
-  }, [status]);
-
-  if (status === 'idle') return null;
-
-  const isSuccess = status === 'success';
-
-  return (
-    <div
-      ref={ref}
-      tabIndex={-1}
-      role="status"
-      aria-live="polite"
-      className={
-        isSuccess
-          ? 'rounded-md border border-brand-400 bg-brand-50 p-4 text-sm text-brand-900'
-          : 'rounded-md border border-red-700 bg-red-50 p-4 text-sm text-red-900'
-      }
-    >
-      {isSuccess && !delivered ? (
-        <>
-          <p className="font-semibold">Your details passed validation — but were not sent.</p>
-          <p className="mt-1">
-            This is a preview build with no mail delivery configured, so nobody has received this.
-            Please call {site.phone.display} to reach the team.
-          </p>
-        </>
-      ) : (
-        <p>{message}</p>
-      )}
-    </div>
-  );
-}
-
-const TIMEFRAMES_RESIDENTIAL = [
-  { value: 'asap', label: 'As soon as possible' },
-  { value: '1-3-months', label: 'Within 1–3 months' },
-  { value: '3-plus-months', label: 'More than 3 months away' },
-  { value: 'planning', label: 'Still planning' },
-] as const;
-
-const TIMEFRAMES_COMMERCIAL = [
-  { value: 'asap', label: 'As soon as possible' },
-  { value: '1-3-months', label: 'Within 1–3 months' },
-  { value: '3-plus-months', label: 'More than 3 months away' },
-  { value: 'planning', label: 'Still planning' },
-  { value: 'tender', label: 'Going to tender' },
-] as const;
 
 /* ------------------------------------------------------------------ */
 /* Residential                                                          */
@@ -153,22 +99,13 @@ export function ResidentialEnquiryForm() {
           label="Property type"
           name="propertyType"
           errors={state.errors?.propertyType}
-          options={[
-            { value: 'house', label: 'House' },
-            { value: 'apartment', label: 'Apartment' },
-            { value: 'townhouse', label: 'Townhouse' },
-            { value: 'other', label: 'Something else' },
-          ]}
+          options={RESIDENTIAL_PROPERTY_TYPES}
         />
         <SelectField
           label="What needs painting?"
           name="workType"
           errors={state.errors?.workType}
-          options={[
-            { value: 'interior', label: 'Interior' },
-            { value: 'exterior', label: 'Exterior' },
-            { value: 'both', label: 'Both' },
-          ]}
+          options={RESIDENTIAL_WORK_TYPES}
         />
       </div>
 
@@ -176,7 +113,7 @@ export function ResidentialEnquiryForm() {
         label="Approximate timeframe"
         name="timeframe"
         errors={state.errors?.timeframe}
-        options={TIMEFRAMES_RESIDENTIAL}
+        options={RESIDENTIAL_TIMEFRAMES}
       />
 
       <TextAreaField
@@ -240,18 +177,7 @@ export function CommercialEnquiryForm() {
           label="Property or sector type"
           name="propertyType"
           errors={state.errors?.propertyType}
-          options={[
-            { value: 'education-and-childcare', label: 'School or childcare' },
-            { value: 'healthcare', label: 'Healthcare or medical' },
-            { value: 'aged-care-and-retirement', label: 'Aged care or retirement living' },
-            { value: 'body-corporate-and-strata', label: 'Body corporate or strata' },
-            { value: 'retail', label: 'Retail' },
-            { value: 'hospitality', label: 'Hospitality or venue' },
-            { value: 'leisure-and-sports', label: 'Leisure or sports facility' },
-            { value: 'industrial', label: 'Industrial or warehouse' },
-            { value: 'office', label: 'Office' },
-            { value: 'other', label: 'Something else' },
-          ]}
+          options={COMMERCIAL_PROPERTY_TYPES}
         />
         <TextField
           label="Project location"
@@ -272,7 +198,7 @@ export function CommercialEnquiryForm() {
         label="Desired timeframe"
         name="timeframe"
         errors={state.errors?.timeframe}
-        options={TIMEFRAMES_COMMERCIAL}
+        options={COMMERCIAL_TIMEFRAMES}
       />
 
       <TextAreaField

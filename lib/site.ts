@@ -57,9 +57,45 @@ export const site = {
     radiusKm: 60,
   },
 
+  /**
+   * Geographic coordinates of the Chirnside Park base.
+   *
+   * Null until APMG confirms them. A service-area business is ranked partly on
+   * a `GeoCircle` built from this point plus `serviceArea.radiusKm`, so this is
+   * the single highest-value missing local signal — but a guessed latitude is
+   * worse than none, because it moves the entity to a place APMG does not
+   * work from. Geocode the published street address and paste the result.
+   */
+  coords: null as { latitude: number; longitude: number } | null,
+
+  /**
+   * Trading hours, as `openingHoursSpecification` entries.
+   *
+   * Null until APMG confirms them. The live site states none. Emitted into
+   * LocalBusiness schema only when populated — inventing hours produces a rich
+   * result that tells people to call when nobody is there.
+   */
+  openingHours: null as
+    | readonly {
+        days: readonly string[];
+        opens: string;
+        closes: string;
+      }[]
+    | null,
+
   social: {
     instagram: 'https://www.instagram.com/apmgpainting/',
     facebook: 'https://www.facebook.com/apmgpainting/',
+    /**
+     * Google Business Profile.
+     *
+     * Null until APMG supplies the profile URL. For a local trade business
+     * this is the largest single ranking asset there is, and `sameAs` is how
+     * the site tells Google that this entity and that profile are the same
+     * business. Nothing else in this file matters as much for map-pack
+     * visibility.
+     */
+    google: null as string | null,
   },
 } as const;
 

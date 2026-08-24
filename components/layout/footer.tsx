@@ -1,6 +1,7 @@
-import Link from 'next/link';
+import Image from 'next/image';
 import { Container } from '@/components/ui';
 import { footerNav } from '@/components/navigation/nav-data';
+import { FooterNavList } from '@/components/navigation/footer-nav-list';
 import { formattedAddress, site } from '@/lib/site';
 
 function FooterColumn({
@@ -12,21 +13,10 @@ function FooterColumn({
 }) {
   return (
     <div>
-      <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-white/60">
+      <h2 className="mb-4 text-xs font-semibold uppercase tracking-label text-white/60">
         {heading}
       </h2>
-      <ul className="flex flex-col gap-2.5">
-        {links.map((link) => (
-          <li key={link.href}>
-            <Link
-              href={link.href}
-              className="rounded text-sm text-white/85 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
-            >
-              {link.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <FooterNavList links={links} />
     </div>
   );
 }
@@ -36,18 +26,18 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-ink text-white">
+    <footer className="border-t-4 border-brand-600 bg-ink text-white">
       <Container width="wide">
         <div className="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <div className="mb-4 flex flex-col">
-              <span className="font-display text-xl font-bold leading-none tracking-tight">
-                APMG
-              </span>
-              <span className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-white/60">
-                Painting
-              </span>
-            </div>
+            {/* The white original, on the ink ground it was drawn for. */}
+            <Image
+              src="/images/brand/apmg-logo-white.webp"
+              alt="APMG Painting"
+              width={378}
+              height={285}
+              className="mb-5 h-16 w-auto"
+            />
             <address className="text-sm not-italic leading-relaxed text-white/85">
               {formattedAddress}
               <br />

@@ -277,7 +277,11 @@ Four independent layers, so no single mistake exposes the site.
 1. `NEXT_PUBLIC_SANDBOX` defaults to **on**. Live requires explicitly setting it to the string `"false"`.
 2. `robots.txt` returns `User-agent: * / Disallow: /`, no sitemap reference.
 3. `<meta name="robots" content="noindex, nofollow">` on every page.
-4. **`X-Robots-Tag: noindex, nofollow` response header** set in middleware. Site 2 does not have this. It is the only layer that covers non-HTML responses — images, the OG image route, `llms.txt`, any PDF.
+4. **`X-Robots-Tag: noindex, nofollow` response header.** It is the only layer that covers non-HTML responses — images, the OG image route, `llms.txt`, any PDF.
+
+   Site 2 already sets this in `next.config.ts` `headers()`, but **unconditionally**. That is worse than not having it: at go-live, setting `NEXT_PUBLIC_SANDBOX="false"` would switch off layers 2 and 3 while this header kept returning `noindex` — and a header-level `noindex` overrides everything. The site would be launched and permanently unindexable, with no visible symptom on the page itself.
+
+   This build makes the header conditional on the same `isSandbox` value as the other three layers, so all four switch together. A test asserts the header is **absent** when `NEXT_PUBLIC_SANDBOX="false"`.
 
 Plus, operationally: Vercel deployment protection on, sitemap never submitted to Search Console, and no external link pointed at the preview.
 
@@ -296,6 +300,7 @@ Site 1's `/robots.txt` and every sitemap endpoint return HTTP 500, so Google cur
 | Internal linking | Suburb pages orphaned | Suburb → region → state → sector matrix |
 | Structured data | Inconsistent | Typed, evidence-gated |
 | Business name | Rendered 4 ways + one typo ("AMPG") | Single source in `lib/site.ts` |
+| Go-live switch | n/a | All four noindex layers keyed to one value, tested in both states |
 | Service area claim | "throughout Australia" once | Explicit, evidenced |
 | `llms.txt` | Absent | Present, extended to the region model |
 
@@ -314,7 +319,7 @@ Site 1's `/robots.txt` and every sitemap endpoint return HTTP 500, so Google cur
 | Unit | Haversine, nearest-anchor assignment, region rules, bearing split, tier assignment, slug generation, neighbour selection |
 | Data | Every locality has exactly one URL; no duplicate slugs; every suburb resolves to a real region; sanity check fires on a seeded bad record |
 | Schema | Valid JSON-LD; no `AggregateRating`; no second `LocalBusiness` while `qldPresence` is false |
-| Sandbox | All four lockdown layers active when unset; sitemap excludes noindex URLs |
+| Sandbox | All four lockdown layers active when `NEXT_PUBLIC_SANDBOX` is unset; **all four absent when it is `"false"`**; sitemap excludes noindex URLs |
 | Copy | No QLD page contains "based in", "our Brisbane", "local to" |
 | E2E | Suburb → region → state → sector navigation; enquiry form; 404 |
 | Build | 1,516 static pages generate; build time recorded |
