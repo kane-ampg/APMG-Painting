@@ -13,3 +13,6 @@ next-env.d.ts
 /blob-report
 /playwright/.cache
 tsconfig.tsbuildinfo
+
+# Local tool cache — machine-specific absolute paths and session ids.
+.impeccable/
