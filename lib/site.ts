@@ -167,13 +167,38 @@ export const formattedAddress = [
 ].join(', ');
 
 /**
- * Canonical origin. Falls back to localhost so builds never emit a wrong
- * absolute URL by accident.
+ * Canonical origin, resolved in priority order.
+ *
+ * Vercel injects a declared-but-unset variable as an empty string, so a `??`
+ * fallback is not enough here: an empty value has to be treated as absent, or
+ * `new URL('')` throws during the metadata collection pass and fails the build.
  */
-export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(
-  /\/$/,
-  '',
-);
+function normaliseOrigin(value: string | undefined): string | undefined {
+  const trimmed = value?.trim();
+  if (!trimmed) return undefined;
+
+  // Vercel's system host vars arrive bare (`apmg-painting.vercel.app`), and a
+  // hand-entered domain usually does too. Assume https rather than reject it.
+  const withProtocol = /^https?:\/\//.test(trimmed) ? trimmed : `https://${trimmed}`;
+
+  try {
+    return new URL(withProtocol).href.replace(/\/$/, '');
+  } catch {
+    return undefined;
+  }
+}
+
+export const siteUrl =
+  normaliseOrigin(process.env.NEXT_PUBLIC_SITE_URL) ??
+  // No explicit origin on Vercel: use the stable production domain in
+  // production and the per-deployment host everywhere else, so preview builds
+  // never advertise production URLs in their sitemap, canonicals or JSON-LD.
+  normaliseOrigin(
+    process.env.VERCEL_ENV === 'production'
+      ? process.env.VERCEL_PROJECT_PRODUCTION_URL
+      : process.env.VERCEL_URL,
+  ) ??
+  'http://localhost:3000';
 
 /** Sandbox guard — defaults to ON so the mock-up cannot be indexed. */
 export const isSandbox = process.env.NEXT_PUBLIC_SANDBOX !== 'false';
