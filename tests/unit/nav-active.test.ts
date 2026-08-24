@@ -32,15 +32,41 @@ describe('isCurrentPage', () => {
 });
 
 describe('isSamePath', () => {
-  it('spots the overview child that repeats its own section', () => {
-    // Every dropdown opens with a link back to the page the trigger points at.
-    // Both cannot announce themselves as the current page.
-    for (const item of mainNav) {
-      const overview = item.children?.filter((child) => isSamePath(child.href, item.href)) ?? [];
-      expect(overview.length).toBeLessThanOrEqual(1);
-    }
+  it('ignores trailing slashes and in-page anchors', () => {
     expect(isSamePath('/commercial', '/commercial/')).toBe(true);
+    expect(isSamePath('/residential-painting/#interior', '/residential-painting/')).toBe(true);
     expect(isSamePath('/commercial/', '/office-painters/')).toBe(false);
+  });
+});
+
+/**
+ * The rule the two menus implement: a child link announces itself only if it is
+ * the current page *and* is not simply repeating the section trigger above it.
+ * Every dropdown opens with an "Overview" link back to its own section, so
+ * without the second half both would claim to be the current page.
+ */
+function announcedCount(pathname: string): number {
+  let count = 0;
+  for (const item of mainNav) {
+    if (navActiveState(pathname, item) === 'page') count += 1;
+    for (const child of item.children ?? []) {
+      if (isCurrentPage(pathname, child.href) && !isSamePath(child.href, item.href)) count += 1;
+    }
+  }
+  return count;
+}
+
+describe('aria-current across the whole menu', () => {
+  it('announces exactly one current page, dropdowns included', () => {
+    const everyDestination = mainNav.flatMap((item) => [
+      item.href,
+      ...(item.children ?? []).map((child) => child.href),
+    ]);
+
+    for (const href of everyDestination) {
+      // Anchors are not destinations of their own; they land on their section.
+      expect(announcedCount(href), `on ${href}`).toBe(1);
+    }
   });
 });
 

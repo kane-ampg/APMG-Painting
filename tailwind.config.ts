@@ -95,12 +95,31 @@ const config: Config = {
           from: { transform: 'translateY(100%)' },
           to: { transform: 'translateY(0)' },
         },
+        /*
+         * Navigation drawer. Same reasoning as the sheet above — it enters
+         * from the edge it is anchored to, so the movement explains where the
+         * panel came from and where "close" will send it back to.
+         *
+         * Slightly longer than the chat's transitions: this one crosses most
+         * of the screen rather than a few pixels, and the same duration over a
+         * much greater distance reads as a snap.
+         */
+        'drawer-in': {
+          from: { transform: 'translateX(100%)' },
+          to: { transform: 'translateX(0)' },
+        },
+        'scrim-in': {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
       },
       animation: {
         'turn-in': 'turn-in 220ms cubic-bezier(0.16, 1, 0.3, 1)',
         'controls-in': 'controls-in 200ms cubic-bezier(0.16, 1, 0.3, 1)',
         'panel-in': 'panel-in 220ms cubic-bezier(0.16, 1, 0.3, 1)',
         'sheet-in': 'sheet-in 260ms cubic-bezier(0.16, 1, 0.3, 1)',
+        'drawer-in': 'drawer-in 300ms cubic-bezier(0.16, 1, 0.3, 1)',
+        'scrim-in': 'scrim-in 220ms ease-out',
       },
       /*
        * Corners.

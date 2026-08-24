@@ -43,6 +43,54 @@ test.describe('navigation', () => {
     await expect(trigger).toHaveAttribute('aria-expanded', 'false');
   });
 
+  test('the mobile menu is a full-height sidebar, not a strip', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'Mobile drawer only renders below the lg breakpoint.');
+
+    /*
+     * A measured regression test, because the queries above cannot catch this.
+     *
+     * The header carries `backdrop-blur`, and a `backdrop-filter` makes an
+     * element a containing block for `position: fixed` descendants. Rendered
+     * inside the header, the drawer's `inset-y-0` resolved against the header
+     * instead of the viewport and the panel collapsed to a 64px strip — every
+     * link still in the DOM, still with a bounding box, still "visible" to a
+     * role query, but scrolled out of sight inside an overflow container. The
+     * suite stayed green while the menu was unusable on every phone.
+     *
+     * Only the geometry tells the truth, so the geometry is what is asserted.
+     */
+    await page.goto('/');
+    await page.getByRole('button', { name: /menu/i }).click();
+
+    const drawer = page.getByRole('dialog', { name: 'Site menu' });
+    await drawer.waitFor({ state: 'visible' });
+
+    // Measure the settled panel. The drawer slides in over 300ms, and reading
+    // its box mid-flight measures the animation rather than the layout.
+    await page.waitForFunction(() => {
+      const panel = document.querySelector('[role="dialog"]');
+      return Boolean(panel) && panel!.getAnimations().every((a) => a.playState === 'finished');
+    });
+
+    const box = await drawer.boundingBox();
+    const viewport = page.viewportSize();
+    expect(box).not.toBeNull();
+    expect(viewport).not.toBeNull();
+    if (!box || !viewport) return;
+
+    // Full height, anchored to the right edge.
+    expect(box.height).toBeGreaterThanOrEqual(viewport.height - 1);
+    expect(Math.round(box.x + box.width)).toBe(viewport.width);
+
+    // A sidebar, not a page swap: some of the page must remain behind it.
+    expect(box.width).toBeLessThan(viewport.width);
+    expect(box.x).toBeGreaterThan(0);
+
+    // The last thing in the drawer has to be reachable without the panel
+    // clipping it — the failure mode that hid every link before.
+    await expect(drawer.getByRole('link', { name: /request a free quote/i })).toBeInViewport();
+  });
+
   test('reaches the commercial page and it targets the commercial query', async ({ page }) => {
     await page.goto('/commercial/');
     await expect(page).toHaveTitle(/Commercial Painters Melbourne/i);
