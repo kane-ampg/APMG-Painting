@@ -9,6 +9,18 @@ type BuildMetadataArgs = {
   /** Set false for pages that must not be indexed (weak location pages). */
   index?: boolean;
   /**
+   * Crawl-the-links directive, deliberately independent of `index`.
+   *
+   * These were one flag until it was noticed that it shipped `nofollow` on
+   * every noindex page. The 1,424 Tier 3 suburb pages are noindex *so that*
+   * they can still be crawled and pass equity up to the 22 region hubs — that
+   * is the entire argument for generating them. `nofollow` turns them into
+   * dead ends and deletes the internal-link architecture the plan rests on.
+   *
+   * Almost nothing should set this. The sandbox lockdown overrides it anyway.
+   */
+  follow?: boolean;
+  /**
    * Overrides the generated card. Leave unset: app/opengraph-image.tsx renders
    * the default one at build time. The previous default pointed at
    * /images/og/apmg-default.jpg, which does not exist, so every shared link
@@ -30,12 +42,17 @@ export function buildMetadata({
   description,
   path,
   index = true,
+  follow = true,
   ogImage,
 }: BuildMetadataArgs): Metadata {
   const url = `${siteUrl}${path}`;
 
-  // The sandbox is never indexable, whatever the page asks for.
+  // The sandbox is never indexable or crawlable, whatever the page asks for —
+  // this is layer 3 of the lockdown and it must stay all-or-nothing. Off the
+  // sandbox the two directives are independent: an indexable page is
+  // `index, follow`, a Tier 3 page is `noindex, follow`.
   const shouldIndex = index && !isSandbox;
+  const shouldFollow = follow && !isSandbox;
 
   return {
     // `absolute` opts out of the root layout's `%s | APMG Painting`
@@ -46,8 +63,8 @@ export function buildMetadata({
     alternates: { canonical: url },
     robots: {
       index: shouldIndex,
-      follow: shouldIndex,
-      googleBot: { index: shouldIndex, follow: shouldIndex },
+      follow: shouldFollow,
+      googleBot: { index: shouldIndex, follow: shouldFollow },
     },
     openGraph: {
       type: 'website',

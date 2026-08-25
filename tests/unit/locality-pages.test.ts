@@ -1,5 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { allLocalities, indexableLocalities, regionsInState } from '@/lib/locations';
+import { NearbySuburbs } from '@/components/sections/locality';
 import { generateStaticParams as suburbParams } from '@/app/areas/[state]/[region]/[suburb]/page';
 import { generateStaticParams as regionParams } from '@/app/areas/[state]/[region]/page';
 import { generateStaticParams as stateParams } from '@/app/areas/[state]/page';
@@ -62,5 +65,94 @@ describe('the page count the spec commits to', () => {
     const pages = suburbParams().length + regionParams().length + stateParams().length + 1;
     expect(pages).toBe(1465);
     expect(indexableLocalities().length + 22 + 2 + 1).toBe(41);
+  });
+});
+
+/**
+ * Robots directives.
+ *
+ * `noindex, follow` is the whole basis for generating 1,440 pages instead of
+ * 41: the Tier 3 pages are kept out of the index but stay crawlable, so the
+ * links out of them carry equity up to the 22 region hubs. `buildMetadata`
+ * originally derived `follow` from `index`, which quietly shipped
+ * `noindex, nofollow` on all 1,424 of them and made every one a dead end.
+ *
+ * The sandbox case is asserted alongside it because the fix must not punch a
+ * hole in layer 3 of the lockdown: while sandboxed, everything stays
+ * `noindex, nofollow` whatever the page asks for.
+ */
+type Robots = { index: boolean; follow: boolean };
+
+async function robotsFor(href: string, sandbox: 'true' | 'false'): Promise<Robots> {
+  vi.resetModules();
+  const previous = process.env.NEXT_PUBLIC_SANDBOX;
+  process.env.NEXT_PUBLIC_SANDBOX = sandbox;
+
+  try {
+    const page = await import('@/app/areas/[state]/[region]/[suburb]/page');
+    const [, , state = '', region = '', suburb = ''] = href.split('/');
+    const meta = await page.generateMetadata({
+      params: Promise.resolve({ state, region, suburb }),
+    });
+    return meta.robots as Robots;
+  } finally {
+    if (previous === undefined) delete process.env.NEXT_PUBLIC_SANDBOX;
+    else process.env.NEXT_PUBLIC_SANDBOX = previous;
+  }
+}
+
+afterEach(() => {
+  vi.resetModules();
+});
+
+describe('suburb page robots directives', () => {
+  const indexable = indexableLocalities()[0];
+  const tier3 = allLocalities().find((l) => !l.indexable);
+
+  it('has both a Tier 1 and a Tier 3 page to test', () => {
+    expect(indexable).toBeDefined();
+    expect(tier3).toBeDefined();
+  });
+
+  it('leaves a Tier 3 page crawlable at launch — noindex, follow', async () => {
+    await expect(robotsFor(tier3!.href, 'false')).resolves.toEqual(
+      expect.objectContaining({ index: false, follow: true }),
+    );
+  });
+
+  it('indexes and follows a Tier 1 page at launch', async () => {
+    await expect(robotsFor(indexable!.href, 'false')).resolves.toEqual(
+      expect.objectContaining({ index: true, follow: true }),
+    );
+  });
+
+  it('holds both shut while sandboxed, whatever the page asks for', async () => {
+    await expect(robotsFor(tier3!.href, 'true')).resolves.toEqual(
+      expect.objectContaining({ index: false, follow: false }),
+    );
+    await expect(robotsFor(indexable!.href, 'true')).resolves.toEqual(
+      expect.objectContaining({ index: false, follow: false }),
+    );
+  });
+});
+
+/**
+ * The nearby-suburbs slot.
+ *
+ * All 209 rural-fringe localities carry an empty `neighbourHrefs` — they are
+ * held out of neighbour lists on purpose — so the block used to return null
+ * and leave a hole where one of the six facts spec §8 requires should be.
+ */
+describe('the nearby-suburbs slot', () => {
+  it('has fringe localities with no neighbours at all, so the branch is real', () => {
+    expect(allLocalities().filter((l) => l.neighbourHrefs.length === 0)).toHaveLength(209);
+  });
+
+  it('renders something with a link on every suburb page', () => {
+    for (const locality of allLocalities()) {
+      const html = renderToStaticMarkup(createElement(NearbySuburbs, { locality }));
+      expect(html, locality.href).toContain('<a ');
+      expect(html.length, locality.href).toBeGreaterThan(100);
+    }
   });
 });

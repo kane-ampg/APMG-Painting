@@ -161,7 +161,11 @@ export default async function StatePage({ params }: Props) {
 
       <CtaBand
         heading={vic ? 'Painting in Victoria?' : 'Painting in Queensland?'}
-        body="Tell us what needs doing and we will come and look."
+        body={
+          vic
+            ? 'Tell us what needs doing and we will come and look.'
+            : 'Tell us about the site and we will tell you how we would approach it.'
+        }
         cta={{ label: 'Get in touch', href: '/contact-us/' }}
       />
     </>

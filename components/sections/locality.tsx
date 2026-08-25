@@ -39,8 +39,18 @@ export function driveBand(distanceKm: number): string {
   return 'over an hour';
 }
 
-function anchorLabel(anchorKey: string): string {
-  return ANCHORS.find((a) => a.key === anchorKey)?.label ?? 'Melbourne';
+/**
+ * The reference point a locality's `distanceKm` was measured from.
+ *
+ * The fallback is state-correct rather than convenient: every generated
+ * locality carries an in-radius anchor key, but if a hand-edit ever broke that
+ * a bare `?? 'Melbourne'` would print "…from Melbourne" on a Brisbane page,
+ * which is a fabricated fact rather than a vague one.
+ */
+function anchorLabel(locality: Locality): string {
+  const anchor = ANCHORS.find((a) => a.key === locality.anchorKey);
+  if (anchor) return anchor.label;
+  return locality.state === 'VIC' ? 'Melbourne' : 'Brisbane';
 }
 
 /** Whole kilometres above 10, one decimal below — 0.4km is a fact, 23.4km is noise. */
@@ -110,7 +120,7 @@ const factLink =
 
 /** Region, council, postcode and the distance band — the page's quick facts. */
 export function LocalityFacts({ locality }: { locality: Locality }) {
-  const label = anchorLabel(locality.anchorKey);
+  const label = anchorLabel(locality);
   const band = driveBand(locality.distanceKm);
   const state = locality.state === 'VIC' ? 'victoria' : 'queensland';
 
@@ -192,13 +202,45 @@ export function NearestProjectBlock({ locality }: { locality: Locality }) {
   );
 }
 
-/** The six nearest localities, as links. Traversable from noindex pages too. */
+/**
+ * The six nearest localities, as links. Traversable from noindex pages too.
+ *
+ * The 209 rural-fringe localities carry no neighbours at all — they are held
+ * out of every neighbour list on purpose, because a farm township is not a
+ * neighbouring suburb in any sense a facilities manager would use the word.
+ * Returning null there left a hole in one of the six facts spec §8 requires on
+ * every suburb page, so the slot now says what is true of those places instead
+ * and points at the region hub, which is the genuinely useful nearby link.
+ */
 export function NearbySuburbs({ locality }: { locality: Locality }) {
   const neighbours = locality.neighbourHrefs
     .map((href) => getLocalityByHref(href))
     .filter((l): l is Locality => l !== undefined);
 
-  if (neighbours.length === 0) return null;
+  const name = displayName(locality.name);
+  const region = getRegion(locality.regionSlug);
+  const regionHref = `/areas/${locality.state === 'VIC' ? 'victoria' : 'queensland'}/${locality.regionSlug}/`;
+
+  if (neighbours.length === 0) {
+    return (
+      <div>
+        <SectionHeading className="mb-4">Nearby</SectionHeading>
+        <div className="max-w-prose space-y-4 text-ink-soft">
+          <p>
+            {name} has no adjoining suburb — what surrounds it is farmland and township, which is
+            what makes travel and mobilisation a real share of the cost of a job out here, and why a
+            rural site cannot be assumed to have hardstand for a lift or three-phase power.
+          </p>
+          <p>
+            <Link href={regionHref} className={factLink}>
+              {region?.name ?? locality.regionSlug}
+            </Link>{' '}
+            is the wider area {name} sits in, and lists every locality covered.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

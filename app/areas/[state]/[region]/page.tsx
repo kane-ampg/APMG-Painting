@@ -171,7 +171,11 @@ export default async function RegionPage({ params }: Props) {
 
       <CtaBand
         heading={`Painting in ${regionDef.name}?`}
-        body="Tell us what needs doing and we will come and look."
+        body={
+          vic
+            ? 'Tell us what needs doing and we will come and look.'
+            : 'Tell us about the site and we will tell you how we would approach it.'
+        }
         cta={{ label: 'Get in touch', href: '/contact-us/' }}
       />
     </>
