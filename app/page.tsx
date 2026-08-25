@@ -23,6 +23,7 @@ import { faqSchema } from '@/lib/schema';
 import { homeFaqs } from '@/content/faqs';
 import { locations } from '@/content/locations';
 import { featuredProjects, getProject } from '@/content/projects';
+import { googleAggregate } from '@/content/reviews';
 import { sectors } from '@/content/sectors';
 import { services } from '@/content/services';
 import { isPlaceholder } from '@/lib/content/types';
@@ -132,7 +133,10 @@ export default function HomePage() {
         secondaryCta={{ label: 'See our projects', href: '/projects/' }}
         proof={[
           { figure: `${yearsTrading} years`, label: 'In business' },
-          { figure: '~30 years', label: 'Combined experience' },
+          {
+            figure: `${googleAggregate.rating.toFixed(1)} on Google`,
+            label: `From ${googleAggregate.count} reviews`,
+          },
           { figure: 'Cm3', label: 'OHS prequalified' },
         ]}
         poster={{
@@ -152,10 +156,9 @@ export default function HomePage() {
             detail: `${site.legalName} was founded in ${site.founded} and has grown into a painting and property maintenance contractor.`,
           },
           {
-            label: 'Combined experience',
-            figure: '~30 years',
-            detail:
-              'The team’s industry experience, across offices, schools, healthcare and industrial sites.',
+            label: 'Client rating',
+            figure: `${googleAggregate.rating.toFixed(1)} on Google`,
+            detail: `Averaged across ${googleAggregate.count} reviews from schools, healthcare, strata, retail and industrial clients.`,
           },
           {
             label: 'Commercial sectors',
@@ -257,10 +260,10 @@ export default function HomePage() {
       <ContentBlock tone="sunken" heading="About APMG Painting">
         <Prose>
           <p>
-            APMG Painting was founded in {site.founded}. The team brings around 30 years of combined
-            industry experience, and the business has grown into a painting and property maintenance
-            contractor working across schools, healthcare, aged care, strata, retail and industrial
-            sites.
+            APMG Painting was founded in {site.founded} and has grown into a painting and property
+            maintenance contractor working across schools, healthcare, aged care, strata, retail and
+            industrial sites. Those clients rate the work {googleAggregate.rating.toFixed(1)} out of 5
+            across {googleAggregate.count} Google reviews.
           </p>
           <p>
             The approach has not changed much: do the work properly, keep the standard consistent,
