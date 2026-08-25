@@ -49,8 +49,9 @@ export const ANCHORS: readonly Anchor[] = [
  * Nearest in-radius anchor within the same state.
  *
  * State-scoped so a border locality cannot be pulled across, and nearest-wins
- * so overlapping radii (Caboolture sits in both Brisbane's and the Sunshine
- * Coast's) still yield exactly one URL per locality.
+ * so overlapping radii (Brisbane and Southport are 66.6km apart, so their
+ * 40km radii overlap, putting 35 localities inside both) still yield exactly
+ * one URL per locality.
  */
 export function nearestAnchor(
   c: Coords,
