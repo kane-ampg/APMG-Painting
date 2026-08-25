@@ -3,76 +3,128 @@ import Link from 'next/link';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import { CtaBand } from '@/components/sections';
-import { Container, Placeholder, Prose, Section } from '@/components/ui';
-import { locationsByRegion } from '@/content/locations';
+import { Card, Container, Eyebrow, Lede, Prose, Section, SectionHeading } from '@/components/ui';
+import { allLocalities, localitiesInRegion, regionsInState, type StateKey } from '@/lib/locations';
 
 /**
- * Areas hub.
+ * The national hub.
  *
- * This page stays indexable — it is a genuine directory. The individual suburb
- * pages beneath it are indexable only where they carry real evidence, which is
- * decided per record in content/locations.ts, not per route.
+ * Indexable, and now a genuine directory: 1,440 localities across two states,
+ * 22 regions, all reachable from here in at most two clicks. The editorial
+ * placeholder this page used to carry — a caveat that the coverage was a
+ * representative subset pending real data — is gone, because the coverage is
+ * no longer a subset.
  */
 export const metadata: Metadata = buildMetadata({
-  title: 'Areas We Service | Melbourne Painters | APMG Painting',
+  title: 'Areas We Service | Commercial Painters VIC & QLD | APMG Painting',
   description:
-    'APMG Painting works across metropolitan Melbourne from Bayswater North. Suburbs and regions we service, with links to projects completed nearby.',
+    'APMG Painting works across metropolitan Melbourne from Bayswater North and services south-east Queensland. Every region and suburb, with the council notes that shape the work.',
   path: '/areas/',
 });
 
+const STATES: readonly {
+  key: StateKey;
+  name: string;
+  slug: string;
+  blurb: string;
+}[] = [
+  {
+    key: 'VIC',
+    name: 'Victoria',
+    slug: 'victoria',
+    blurb:
+      'Metropolitan Melbourne and the Yarra Valley hinterland, worked from our base at Bayswater North. Every documented project on this site is here.',
+  },
+  {
+    key: 'QLD',
+    name: 'Queensland',
+    slug: 'queensland',
+    blurb:
+      'South-east Queensland, from Noosa to the Gold Coast. APMG Painting services these areas; no Queensland project is documented on this site yet.',
+  },
+];
+
 export default function AreasPage() {
-  const byRegion = locationsByRegion();
+  const localities = allLocalities();
 
   return (
     <>
-      <Section tone="sunken" className="py-10">
+      <Container width="wide">
+        <Breadcrumbs crumbs={[{ name: 'Areas we service', path: '/areas/' }]} />
+      </Container>
+
+      <Section tone="sunken" className="py-10" reveal={false}>
         <Container width="wide">
-          <Breadcrumbs crumbs={[{ name: 'Areas we service', path: '/areas/' }]} />
+          <Eyebrow>Coverage</Eyebrow>
           <h1 className="font-display text-4xl tracking-tight sm:text-5xl">Areas we service</h1>
-          <p className="mt-4 max-w-prose text-lg text-ink-soft">
-            We work across metropolitan Melbourne from our base at Bayswater North.
-          </p>
+          <Lede className="mt-4">
+            {localities.length.toLocaleString('en-AU')} suburbs across{' '}
+            {regionsInState('VIC').length + regionsInState('QLD').length} regions in two states.
+          </Lede>
         </Container>
       </Section>
 
       <Section tone="paper">
         <Container>
-          <Prose className="mb-8">
+          <ul className="mb-14 grid gap-5 md:grid-cols-2">
+            {STATES.map((state) => {
+              const count = localities.filter((l) => l.state === state.key).length;
+              return (
+                <Card
+                  as="li"
+                  key={state.key}
+                  className="gap-3 transition-colors duration-300 focus-within:border-brand-600 hover:border-brand-600 motion-reduce:transition-none"
+                >
+                  <h2 className="font-display text-2xl tracking-tight">
+                    <Link
+                      href={`/areas/${state.slug}/`}
+                      className="rounded before:absolute before:inset-0 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
+                    >
+                      {state.name}
+                    </Link>
+                  </h2>
+                  <p className="text-sm text-ink-soft">{state.blurb}</p>
+                  <p className="mt-auto pt-2 text-xs font-semibold uppercase tracking-label text-ink-muted">
+                    {count.toLocaleString('en-AU')} suburbs · {regionsInState(state.key).length}{' '}
+                    regions
+                  </p>
+                </Card>
+              );
+            })}
+          </ul>
+
+          <Prose className="mb-10">
             <p>
-              Suburb pages only exist here where there is something real to say — a project we
-              completed nearby, photography from it, or a local detail that actually affects the
-              work. Where there is not, the page is not indexed and does not pretend otherwise.
+              Suburb pages exist for every locality in range, but only a small number of them are
+              indexed. A page earns that when it carries something a search engine has not already
+              seen a thousand times — a project completed nearby, photography from it, or a local
+              detail that genuinely affects the work. The rest stay out of the index and link upward
+              to the region hub instead of pretending to be a destination.
             </p>
           </Prose>
 
-          <div className="mb-10">
-            <Placeholder note="this is a representative subset. The full sort of all 68 existing suburb pages into keep / consolidate / noindex / redirect needs APMG's real project list plus Search Console impression data. Neither is available yet, and guessing is not a substitute." />
-          </div>
-
-          <div className="flex flex-col gap-10">
-            {[...byRegion.entries()].map(([region, locations]) => (
-              <div key={region}>
-                <h2 className="mb-4 font-display text-2xl tracking-tight">{region}</h2>
-                <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {locations.map((location) => (
-                    <li key={location.slug}>
-                      <Link
-                        href={`/areas/${location.slug}/`}
-                        className="flex h-full flex-col gap-1 rounded-lg border border-paper-edge bg-white p-4 hover:bg-paper-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
-                      >
-                        <span className="font-semibold text-ink">{location.suburb}</span>
-                        <span className="text-xs text-ink-muted">
-                          {location.projectSlugs.length > 0
-                            ? `${location.projectSlugs.length} project${location.projectSlugs.length === 1 ? '' : 's'} nearby`
-                            : 'No project documented yet'}
-                        </span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+          {STATES.map((state) => (
+            <div key={state.key} className="mb-12 last:mb-0">
+              <SectionHeading className="mb-5 text-2xl sm:text-3xl">
+                {state.name} regions
+              </SectionHeading>
+              <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {regionsInState(state.key).map((region) => (
+                  <li key={region.slug}>
+                    <Link
+                      href={`/areas/${state.slug}/${region.slug}/`}
+                      className="flex h-full flex-col gap-1 rounded-lg border border-paper-edge bg-white p-4 hover:border-brand-600 hover:bg-paper-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
+                    >
+                      <span className="font-semibold text-ink">{region.name}</span>
+                      <span className="text-xs text-ink-muted">
+                        {localitiesInRegion(region.slug).length} suburbs
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </Container>
       </Section>
 

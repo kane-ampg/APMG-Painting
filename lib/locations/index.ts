@@ -114,5 +114,18 @@ export function indexableLocalities(): readonly Locality[] {
   return ALL.filter((l) => l.indexable);
 }
 
+/**
+ * Resolve a bare, un-prefixed slug against Victoria only.
+ *
+ * Bare slugs survive in `content/projects.ts` (`relatedLocationSlugs`), which
+ * predates the two-state dataset. Thirteen slugs exist in both states, so an
+ * unqualified lookup would resolve Brighton to Queensland as readily as to
+ * Victoria; every documented APMG project is Victorian, so Victoria is the
+ * only correct scope for that resolution.
+ */
+export function hrefForVicSlug(slug: string): string | undefined {
+  return ALL.find((l) => l.state === 'VIC' && l.slug === slug)?.href;
+}
+
 export { REGIONS };
 export type { RegionDef, StateKey };
