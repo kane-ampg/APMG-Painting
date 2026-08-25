@@ -144,9 +144,10 @@ Used verbatim. Do not round.
 | Southport       | −27.9680, 153.4000     | 40 km  | 172        |
 | Maroochydore    | −26.6600, 153.0930     | 40 km  | 155        |
 
-Assignment is nearest-anchor **within the same state**, so overlapping radii (Caboolture
-is inside both Brisbane's and the Sunshine Coast's) still yield exactly one URL per
-locality, and no border locality is pulled across the state line.
+Assignment is nearest-anchor **within the same state**, so overlapping radii (Brisbane
+and Southport are 66.6km apart with 40km radii, meaning 35 localities in the Logan/Beenleigh
+corridor fall inside both) still yield exactly one URL per locality, and no border locality
+is pulled across the state line.
 
 ### 6.2 Why the generator is ported rather than rewritten
 

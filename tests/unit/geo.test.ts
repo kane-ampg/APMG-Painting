@@ -87,11 +87,24 @@ describe('nearestAnchor', () => {
     expect(nearestAnchor(BRISBANE_CBD, 'VIC')).toBeNull();
   });
 
-  it('picks the nearer of two overlapping radii', () => {
-    // Caboolture sits inside both Brisbane's and the Sunshine Coast's 40km.
-    const caboolture = { lat: -27.0839, lng: 152.9508 };
-    const result = nearestAnchor(caboolture, 'QLD');
+  /*
+   * Brisbane and Southport are 66.6km apart, so their 40km radii overlap and
+   * 35 localities in the Logan/Beenleigh corridor fall inside both. Nearest
+   * wins, which is what keeps every locality on exactly one URL.
+   *
+   * Both directions are asserted deliberately: a rule that always returned
+   * Brisbane would pass a one-sided test and still be wrong.
+   */
+  it('resolves an overlapping locality to Brisbane when Brisbane is nearer', () => {
+    // Beenleigh — 32.17km from Brisbane, 34.39km from Southport.
+    const result = nearestAnchor({ lat: -27.7130, lng: 153.2020 }, 'QLD');
     expect(result?.anchor.key).toBe('brisbane');
+  });
+
+  it('resolves an overlapping locality to the Gold Coast when Southport is nearer', () => {
+    // Alberton — 39.33km from Brisbane, 27.23km from Southport.
+    const result = nearestAnchor({ lat: -27.765, lng: 153.245 }, 'QLD');
+    expect(result?.anchor.key).toBe('southport');
   });
 
   it('reports the distance it measured', () => {
