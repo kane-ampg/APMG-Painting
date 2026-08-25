@@ -21,3 +21,7 @@ tsconfig.tsbuildinfo
 # The web encodes in public/video/ are generated from it by
 # scripts/encode-hero-video.mjs and are what ship.
 /media/
+
+# Third-party locality dataset. The generated output in content/ is committed
+# instead, so builds are deterministic and offline.
+.cache/
