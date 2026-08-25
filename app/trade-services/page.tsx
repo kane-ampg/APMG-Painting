@@ -68,6 +68,10 @@ export default function TradeServicesPage() {
       />
       <JsonLd data={faqSchema(tradeFaqs)} />
 
+      <Container width="wide">
+        <Breadcrumbs crumbs={[{ name: 'Builders & head contractors', path: '/trade-services/' }]} />
+      </Container>
+
       <Hero
         eyebrow="Builders & head contractors"
         heading="Painting for builders and head contractors"
@@ -79,10 +83,6 @@ export default function TradeServicesPage() {
           alt: 'An APMG painter cutting in above a glazed partition in an open-plan office, working around the fit-out already in place',
         }}
       />
-
-      <Container width="wide">
-        <Breadcrumbs crumbs={[{ name: 'Builders & head contractors', path: '/trade-services/' }]} />
-      </Container>
 
       <ContentBlock heading="Painting on a construction programme">
         <Prose className="mb-8">

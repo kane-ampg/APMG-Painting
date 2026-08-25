@@ -69,14 +69,6 @@ export default async function SectorPage({ params }: Props) {
       />
       <JsonLd data={faqSchema(sector.faqs)} />
 
-      <Hero
-        eyebrow="Commercial painting"
-        heading={sector.title}
-        lede={sector.intro}
-        primaryCta={{ label: 'Request a site assessment', href: '/contact-us/#commercial' }}
-        secondaryCta={{ label: 'All commercial work', href: '/commercial/' }}
-      />
-
       <Container width="wide">
         <Breadcrumbs
           crumbs={[
@@ -85,6 +77,14 @@ export default async function SectorPage({ params }: Props) {
           ]}
         />
       </Container>
+
+      <Hero
+        eyebrow="Commercial painting"
+        heading={sector.title}
+        lede={sector.intro}
+        primaryCta={{ label: 'Request a site assessment', href: '/contact-us/#commercial' }}
+        secondaryCta={{ label: 'All commercial work', href: '/commercial/' }}
+      />
 
       <TrustBar />
 

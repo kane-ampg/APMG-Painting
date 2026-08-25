@@ -87,14 +87,6 @@ export default function OfficePaintersPage() {
       />
       <JsonLd data={faqSchema(officeFaqs)} />
 
-      <Hero
-        eyebrow="Commercial painting"
-        heading="Office painters in Melbourne"
-        lede="Office work is judged on disruption as much as finish. Most programmes run after hours or in staged zones, so desks stay occupied and the business keeps operating."
-        primaryCta={{ label: 'Request a site assessment', href: '/contact-us/#commercial' }}
-        secondaryCta={{ label: 'All commercial work', href: '/commercial/' }}
-      />
-
       <Container width="wide">
         <Breadcrumbs
           crumbs={[
@@ -103,6 +95,14 @@ export default function OfficePaintersPage() {
           ]}
         />
       </Container>
+
+      <Hero
+        eyebrow="Commercial painting"
+        heading="Office painters in Melbourne"
+        lede="Office work is judged on disruption as much as finish. Most programmes run after hours or in staged zones, so desks stay occupied and the business keeps operating."
+        primaryCta={{ label: 'Request a site assessment', href: '/contact-us/#commercial' }}
+        secondaryCta={{ label: 'All commercial work', href: '/commercial/' }}
+      />
 
       <TrustBar />
 

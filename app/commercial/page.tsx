@@ -71,6 +71,10 @@ export default function CommercialPage() {
           neither rich results nor AI answer engines could extract it. */}
       <JsonLd data={faqSchema(faqsFor('commercial'))} />
 
+      <Container width="wide">
+        <Breadcrumbs crumbs={[{ name: 'Commercial painting', path: '/commercial/' }]} />
+      </Container>
+
       <Hero
         eyebrow="Commercial painting"
         heading="Commercial painters in Melbourne"
@@ -82,10 +86,6 @@ export default function CommercialPage() {
           alt: 'An APMG painter working from a boom lift, harnessed, cutting the line between white and green tilt panels on a warehouse elevation',
         }}
       />
-
-      <Container width="wide">
-        <Breadcrumbs crumbs={[{ name: 'Commercial painting', path: '/commercial/' }]} />
-      </Container>
 
       <TrustBar />
 
