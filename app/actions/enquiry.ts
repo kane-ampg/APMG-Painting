@@ -4,11 +4,7 @@ import { headers } from 'next/headers';
 import { checkRateLimit } from '@/lib/enquiry/rate-limit';
 import type { EnquiryState } from '@/lib/enquiry/state';
 import { getEnquiryTransport } from '@/lib/enquiry/transport';
-import {
-  MIN_COMPLETION_SECONDS,
-  commercialEnquirySchema,
-  residentialEnquirySchema,
-} from '@/lib/validation/enquiry';
+import { MIN_COMPLETION_SECONDS, commercialEnquirySchema } from '@/lib/validation/enquiry';
 
 async function clientKey(): Promise<string> {
   const headerList = await headers();
@@ -21,10 +17,7 @@ export async function submitEnquiry(
   _previous: EnquiryState,
   formData: FormData,
 ): Promise<EnquiryState> {
-  const formType = formData.get('formType');
-  const schema = formType === 'commercial' ? commercialEnquirySchema : residentialEnquirySchema;
-
-  const parsed = schema.safeParse(Object.fromEntries(formData));
+  const parsed = commercialEnquirySchema.safeParse(Object.fromEntries(formData));
 
   if (!parsed.success) {
     // Honeypot rejections look identical to validation failures from outside.

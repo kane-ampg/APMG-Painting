@@ -7,13 +7,11 @@ import { submitEnquiry } from '@/app/actions/enquiry';
 import { FormStatus } from '@/components/forms/form-status';
 import { QUOTE_HASH, QUOTE_PATH } from '@/components/navigation/quote-cta';
 import {
-  AUDIENCE_STEP,
   buildEnquiryFormData,
   flows,
   validateField,
   type ChatField,
   type ChatStep,
-  type EnquiryFormType,
 } from '@/lib/enquiry/chat-flow';
 import { QUICK_ANSWERS } from '@/lib/enquiry/chat-faqs';
 import { initialEnquiryState } from '@/lib/enquiry/state';
@@ -48,7 +46,6 @@ export function QuoteChat() {
   const pathname = usePathname();
 
   const [open, setOpen] = useState(false);
-  const [formType, setFormType] = useState<EnquiryFormType | null>(null);
   const [stepIndex, setStepIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -70,9 +67,11 @@ export function QuoteChat() {
    */
   const openedAt = useRef(0);
 
-  const steps: readonly ChatStep[] = formType ? flows[formType].steps : [];
-  const step: ChatStep | undefined = formType ? steps[stepIndex] : AUDIENCE_STEP;
-  const submitted = formType !== null && stepIndex >= steps.length;
+  /** One flow now — the chat opens straight on its first question. */
+  const formType = 'commercial';
+  const steps: readonly ChatStep[] = flows[formType].steps;
+  const step: ChatStep | undefined = steps[stepIndex];
+  const submitted = stepIndex >= steps.length;
 
   /* --- focus ----------------------------------------------------------- */
 
@@ -156,8 +155,6 @@ export function QuoteChat() {
   }
 
   function submit(finalAnswers: Record<string, string>) {
-    if (!formType) return;
-
     setStepIndex(steps.length);
     dispatch(
       buildEnquiryFormData({
@@ -172,13 +169,6 @@ export function QuoteChat() {
   }
 
   function choose(field: ChatField, value: string) {
-    if (field.name === 'formType') {
-      setFormType(value as EnquiryFormType);
-      setStepIndex(0);
-      setAnswers({});
-      setErrors({});
-      return;
-    }
     advanceWith({ [field.name]: value });
   }
 
@@ -198,12 +188,8 @@ export function QuoteChat() {
       setStepIndex(steps.length - 1);
       return;
     }
-    if (stepIndex === 0) {
-      setFormType(null);
-      setAnswers({});
-      return;
-    }
-    setStepIndex(stepIndex - 1);
+    // The first step has nothing before it — the Back control is hidden there.
+    setStepIndex(Math.max(0, stepIndex - 1));
   }
 
   function onStepSubmit(event: FormEvent<HTMLFormElement>) {
@@ -233,41 +219,33 @@ export function QuoteChat() {
 
   /* --- transcript ------------------------------------------------------ */
 
-  const turns: Turn[] = [{ role: 'bot', text: AUDIENCE_STEP.prompt }, ...asked];
+  const turns: Turn[] = [...asked];
 
-  if (formType) {
-    turns.push({ role: 'user', text: optionLabel(AUDIENCE_STEP.fields[0], formType) });
-
-    for (const done of steps.slice(0, stepIndex)) {
-      turns.push({ role: 'bot', text: done.prompt });
-      turns.push({ role: 'user', text: summarise(done, answers) });
-    }
-
-    if (step) turns.push({ role: 'bot', text: step.prompt });
+  for (const done of steps.slice(0, stepIndex)) {
+    turns.push({ role: 'bot', text: done.prompt });
+    turns.push({ role: 'user', text: summarise(done, answers) });
   }
+
+  if (step) turns.push({ role: 'bot', text: step.prompt });
 
   const isChoiceStep = step?.fields.every((f) => f.kind === 'choice' || f.kind === 'confirm');
 
   /**
-   * Progress through the quote itself: the opening turn plus the branch's
-   * steps. Answered FAQs are not questions APMG asked, so they do not count.
-   * Clamped, because once submitted `stepIndex` sits one past the last step.
+   * Progress through the quote. Answered FAQs are not questions APMG asked, so
+   * they do not count. Clamped, because once submitted `stepIndex` sits one
+   * past the last step.
    */
-  const questionCount = formType ? steps.length + 1 : null;
-  const questionNumber = questionCount ? Math.min(stepIndex + 2, questionCount) : 1;
+  const questionCount = steps.length;
+  const questionNumber = Math.min(stepIndex + 1, questionCount);
 
   /**
    * Identity of the current turn. Used as a React key on the controls, so a tap
    * remounts them and replays their entry animation rather than swapping the
    * buttons under the pointer with no transition at all.
    */
-  const turnKey = submitted ? 'submitted' : formType ? `${formType}:${step?.id}` : 'audience';
+  const turnKey = submitted ? 'submitted' : `${formType}:${step?.id}`;
 
-  const subtitle = submitted
-    ? 'Your answers'
-    : questionCount
-      ? `Question ${questionNumber} of ${questionCount}`
-      : 'A few quick questions';
+  const subtitle = submitted ? 'Your answers' : `Question ${questionNumber} of ${questionCount}`;
 
   return (
     <>
@@ -403,9 +381,62 @@ export function QuoteChat() {
                       onChoose={(value) => choose(field, value)}
                     />
                   ))}
-                  {formType ? (
-                    <BackButton onClick={goBack}>Back</BackButton>
+                  {stepIndex === 0 ? (
+                    <QuickQuestions
+                      onAsk={ask}
+                      expanded={questionsOpen}
+                      onExpand={() => setQuestionsOpen(true)}
+                    />
                   ) : (
+                    <BackButton onClick={goBack}>Back</BackButton>
+                  )}
+                </div>
+              ) : step ? (
+                <div className="flex flex-col gap-2">
+                  <form
+                    key={step.id}
+                    onSubmit={onStepSubmit}
+                    className="flex flex-col gap-3"
+                    noValidate
+                  >
+                    {step.fields.map((field, index) => (
+                      <ChatTextField
+                        key={field.name}
+                        field={field}
+                        error={errors[field.name]}
+                        defaultValue={answers[field.name] ?? ''}
+                        autoFocus={index === 0}
+                      />
+                    ))}
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="submit"
+                        className="rounded-md bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 active:scale-95"
+                      >
+                        {stepIndex + 1 >= steps.length ? 'Send enquiry' : 'Next'}
+                      </button>
+
+                      {step.fields.every((field) => field.optional) && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            advanceWith(Object.fromEntries(step.fields.map((f) => [f.name, ''])))
+                          }
+                          className="rounded-md px-3 py-2 text-sm font-semibold text-ink-muted transition hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
+                        >
+                          Skip
+                        </button>
+                      )}
+
+                      {stepIndex > 0 && (
+                        <BackButton onClick={goBack} className="ml-auto">
+                          Back
+                        </BackButton>
+                      )}
+                    </div>
+                  </form>
+                  {stepIndex === 0 && (
                     <QuickQuestions
                       onAsk={ask}
                       expanded={questionsOpen}
@@ -413,48 +444,6 @@ export function QuoteChat() {
                     />
                   )}
                 </div>
-              ) : step ? (
-                <form
-                  key={step.id}
-                  onSubmit={onStepSubmit}
-                  className="flex flex-col gap-3"
-                  noValidate
-                >
-                  {step.fields.map((field, index) => (
-                    <ChatTextField
-                      key={field.name}
-                      field={field}
-                      error={errors[field.name]}
-                      defaultValue={answers[field.name] ?? ''}
-                      autoFocus={index === 0}
-                    />
-                  ))}
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="submit"
-                      className="rounded-md bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 active:scale-95"
-                    >
-                      {stepIndex + 1 >= steps.length ? 'Send enquiry' : 'Next'}
-                    </button>
-
-                    {step.fields.every((field) => field.optional) && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          advanceWith(Object.fromEntries(step.fields.map((f) => [f.name, ''])))
-                        }
-                        className="rounded-md px-3 py-2 text-sm font-semibold text-ink-muted transition hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
-                      >
-                        Skip
-                      </button>
-                    )}
-
-                    <BackButton onClick={goBack} className="ml-auto">
-                      Back
-                    </BackButton>
-                  </div>
-                </form>
               ) : null}
             </div>
           </div>

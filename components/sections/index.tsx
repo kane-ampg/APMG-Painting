@@ -1,6 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { SectorIcon } from '@/components/icons/sector-icons';
+import { HeroReel } from '@/components/media/hero-reel';
 import {
   ButtonLink,
   Card,
@@ -13,8 +15,13 @@ import {
   Section,
 } from '@/components/ui';
 import { cn } from '@/lib/utils';
-import { accreditations, site, verifiedAccreditations } from '@/lib/site';
-import { averageRating, verifiedReviews } from '@/content/reviews';
+import { accreditationLogos, accreditations, site } from '@/lib/site';
+import {
+  averageRating,
+  firstPartyReviews,
+  googleAggregate,
+  googleReviews,
+} from '@/content/reviews';
 import type { Faq, Location, Project, Sector, Service } from '@/lib/content/types';
 
 /* ------------------------------------------------------------------ */
@@ -66,7 +73,7 @@ export function Hero({
                 >
                   {site.phone.display}
                 </a>{' '}
-                — commercial and residential, Monday to Friday.
+                — Monday to Friday.
               </p>
             )}
           </div>
@@ -102,18 +109,28 @@ export function Hero({
  * that there is more page, on the one screen that has to carry the offer, both
  * audience paths, a way to call and a reason to believe any of it.
  *
- * Two layouts out of one set of markup: a photographic band above the copy
- * below `lg`, and the photograph in the right half beside it from `lg` up. Both
- * are driven by the asset — home-hero.webp is 1760x1920, so a half-width column
- * at desktop height matches its aspect almost exactly, and a short wide band is
- * what crops a near-square frame down to the part with the painters in it.
- * Copy over the photograph was the other option and it was worse: a scrim heavy
- * enough to carry white text at 360px wide left nothing of the photograph.
+ * The fold is a reel now, not a photograph. Twenty-nine seconds of APMG's own
+ * footage runs full-bleed behind the copy — Docklands from the air, the
+ * branded vans on a shopping strip, an open-plan office being repainted around
+ * the desks, a stairwell, a retail showroom — and the whole thing is the claim
+ * in the headline demonstrated rather than asserted. Every shot in the cut is
+ * commercial, and the cut ends where the master stops being so — the last
+ * fifteen seconds are on the cutting-room floor for the same reason the page
+ * they would have suited is gone. There is a unit test in tests/unit/ holding
+ * that line across the source; this is the same rule applied to footage — and
+ * it is enforced in scripts/encode-hero-video.mjs, which is where the cut
+ * length is set.
  *
- * On a phone that is both narrow and short — a 360x640 viewport leaves the band
- * about 30px — the band drops out altogether and the copy centres in the space
- * instead. A 30px sliver of photograph reads as a rendering fault; no band
- * reads as a decision.
+ * `HeroReel` owns the media, the scrim and the pause control. It takes this
+ * copy as children so none of it becomes client JavaScript, and hands back one
+ * value across the boundary: `--reel-progress`, which drives the red line on
+ * the strip's top edge.
+ *
+ * Copy over footage is the arrangement the still version could not support. A
+ * scrim heavy enough to carry white text at 360px wide left nothing of a
+ * photograph, so the photograph got its own band instead. A cut that moves
+ * survives the same scrim — there is always another frame — which is what lets
+ * the fold finally be one image rather than two panels.
  *
  * Kept separate from `Hero` deliberately. Every other page wants a compact
  * header it can scroll past, and a shared component that did both would be
@@ -127,7 +144,7 @@ export function HomeHero({
   primaryCta,
   secondaryCta,
   proof,
-  image,
+  poster,
   scrollTo,
 }: {
   eyebrow: string;
@@ -142,61 +159,46 @@ export function HomeHero({
   /** Figures for the strip on the fold's bottom edge. Facts only — every one
    *  of these is stated at length further down the page. */
   proof: readonly { figure: string; label: string }[];
-  image: { src: string; alt: string };
+  /** The reel's own first frame. It is the LCP element, and it is what the
+   *  fold falls back to whenever the video does not load. */
+  poster: { src: string; alt: string };
   scrollTo: { label: string; href: string };
 }) {
   return (
-    <section className="hero-viewport relative isolate flex flex-col overflow-hidden bg-ink text-white">
-      {/*
-       * A band across the top below lg, the right half from lg up. Below lg it
-       * takes whatever height the copy and the strip leave it — which is what
-       * lets the section hold one viewport exactly on a 640px-tall phone and
-       * still give the photograph ~190px on a 390x844 one. A short, wide band
-       * also crops the frame vertically, so both painters are in it; the
-       * full-bleed version could only ever show the top of the photograph,
-       * which is roofline.
-       */}
-      <div className="relative min-h-20 flex-1 lg:absolute lg:inset-0 lg:left-1/2 lg:min-h-0 lg:flex-none tight:hidden">
-        <Image
-          src={image.src}
-          alt={image.alt}
-          fill
-          // The largest thing above the fold on the site's most-visited page.
-          priority
-          sizes="(min-width: 1024px) 50vw, 100vw"
-          // 55% vertically keeps both painters in the band; the desktop half
-          // column is within a few percent of the file's own aspect ratio and
-          // needs no help.
-          className="object-cover object-[50%_55%] lg:object-center"
-        />
-
-        {/* Fade the band into the ink panel under it rather than butting it. */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-ink to-transparent lg:hidden"
-        />
-
-        {/* Desktop: dissolve the seam down the middle of the section. */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-y-0 left-0 hidden w-32 bg-gradient-to-r from-ink to-transparent lg:block"
-        />
-      </div>
-
-      <div className="relative z-10 lg:flex lg:flex-1 lg:items-center tight:flex tight:flex-1 tight:items-center">
+    <HeroReel poster={poster}>
+      <div className="relative z-10 flex flex-1 items-center">
         <Container width="wide">
           <div className="grid py-10 sm:py-12 lg:grid-cols-2 lg:py-16 short:py-8 tight:py-6">
             <div className="lg:pr-12">
-              <p className={cn(microLabel, 'flex items-center gap-3 text-brand-400')}>
+              {/* A step down on the tightest phones, where the pause control
+                  in the opposite corner comes within a few pixels of this line
+                  and the label would otherwise run under it. */}
+              <p
+                className={cn(
+                  microLabel,
+                  'flex items-center gap-3 text-brand-400 tight:text-[0.625rem]',
+                )}
+              >
                 <span aria-hidden="true" className="h-px w-8 bg-brand-500" />
                 {eyebrow}
               </p>
 
-              <h1 className="mt-4 text-balance font-display text-[1.95rem] leading-[1.06] tracking-tight sm:text-[2.6rem] lg:text-[3.4rem] short:text-[2.35rem] sm:short:text-[2.6rem] tight:text-[1.7rem]">
+              {/*
+               * Larger than the still version carried, because the fold is one
+               * image now rather than a copy panel beside a photograph — the
+               * headline is competing with moving footage for the first second
+               * of attention and has to win it.
+               *
+               * The shadow is offset and softly blurred rather than a halo. It
+               * is insurance against the two brightest frames in the cut, the
+               * hazy skyline and the fluorescent-lit office, either of which
+               * can sit behind the descenders when the loop restarts.
+               */}
+              <h1 className="mt-4 text-balance font-display text-[2.15rem] leading-[1.05] tracking-tight [text-shadow:0_2px_28px_rgba(15,17,19,0.6)] sm:text-[3rem] lg:text-[3.3rem] xl:text-[3.7rem] short:text-[2.5rem] sm:short:text-[3rem] tight:text-[1.85rem]">
                 {heading} <span className="text-brand-400">{headingAccent}</span>
               </h1>
 
-              <p className="mt-4 max-w-lg text-base text-white/75 sm:text-lg short:text-base tight:text-sm">
+              <p className="mt-5 max-w-lg text-base text-white/85 [text-shadow:0_1px_16px_rgba(15,17,19,0.7)] sm:text-lg short:mt-4 short:text-base tight:text-sm">
                 {lede}
               </p>
 
@@ -209,7 +211,7 @@ export function HomeHero({
                 </ButtonLink>
               </div>
 
-              <p className="mt-5 text-sm text-white/70 short:mt-4">
+              <p className="mt-5 text-sm text-white/80 [text-shadow:0_1px_16px_rgba(15,17,19,0.7)] short:mt-4">
                 Or call{' '}
                 <a
                   href={site.phone.href}
@@ -217,16 +219,35 @@ export function HomeHero({
                 >
                   {site.phone.display}
                 </a>{' '}
-                — commercial and residential, Monday to Friday.
+                — Monday to Friday.
               </p>
             </div>
           </div>
         </Container>
       </div>
 
-      {/* The fold's bottom edge. Translucent so the photograph continues behind
-          it rather than being cut off by a solid bar. */}
-      <div className="relative z-10 border-t border-white/15 bg-ink/70 backdrop-blur-sm">
+      {/* The fold's bottom edge. Translucent so the reel continues behind it
+          rather than being cut off by a solid bar. */}
+      <div className="relative z-10 bg-ink/70 backdrop-blur-sm">
+        {/*
+         * The rule along this edge was already the seam between the fold and
+         * the rest of the page. It is now also the reel's own clock: the red
+         * line lays itself along the white one over the length of the loop and
+         * starts again with it — the cut line every job on this site begins
+         * with, drawn at the speed of the footage above it.
+         *
+         * `--reel-progress` is 0 until a video is actually playing, so under
+         * reduced motion, a refused autoplay, or the reel paused by hand, the
+         * red is simply not there and the white rule is the whole edge, exactly
+         * as it was.
+         */}
+        <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-white/15" />
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 top-0 h-0.5 origin-left bg-brand-500"
+          style={{ transform: 'scaleX(var(--reel-progress, 0))' }}
+        />
+
         <Container width="wide">
           <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-3 py-3.5 sm:py-5">
             {/* Stacked into three columns on phones, back onto one baseline
@@ -241,7 +262,7 @@ export function HomeHero({
                   <span className="font-display text-base tracking-tight sm:text-lg">
                     {item.figure}
                   </span>
-                  <span className={cn(microLabel, 'text-[0.625rem] text-white/60 sm:text-xs')}>
+                  <span className={cn(microLabel, 'text-[0.625rem] text-white/70 sm:text-xs')}>
                     {item.label}
                   </span>
                 </li>
@@ -263,52 +284,7 @@ export function HomeHero({
           </div>
         </Container>
       </div>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Audience split — the homepage's main job under a commercial-led plan */
-/* ------------------------------------------------------------------ */
-
-export function AudienceSplit() {
-  const paths = [
-    {
-      eyebrow: 'For organisations',
-      heading: 'Commercial painting',
-      body: 'Schools, clinics, aged care, strata, retail, hospitality and industrial sites. Work programmed around your operating hours, with documented scopes and safety paperwork before we start.',
-      cta: { label: 'Commercial painting', href: '/commercial/' },
-      secondary: { label: 'Request a site assessment', href: '/contact-us/#commercial' },
-    },
-    {
-      eyebrow: 'For homeowners',
-      heading: 'House painting',
-      body: 'Interior and exterior work across Melbourne homes. Staged room by room so you keep living in the house, with preparation that decides how long the finish lasts.',
-      cta: { label: 'House painting', href: '/residential-painting/' },
-      secondary: { label: 'Request a free quote', href: '/contact-us/#residential' },
-    },
-  ];
-
-  return (
-    <Section tone="paper">
-      <Container>
-        <div className="grid gap-6 md:grid-cols-2">
-          {paths.map((path) => (
-            <Card key={path.heading} className="gap-4 p-8">
-              <Eyebrow>{path.eyebrow}</Eyebrow>
-              <h2 className="font-display text-2xl tracking-tight">{path.heading}</h2>
-              <p className="flex-1 text-ink-soft">{path.body}</p>
-              <div className="mt-2 flex flex-wrap gap-3">
-                <ButtonLink href={path.cta.href}>{path.cta.label}</ButtonLink>
-                <ButtonLink href={path.secondary.href} variant="outline">
-                  {path.secondary.label}
-                </ButtonLink>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </Container>
-    </Section>
+    </HeroReel>
   );
 }
 
@@ -317,37 +293,61 @@ export function AudienceSplit() {
 /* ------------------------------------------------------------------ */
 
 /**
- * Accreditations.
+ * Accreditations, as a logo wall.
  *
- * Only entries flagged `verified` in lib/site.ts are presented as credentials.
- * While none are verified, this renders an explicit reviewer note instead of a
- * logo wall — the sandbox must not display an unverified claim as fact.
+ * Only entries flagged `verified` in lib/site.ts are presented as credentials,
+ * and only the four that carry a mark get a logo — the screening checks are
+ * held per person, so badging them would imply a company-level certification
+ * that does not exist. They are stated in words on the about page instead.
+ *
+ * Each mark sits on its own white chip. The four supplied files do not agree
+ * on a background — MPA is transparent, the Dulux badge has white baked in and
+ * Haymes a solid blue box — so dropping them straight onto the sunken band
+ * showed the boxes. A chip normalises that, and heights are capped rather than
+ * widths so the portrait MPA mark and the landscape Dulux one read at the same
+ * optical weight.
+ *
+ * In colour, not greyscale: a faded accreditation badge reads as decoration,
+ * and these are the strongest trust signal on the page.
+ *
+ * If nothing is verified the bar renders the gap rather than disappearing:
+ * a silently empty trust bar looks identical to a business with no credentials.
  */
 export function TrustBar() {
-  if (verifiedAccreditations.length === 0) {
+  if (accreditationLogos.length === 0) {
     return (
       <Section tone="sunken" reveal={false} className="py-8">
         <Container>
-          <p className="rounded-md border border-dashed border-signal-400 bg-signal-400/5 px-4 py-3 text-sm text-ink-soft">
-            <span className="font-semibold uppercase tracking-label text-signal-600">
-              Awaiting content —{' '}
-            </span>
-            accreditation logos and wording appear here once APMG supplies certificates for{' '}
-            {accreditations.map((a) => a.label).join(', ')}. Nothing is displayed as verified until
-            then.
-          </p>
+          <Placeholder
+            note={`accreditation logos and wording appear here once APMG supplies certificates for ${accreditations
+              .map((a) => a.label)
+              .join(', ')}. Nothing is displayed as verified until then.`}
+          />
         </Container>
       </Section>
     );
   }
 
   return (
-    <Section tone="sunken" className="py-10">
+    <Section tone="sunken" reveal={false} className="py-8 sm:py-10">
       <Container>
-        <ul className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
-          {verifiedAccreditations.map((item) => (
-            <li key={item.id} className="text-sm font-semibold text-ink-soft">
-              {item.label}
+        <h2 className={cn(microLabel, 'mb-6 text-center text-ink-muted')}>
+          Accredited, prequalified and insured
+        </h2>
+        <ul className="flex flex-wrap items-center justify-center gap-4 sm:gap-5">
+          {accreditationLogos.map((item) => (
+            <li
+              key={item.id}
+              className="flex h-20 w-36 items-center justify-center rounded-lg border border-paper-edge bg-white px-4 py-3 sm:w-40"
+            >
+              <Image
+                src={item.logo!.src}
+                alt={item.logo!.alt}
+                width={item.logo!.width}
+                height={item.logo!.height}
+                className="max-h-full w-auto object-contain"
+              />
+              <span className="sr-only">{item.detail}</span>
             </li>
           ))}
         </ul>
@@ -414,11 +414,25 @@ export function ServiceGrid({ services }: { services: readonly Service[] }) {
   );
 }
 
+/**
+ * Where we work, as eight cards.
+ *
+ * Each card leads with a glyph rather than a photograph: three of these eight
+ * sectors have a project behind them and five do not, and a stock building
+ * would read as a job we did. See components/icons/sector-icons.
+ */
 export function SectorGrid({ sectors }: { sectors: readonly Sector[] }) {
   return (
     <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {sectors.map((sector) => (
-        <Card as="li" key={sector.slug} className="gap-3">
+        <Card
+          as="li"
+          key={sector.slug}
+          className="gap-3 transition-[border-color,box-shadow] duration-300 ease-out focus-within:border-brand-600 hover:border-brand-600 hover:shadow-lg hover:shadow-ink/10 motion-reduce:transition-none"
+        >
+          <span className="flex h-12 w-12 items-center justify-center rounded-md bg-brand-50 text-brand-600 ring-1 ring-inset ring-brand-100">
+            <SectorIcon slug={sector.slug} className="h-7 w-7" />
+          </span>
           <h3 className="font-display text-lg tracking-tight">
             <Link
               href={sector.legacyPath}
@@ -831,47 +845,163 @@ export function ServiceAreas({ locations }: { locations: readonly Location[] }) 
 /* ------------------------------------------------------------------ */
 
 /**
- * First-party reviews, or an honest note that there are none yet.
+ * The Google "G", inline.
  *
- * Same contract as TrustBar: while content/reviews.ts holds no verified
- * entries this renders the gap rather than a Google widget, because a widget's
- * aggregate is not something this site can evidence. Populating reviews.ts
- * turns this section and the LocalBusiness aggregateRating on together.
+ * Inline rather than an asset because it is four flat paths, it has to sit
+ * beside text at whatever size the line box is, and a reviews section that
+ * shows a broken image where the attribution should be is worse than one with
+ * no mark at all.
  */
-export function ReviewWall({ audience }: { audience?: 'residential' | 'commercial' }) {
-  const shown = audience
-    ? verifiedReviews.filter((review) => review.audience === audience)
-    : verifiedReviews;
+function GoogleMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false" className={className}>
+      <path
+        fill="#4285F4"
+        d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"
+      />
+      <path
+        fill="#34A853"
+        d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"
+      />
+      <path
+        fill="#EA4335"
+        d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"
+      />
+    </svg>
+  );
+}
+
+/** Five stars, `rating` of them filled. Announced once, as text, to a reader. */
+function Stars({ rating }: { rating: number }) {
+  return (
+    <p className="text-sm tracking-[0.15em] text-brand-600">
+      <span className="sr-only">{rating} out of 5</span>
+      <span aria-hidden="true">
+        {'★'.repeat(rating)}
+        <span className="text-paper-edge">{'★'.repeat(5 - rating)}</span>
+      </span>
+    </p>
+  );
+}
+
+/**
+ * Reviews on Google, as their own section.
+ *
+ * Reproduced with the reviewer's name and the Google attribution intact, and
+ * linked back to the profile so any of it can be checked in one click. The
+ * aggregate figure is stated as Google's — "5.0 on Google, from 70 reviews" —
+ * rather than as the site's own, because it is: the site hosts seven of those
+ * seventy and says so.
+ *
+ * None of this reaches `aggregateRating` markup. See the header of
+ * content/reviews.ts for why that line is drawn where it is.
+ */
+export function GoogleReviewWall() {
+  if (googleReviews.length === 0) return null;
+
+  return (
+    <Section tone="sunken" id="reviews">
+      <Container>
+        <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <Eyebrow className="mb-2 text-brand-600">Reviews</Eyebrow>
+            <SectionHeading className="mb-3">What clients say on Google</SectionHeading>
+            <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-ink-soft">
+              <GoogleMark className="h-5 w-5 shrink-0" />
+              <span>
+                <span className="font-semibold text-ink">
+                  {googleAggregate.rating.toFixed(1)} out of 5
+                </span>{' '}
+                from {googleAggregate.count} Google reviews
+              </span>
+            </p>
+          </div>
+          <ButtonLink
+            href={googleAggregate.url}
+            variant="outline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Read them on Google
+          </ButtonLink>
+        </div>
+
+        {/* Columns, not a grid. Reviews run from two lines to twelve, and a
+            grid stretches every card in a row to the tallest one — which left
+            half the wall as whitespace. Columns let each card be its own
+            height and pack the next one underneath. */}
+        <ul className="columns-1 gap-5 sm:columns-2 lg:columns-3">
+          {googleReviews.map((review) => (
+            <Card as="li" key={review.id} className="mb-5 h-auto break-inside-avoid gap-3">
+              {/* figure/blockquote/figcaption is the house pattern for an
+                  attributed quotation — see TestimonialBlock. A <footer> here
+                  would scope to the section, not the card, and put seven of
+                  them on the page. */}
+              <figure className="flex flex-col gap-3">
+                <Stars rating={review.rating} />
+                <blockquote className="flex-1 text-sm leading-relaxed text-ink-soft">
+                  &ldquo;{review.quote}&rdquo;
+                </blockquote>
+                <figcaption className="flex items-center gap-2 border-t border-paper-edge pt-3 text-xs text-ink-muted">
+                  <GoogleMark className="h-3.5 w-3.5 shrink-0" />
+                  <span>
+                    <span className="font-semibold text-ink">{review.attribution}</span>
+                    {review.organisation && <span> · {review.organisation}</span>}
+                    <span className="block">on {review.source}</span>
+                  </span>
+                </figcaption>
+              </figure>
+            </Card>
+          ))}
+        </ul>
+
+        <p className="mt-6 text-xs text-ink-muted">
+          Reviews are reproduced from APMG&rsquo;s Google Business Profile as written. The seven
+          shown are the commercial ones; the profile carries {googleAggregate.count} in total.
+        </p>
+      </Container>
+    </Section>
+  );
+}
+
+/**
+ * First-party reviews — ones given to APMG directly, with permission.
+ *
+ * Distinct from the Google wall above, and empty today. These are the only
+ * reviews the site aggregates into structured data, so this section and the
+ * `aggregateRating` block switch on together the moment one is added.
+ */
+export function ReviewWall() {
+  const shown = firstPartyReviews;
   const average = averageRating();
 
-  if (shown.length === 0) {
-    return (
-      <Placeholder note="no first-party reviews are published yet. The live site shows a Google widget rating that this site cannot evidence, so nothing is claimed here. Collect reviews through Google Business Profile, then add the ones you have permission to reproduce to content/reviews.ts — this section and the structured data switch on together." />
-    );
-  }
+  if (shown.length === 0) return null;
 
   return (
     <div className="flex flex-col gap-6">
       {average !== null && (
         <p className={cn(microLabel, 'text-brand-600')}>
-          {average} out of 5 · {verifiedReviews.length} review
-          {verifiedReviews.length === 1 ? '' : 's'}
+          {average} out of 5 · {shown.length} review{shown.length === 1 ? '' : 's'}
         </p>
       )}
       <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {shown.map((review) => (
           <Card as="li" key={review.id} className="gap-3">
-            <p aria-label={`${review.rating} out of 5`} className="text-sm text-brand-600">
-              <span aria-hidden="true">{'★'.repeat(review.rating)}</span>
-            </p>
-            <blockquote className="flex-1 text-sm leading-relaxed text-ink-soft">
-              &ldquo;{review.quote}&rdquo;
-            </blockquote>
-            <footer className="text-xs text-ink-muted">
-              {review.attribution}
-              {review.organisation && <span> · {review.organisation}</span>}
-              <span className="block">{review.source}</span>
-            </footer>
+            <figure className="flex h-full flex-col gap-3">
+              <Stars rating={review.rating} />
+              <blockquote className="flex-1 text-sm leading-relaxed text-ink-soft">
+                &ldquo;{review.quote}&rdquo;
+              </blockquote>
+              <figcaption className="text-xs text-ink-muted">
+                {review.attribution}
+                {review.organisation && <span> · {review.organisation}</span>}
+                <span className="block">{review.source}</span>
+              </figcaption>
+            </figure>
           </Card>
         ))}
       </ul>

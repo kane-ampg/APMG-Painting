@@ -1,21 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import {
-  AUDIENCE_STEP,
-  buildEnquiryFormData,
-  flows,
-  validateField,
-  type ChatFlow,
-} from '@/lib/enquiry/chat-flow';
-import { commercialEnquirySchema, residentialEnquirySchema } from '@/lib/validation/enquiry';
+import { buildEnquiryFormData, flows, validateField, type ChatFlow } from '@/lib/enquiry/chat-flow';
+import { commercialEnquirySchema } from '@/lib/validation/enquiry';
 
 /**
- * The chat flow asks the same questions the enquiry forms ask, and submits
+ * The chat flow asks the same questions the enquiry form asks, and submits
  * through the same Server Action. If the two ever drift — a renamed field, a
  * new enum value, a question quietly dropped — the chat starts sending payloads
  * the server rejects, and the visitor sees a dead end they cannot fix.
  *
- * These tests derive their expectations from the Zod schemas themselves, so the
+ * These tests derive their expectations from the Zod schema itself, so the
  * schema stays the single source of truth and drift fails the build.
  */
 
@@ -35,10 +29,7 @@ function flowFields(flow: ChatFlow): string[] {
   return flow.steps.flatMap((step) => step.fields.map((field) => field.name));
 }
 
-const CASES = [
-  ['residential', residentialEnquirySchema, flows.residential],
-  ['commercial', commercialEnquirySchema, flows.commercial],
-] as const;
+const CASES = [['commercial', commercialEnquirySchema, flows.commercial]] as const;
 
 describe('the chat flow matches the enquiry schema', () => {
   it.each(CASES)(
@@ -103,35 +94,22 @@ describe('the chat flow matches the enquiry schema', () => {
   });
 });
 
-describe('the opening question routes to a real flow', () => {
-  it('sets formType, so the server picks the matching schema', () => {
-    expect(AUDIENCE_STEP.fields).toHaveLength(1);
-    expect(AUDIENCE_STEP.fields[0]?.name).toBe('formType');
+describe('there is exactly one flow now the audience question is gone', () => {
+  it('offers exactly the flow that exists', () => {
+    expect(Object.keys(flows)).toEqual(['commercial']);
   });
 
-  it('offers exactly the two flows that exist', () => {
-    expect(AUDIENCE_STEP.fields[0]?.options?.map((option) => option.value)).toEqual([
-      'residential',
-      'commercial',
-    ]);
-    expect(Object.keys(flows).sort()).toEqual(['commercial', 'residential']);
+  it('opens on the flow’s first step rather than an audience question', () => {
+    expect(flows.commercial.steps[0]?.id).not.toBe('audience');
+    expect(flows.commercial.steps[0]?.fields.some((field) => field.name === 'formType')).toBe(
+      false,
+    );
   });
 });
 
 /* ------------------------------------------------------------------ */
 /* Submission payload                                                  */
 /* ------------------------------------------------------------------ */
-
-const RESIDENTIAL_ANSWERS = {
-  suburb: 'Chirnside Park',
-  propertyType: 'house',
-  workType: 'both',
-  timeframe: 'asap',
-  description: 'Weatherboard exterior plus three bedrooms inside.',
-  name: 'Sam Taylor',
-  phone: '0400 000 000',
-  email: 'sam@example.com',
-};
 
 const COMMERCIAL_ANSWERS = {
   organisation: 'Ramset Aged Care',
@@ -147,17 +125,6 @@ const COMMERCIAL_ANSWERS = {
 };
 
 describe('buildEnquiryFormData produces a payload the server accepts', () => {
-  it('builds a residential payload the schema parses', () => {
-    const data = buildEnquiryFormData({
-      formType: 'residential',
-      answers: RESIDENTIAL_ANSWERS,
-      renderedAt: 1_700_000_000_000,
-    });
-
-    const parsed = residentialEnquirySchema.safeParse(Object.fromEntries(data));
-    expect(parsed.success, JSON.stringify(parsed.error?.flatten().fieldErrors)).toBe(true);
-  });
-
   it('builds a commercial payload the schema parses', () => {
     const data = buildEnquiryFormData({
       formType: 'commercial',
@@ -180,8 +147,8 @@ describe('buildEnquiryFormData produces a payload the server accepts', () => {
 
   it('sends an empty honeypot, as a real visitor would', () => {
     const data = buildEnquiryFormData({
-      formType: 'residential',
-      answers: RESIDENTIAL_ANSWERS,
+      formType: 'commercial',
+      answers: COMMERCIAL_ANSWERS,
       renderedAt: 1,
     });
     expect(data.get('company_website')).toBe('');
@@ -189,8 +156,8 @@ describe('buildEnquiryFormData produces a payload the server accepts', () => {
 
   it('stamps renderedAt so the timing check has something to measure', () => {
     const data = buildEnquiryFormData({
-      formType: 'residential',
-      answers: RESIDENTIAL_ANSWERS,
+      formType: 'commercial',
+      answers: COMMERCIAL_ANSWERS,
       renderedAt: 1_700_000_000_000,
     });
     expect(data.get('renderedAt')).toBe('1700000000000');
@@ -207,15 +174,15 @@ describe('buildEnquiryFormData produces a payload the server accepts', () => {
 
   it('never invents an answer the visitor did not give', () => {
     const data = buildEnquiryFormData({
-      formType: 'residential',
-      answers: { suburb: 'Ringwood' },
+      formType: 'commercial',
+      answers: { organisation: 'Ramset Aged Care' },
       renderedAt: 1,
     });
     expect([...data.keys()].sort()).toEqual([
       'company_website',
       'formType',
+      'organisation',
       'renderedAt',
-      'suburb',
     ]);
   });
 });
@@ -226,19 +193,19 @@ describe('buildEnquiryFormData produces a payload the server accepts', () => {
 
 describe('validateField reuses the schema rules, so the chat cannot disagree with the server', () => {
   it('rejects a phone number that is too short', () => {
-    expect(validateField('residential', 'phone', '123')).toMatch(/8 digits/i);
+    expect(validateField('commercial', 'phone', '123')).toMatch(/8 digits/i);
   });
 
   it('accepts an Australian mobile written with spaces', () => {
-    expect(validateField('residential', 'phone', '0400 000 000')).toBeUndefined();
+    expect(validateField('commercial', 'phone', '0400 000 000')).toBeUndefined();
   });
 
   it('rejects an address that is not an email', () => {
-    expect(validateField('residential', 'email', 'sam@')).toMatch(/valid email/i);
+    expect(validateField('commercial', 'email', 'sam@')).toMatch(/valid email/i);
   });
 
-  it('rejects a job description that is too short to act on', () => {
-    expect(validateField('residential', 'description', 'paint')).toMatch(/10 characters/i);
+  it('rejects a scope summary that is too short to act on', () => {
+    expect(validateField('commercial', 'scopeSummary', 'paint')).toMatch(/10 characters/i);
   });
 
   it('accepts an empty answer for a field the schema makes optional', () => {
@@ -246,12 +213,12 @@ describe('validateField reuses the schema rules, so the chat cannot disagree wit
   });
 
   it('rejects an empty answer for a field the schema requires', () => {
-    expect(validateField('residential', 'suburb', '')).toBeDefined();
+    expect(validateField('commercial', 'organisation', '')).toBeDefined();
   });
 
   it('returns the schema message verbatim, not a paraphrase', () => {
-    const viaSchema = residentialEnquirySchema.shape.suburb.safeParse('a');
-    expect(validateField('residential', 'suburb', 'a')).toBe(
+    const viaSchema = commercialEnquirySchema.shape.organisation.safeParse('a');
+    expect(validateField('commercial', 'organisation', 'a')).toBe(
       viaSchema.success ? undefined : viaSchema.error.issues[0]?.message,
     );
   });
@@ -260,8 +227,8 @@ describe('validateField reuses the schema rules, so the chat cannot disagree wit
 describe('the honeypot is carried through, not synthesised', () => {
   it('passes a bot-filled honeypot to the server so it is rejected there', () => {
     const data = buildEnquiryFormData({
-      formType: 'residential',
-      answers: RESIDENTIAL_ANSWERS,
+      formType: 'commercial',
+      answers: COMMERCIAL_ANSWERS,
       renderedAt: 1,
       honeypot: 'http://spam.example',
     });

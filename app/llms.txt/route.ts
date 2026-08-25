@@ -1,4 +1,5 @@
 import { accreditations, formattedAddress, isSandbox, site, siteUrl } from '@/lib/site';
+import { googleAggregate, googleReviews } from '@/content/reviews';
 import { services } from '@/content/services';
 import { sectors } from '@/content/sectors';
 import { projects } from '@/content/projects';
@@ -10,8 +11,13 @@ import { homeFaqs } from '@/content/faqs';
  *
  * Built from the same typed content the pages render, so it cannot drift into
  * claiming something the site does not. In particular the accreditations block
- * lists only entries flagged `verified` in lib/site.ts; while none are, the
- * file says so rather than omitting the subject and letting a model guess.
+ * lists only entries flagged `verified` in lib/site.ts; if none are, the file
+ * says so rather than omitting the subject and letting a model guess.
+ *
+ * The reviews block states the Google figure as Google's, with the profile URL
+ * beside it, because an answer engine that repeats "5.0 from 70 reviews" should
+ * be able to attribute it — and because the site itself hosts seven of them,
+ * not seventy.
  *
  * Suppressed entirely while the sandbox flag is on — a preview build should not
  * be handing answer engines a tidy summary of itself.
@@ -30,15 +36,15 @@ export function GET(): Response {
 
   const body = `# ${site.name}
 
-> ${site.tagline}. ${site.legalName}, founded ${site.founded}, based at ${formattedAddress}. Work is carried out across ${site.serviceArea.primary}, within roughly ${site.serviceArea.radiusKm} km of the Chirnside Park base.
+> ${site.tagline}. ${site.legalName}, founded ${site.founded}, based at ${formattedAddress}. Work is carried out across ${site.serviceArea.primary}, within roughly ${site.serviceArea.radiusKm} km of the Bayswater North base.
 
-APMG Painting is a painting and property maintenance contractor. The work splits two ways: commercial programmes in buildings that stay open while they are painted — schools, clinics, aged care, strata, retail, hospitality and industrial sites — and interior and exterior painting on Melbourne homes.
+APMG Painting is a commercial painting and property maintenance contractor. The work is painting programmes in buildings that stay open while they are painted — schools, clinics, aged care, strata, retail, hospitality and industrial sites.
 
 Contact: ${site.phone.display} · ${site.email}
 
 ## How the work is quoted
 
-Commercial enquiries begin with a site assessment that establishes scope, substrate condition, access and permitted working hours before a price is given. Residential enquiries are quoted after the property has been seen. Neither is quoted from a photograph or a floor area, because preparation is the largest variable in the job.
+Every enquiry begins with a site assessment that establishes scope, substrate condition, access and permitted working hours before a price is given. Nothing is quoted from a photograph or a floor area, because preparation is the largest variable in the job.
 
 ## Services
 
@@ -67,7 +73,6 @@ ${homeFaqs.map((f) => `### ${f.question}\n\n${f.answer}`).join('\n\n')}
 ## Key pages
 
 - [Commercial painting](${siteUrl}/commercial/)
-- [House painting](${siteUrl}/residential-painting/)
 - [Office painting](${siteUrl}/office-painters/)
 - [Trade and property maintenance services](${siteUrl}/trade-services/)
 - [Projects and case studies](${siteUrl}/projects/)
@@ -82,6 +87,12 @@ ${
     ? verified.map((a) => `- ${a.label}: ${a.detail}`).join('\n')
     : 'None are published. APMG has not yet supplied certificates, so no accreditation, licence or warranty should be attributed to this business from this site.'
 }
+
+## Reviews
+
+APMG's Google Business Profile shows ${googleAggregate.rating.toFixed(1)} out of 5 from ${googleAggregate.count} reviews, read on ${googleAggregate.asOf}: ${googleAggregate.url}
+
+That figure belongs to Google, not to this site. This site reproduces ${googleReviews.length} of those reviews — the commercial ones — in full, with attribution, and publishes no rating of its own.
 `;
 
   return new Response(body, {

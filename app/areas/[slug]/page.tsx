@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `Painters ${location.suburb} | APMG Painting`,
     description: location.intro
       ? location.intro.slice(0, 155)
-      : `APMG Painting services ${location.suburb} and the surrounding ${location.region.toLowerCase()} area from our Chirnside Park base.`,
+      : `APMG Painting services ${location.suburb} and the surrounding ${location.region.toLowerCase()} area from our Bayswater North base.`,
     path: `/areas/${location.slug}/`,
     // Data-driven: weak pages are noindex until they earn otherwise.
     index: location.indexable,

@@ -20,14 +20,19 @@ export function isPlaceholder(value: unknown): value is EditorialPlaceholder {
   return typeof value === 'object' && value !== null && '__placeholder' in value;
 }
 
-export type Audience = 'residential' | 'commercial';
+/**
+ * One member on purpose. This site is commercial only (spec §3), and a
+ * one-member union keeps every call site typed, so re-widening later is a
+ * type change the compiler walks you through rather than a grep.
+ */
+export type Audience = 'commercial';
 
 export type Service = {
   slug: string;
   title: string;
   /** Short label for cards and navigation. */
   shortTitle: string;
-  audience: Audience | 'both';
+  audience: Audience;
   summary: string;
   body: readonly string[];
   includes: readonly string[];
@@ -148,17 +153,32 @@ export type Review = {
   quote: string;
   attribution: string;
   organisation?: string;
-  /** ISO date the review was given. Required — undated reviews age invisibly. */
-  date: string;
+  /**
+   * ISO date the review was given, or null when the source does not expose one.
+   *
+   * Nullable rather than optional so that a missing date is a decision someone
+   * typed, not a field they forgot. Null suppresses `datePublished` in
+   * structured data and the date line in the UI — an undated review ages
+   * invisibly, so null is a backlog item, not a resting state.
+   */
+  date: string | null;
   /** Which service the review relates to, for filtering onto the right page. */
   audience: Audience;
   /** Where it originally appeared, e.g. 'Google Business Profile'. */
   source: string;
+  /**
+   * Given to APMG directly, with permission to reproduce.
+   *
+   * Only first-party reviews may be aggregated into `aggregateRating`. Reviews
+   * read back off a third-party profile render with attribution and stay out of
+   * review markup — see the header of content/reviews.ts.
+   */
+  firstParty: boolean;
   verified: boolean;
 };
 
 export type Faq = {
   question: string;
   answer: string;
-  audience: Audience | 'both';
+  audience: Audience;
 };

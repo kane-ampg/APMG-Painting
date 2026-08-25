@@ -1,13 +1,6 @@
 import type { z } from 'zod';
-import {
-  COMMERCIAL_PROPERTY_TYPES,
-  COMMERCIAL_TIMEFRAMES,
-  RESIDENTIAL_PROPERTY_TYPES,
-  RESIDENTIAL_TIMEFRAMES,
-  RESIDENTIAL_WORK_TYPES,
-  type EnquiryOption,
-} from './options';
-import { commercialEnquirySchema, residentialEnquirySchema } from '@/lib/validation/enquiry';
+import { COMMERCIAL_PROPERTY_TYPES, COMMERCIAL_TIMEFRAMES, type EnquiryOption } from './options';
+import { commercialEnquirySchema } from '@/lib/validation/enquiry';
 
 /**
  * The quote chat, as data.
@@ -25,7 +18,12 @@ import { commercialEnquirySchema, residentialEnquirySchema } from '@/lib/validat
  * prose about warranties.
  */
 
-export type EnquiryFormType = 'residential' | 'commercial';
+/**
+ * One member on purpose. This site is commercial only, and a one-member union
+ * keeps every call site typed, so re-widening later is a type change the
+ * compiler walks you through rather than a grep.
+ */
+export type EnquiryFormType = 'commercial';
 
 export type ChatFieldKind =
   /** One tap from a fixed list. */
@@ -65,17 +63,16 @@ export type ChatStep = {
 
 export type ChatFlow = {
   formType: EnquiryFormType;
-  /** Names the branch in the transcript, e.g. "Home painting". */
+  /** Names the flow in the transcript, e.g. "Commercial painting". */
   label: string;
   steps: readonly ChatStep[];
 };
 
 const SCHEMAS = {
-  residential: residentialEnquirySchema,
   commercial: commercialEnquirySchema,
 } as const;
 
-/** Shared closing turn. Both audiences are reached the same way. */
+/** The closing turn every branch ends on. */
 const CONTACT_STEP: ChatStep = {
   id: 'contact',
   prompt: 'Last one — how should we reach you?',
@@ -86,95 +83,7 @@ const CONTACT_STEP: ChatStep = {
   ],
 };
 
-/**
- * The opening turn. Sets `formType`, which decides both the branch below and
- * the schema the Server Action validates against.
- */
-export const AUDIENCE_STEP: ChatStep = {
-  id: 'audience',
-  prompt: 'Hi — what can we help you paint?',
-  fields: [
-    {
-      name: 'formType',
-      label: 'What kind of work is it?',
-      kind: 'choice',
-      options: [
-        { value: 'residential', label: 'My home' },
-        { value: 'commercial', label: 'A business or facility' },
-      ],
-    },
-  ],
-};
-
 export const flows: Record<EnquiryFormType, ChatFlow> = {
-  residential: {
-    formType: 'residential',
-    label: 'Home painting',
-    steps: [
-      {
-        id: 'suburb',
-        prompt: 'Whereabouts is the property?',
-        fields: [
-          {
-            name: 'suburb',
-            label: 'Suburb',
-            kind: 'text',
-            autoComplete: 'address-level2',
-          },
-        ],
-      },
-      {
-        id: 'work-type',
-        prompt: 'What needs painting?',
-        fields: [
-          {
-            name: 'workType',
-            label: 'Interior, exterior or both',
-            kind: 'choice',
-            options: RESIDENTIAL_WORK_TYPES,
-          },
-        ],
-      },
-      {
-        id: 'property-type',
-        prompt: 'And what sort of home is it?',
-        fields: [
-          {
-            name: 'propertyType',
-            label: 'Property type',
-            kind: 'choice',
-            options: RESIDENTIAL_PROPERTY_TYPES,
-          },
-        ],
-      },
-      {
-        id: 'timeframe',
-        prompt: 'When are you hoping to have it done?',
-        fields: [
-          {
-            name: 'timeframe',
-            label: 'Approximate timeframe',
-            kind: 'choice',
-            options: RESIDENTIAL_TIMEFRAMES,
-          },
-        ],
-      },
-      {
-        id: 'description',
-        prompt: 'Tell us a little about the job.',
-        fields: [
-          {
-            name: 'description',
-            label: 'About the job',
-            kind: 'textarea',
-            hint: 'Rough size, number of rooms, condition of the surfaces — whatever you know.',
-          },
-        ],
-      },
-      CONTACT_STEP,
-    ],
-  },
-
   commercial: {
     formType: 'commercial',
     label: 'Commercial painting',

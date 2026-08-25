@@ -16,7 +16,7 @@ import { locationsByRegion } from '@/content/locations';
 export const metadata: Metadata = buildMetadata({
   title: 'Areas We Service | Melbourne Painters | APMG Painting',
   description:
-    'APMG Painting works across metropolitan Melbourne from Chirnside Park. Suburbs and regions we service, with links to projects completed nearby.',
+    'APMG Painting works across metropolitan Melbourne from Bayswater North. Suburbs and regions we service, with links to projects completed nearby.',
   path: '/areas/',
 });
 
@@ -30,7 +30,7 @@ export default function AreasPage() {
           <Breadcrumbs crumbs={[{ name: 'Areas we service', path: '/areas/' }]} />
           <h1 className="font-display text-4xl tracking-tight sm:text-5xl">Areas we service</h1>
           <p className="mt-4 max-w-prose text-lg text-ink-soft">
-            We work across metropolitan Melbourne from our base at Chirnside Park.
+            We work across metropolitan Melbourne from our base at Bayswater North.
           </p>
         </Container>
       </Section>

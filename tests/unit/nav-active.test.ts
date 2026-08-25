@@ -4,8 +4,8 @@ import { mainNav } from '@/components/navigation/nav-data';
 
 /** The Commercial item, which is the only one with a non-URL child hierarchy. */
 const commercial = mainNav.find((item) => item.label === 'Commercial');
-const residential = mainNav.find((item) => item.label === 'Residential');
 const projects = mainNav.find((item) => item.label === 'Projects');
+const about = mainNav.find((item) => item.label === 'About');
 
 describe('isCurrentPage', () => {
   it('matches regardless of trailing slash on either side', () => {
@@ -25,16 +25,16 @@ describe('isCurrentPage', () => {
 
   it('never marks an in-page anchor as the current page', () => {
     // Three links would otherwise claim to be the current page at once.
-    expect(isCurrentPage('/residential-painting/', '/residential-painting/#interior')).toBe(false);
-    expect(isCurrentPage('/residential-painting/', '/residential-painting/#exterior')).toBe(false);
-    expect(isCurrentPage('/residential-painting/', '/residential-painting/')).toBe(true);
+    expect(isCurrentPage('/commercial/', '/commercial/#preparation')).toBe(false);
+    expect(isCurrentPage('/commercial/', '/commercial/#access')).toBe(false);
+    expect(isCurrentPage('/commercial/', '/commercial/')).toBe(true);
   });
 });
 
 describe('isSamePath', () => {
   it('ignores trailing slashes and in-page anchors', () => {
     expect(isSamePath('/commercial', '/commercial/')).toBe(true);
-    expect(isSamePath('/residential-painting/#interior', '/residential-painting/')).toBe(true);
+    expect(isSamePath('/commercial/#preparation', '/commercial/')).toBe(true);
     expect(isSamePath('/commercial/', '/office-painters/')).toBe(false);
   });
 });
@@ -87,7 +87,7 @@ describe('navActiveState', () => {
 
   it('leaves unrelated items inactive', () => {
     expect(navActiveState('/about-us/', commercial!)).toBe(false);
-    expect(navActiveState('/commercial/', residential!)).toBe(false);
+    expect(navActiveState('/commercial/', about!)).toBe(false);
   });
 
   it('marks exactly one item as the current page for every top-level route', () => {

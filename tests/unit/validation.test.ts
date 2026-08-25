@@ -1,22 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  commercialEnquirySchema,
-  residentialEnquirySchema,
-} from '@/lib/validation/enquiry';
-
-const validResidential = {
-  formType: 'residential',
-  name: 'Jo Smith',
-  phone: '0400 000 000',
-  email: 'jo@example.com',
-  suburb: 'Camberwell',
-  propertyType: 'house',
-  workType: 'both',
-  timeframe: '1-3-months',
-  description: 'Weatherboard exterior, some peeling on the north face.',
-  renderedAt: 1700000000000,
-  company_website: '',
-};
+import { commercialEnquirySchema } from '@/lib/validation/enquiry';
 
 const validCommercial = {
   formType: 'commercial',
@@ -34,14 +17,14 @@ const validCommercial = {
   company_website: '',
 };
 
-describe('residential enquiry schema', () => {
+describe('commercial enquiry schema', () => {
   it('accepts a complete submission', () => {
-    expect(residentialEnquirySchema.safeParse(validResidential).success).toBe(true);
+    expect(commercialEnquirySchema.safeParse(validCommercial).success).toBe(true);
   });
 
   it('rejects a malformed email', () => {
-    const result = residentialEnquirySchema.safeParse({
-      ...validResidential,
+    const result = commercialEnquirySchema.safeParse({
+      ...validCommercial,
       email: 'not-an-email',
     });
     expect(result.success).toBe(false);
@@ -51,30 +34,19 @@ describe('residential enquiry schema', () => {
   });
 
   it('rejects a phone number containing letters', () => {
-    const result = residentialEnquirySchema.safeParse({
-      ...validResidential,
+    const result = commercialEnquirySchema.safeParse({
+      ...validCommercial,
       phone: 'call me',
     });
     expect(result.success).toBe(false);
   });
 
   it('rejects a filled honeypot', () => {
-    const result = residentialEnquirySchema.safeParse({
-      ...validResidential,
+    const result = commercialEnquirySchema.safeParse({
+      ...validCommercial,
       company_website: 'http://spam.example',
     });
     expect(result.success).toBe(false);
-  });
-
-  it('rejects a description that is too short to be useful', () => {
-    const result = residentialEnquirySchema.safeParse({ ...validResidential, description: 'hi' });
-    expect(result.success).toBe(false);
-  });
-});
-
-describe('commercial enquiry schema', () => {
-  it('accepts a complete submission', () => {
-    expect(commercialEnquirySchema.safeParse(validCommercial).success).toBe(true);
   });
 
   it('requires an organisation — the field the live generic form never asked for', () => {
@@ -104,6 +76,11 @@ describe('commercial enquiry schema', () => {
       ...validCommercial,
       propertyType: 'nuclear-reactor',
     });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects a scope summary that is too short to be useful', () => {
+    const result = commercialEnquirySchema.safeParse({ ...validCommercial, scopeSummary: 'hi' });
     expect(result.success).toBe(false);
   });
 });

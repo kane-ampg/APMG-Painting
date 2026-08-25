@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Stand up the third APMG site — commercial painting only, VIC + QLD — with all 1,516 suburb pages rendering under a tiered indexability model and a four-layer sandbox lockdown that switches as one unit.
+**Goal:** Stand up the third APMG site — commercial painting only, VIC + QLD — with all 1,527 suburb pages rendering under a tiered indexability model and a four-layer sandbox lockdown that switches as one unit.
 
 **Architecture:** Scaffold by copying `APMG Painting v2` (site 2), then strip every residential surface. A build-time Node script turns a third-party Australian locality dataset into a committed JSON file — deterministic, offline, reviewable as a diff. Four nested route segments (national → state → region → suburb) render from that data. Hand-authored content lives in separate override files keyed by slug and is merged at build; the generator never overwrites human copy.
 
@@ -19,7 +19,7 @@
 - **No residential surface anywhere** — no page, route, nav entry, FAQ, copy string, or type member.
 - **Painting and painting-preparation only.** No plastering, rendering-as-a-service, repairs, or line marking.
 - **Queensland copy discipline.** No QLD page may contain "based in", "our Brisbane", "our Gold Coast", "our Sunshine Coast", or "local to". Enforced by a test in Task 14.
-- **No second `LocalBusiness`** while `qldPresence` is false. One entity, Chirnside Park.
+- **No second `LocalBusiness`** while `qldPresence` is false. One entity, Bayswater North.
 - **No `AggregateRating`** emitted anywhere. There are no first-party verified reviews.
 - **URLs keep trailing slashes.** `trailingSlash: true` is set; every internal `href` ends in `/`.
 - **Path alias** is `@/*` → repo root.
@@ -28,7 +28,7 @@
   - Brisbane CBD QLD: `-27.4698, 153.0251`, radius `40` km
   - Southport QLD: `-27.9680, 153.4000`, radius `40` km
   - Maroochydore QLD: `-26.6600, 153.0930`, radius `40` km
-- **Expected locality total after all filters: 1,516.** A test asserts this exact number. If the upstream dataset shifts it, that is a review event, not a number to quietly update.
+- **Expected locality total after all filters: 1,527.** A test asserts this exact number. If the upstream dataset shifts it, that is a review event, not a number to quietly update.
 - **Commit after every task.** Conventional commit prefixes (`feat:`, `test:`, `chore:`, `fix:`).
 
 ---
@@ -37,33 +37,33 @@
 
 **Created**
 
-| File | Responsibility |
-|---|---|
-| `lib/geo/haversine.ts` | Distance and bearing between two coordinates. Pure, no deps. |
-| `lib/geo/anchors.ts` | The four anchors as typed constants. Single source. |
-| `lib/locations/types.ts` | `Locality`, `Region`, `StateKey`, `Tier`, `GeneratedLocality`. |
-| `lib/locations/regions.ts` | Region definitions and the council → region rules. |
-| `lib/locations/index.ts` | Read API over the generated data: lookups, grouping, tiering. |
-| `content/councils.ts` | 49 hand-authored council notes. |
-| `content/locations.overrides.ts` | Hand-written suburb copy + `qldPresence` flag. |
-| `content/locations.generated.json` | Generator output. Committed. |
-| `scripts/build-locations.mts` | The generator. |
-| `app/locations/page.tsx` | National hub. |
-| `app/locations/[state]/page.tsx` | State hub. |
-| `app/locations/[state]/[region]/page.tsx` | Region hub. |
-| `app/locations/[state]/[region]/[suburb]/page.tsx` | Suburb page. |
-| `components/locations/locality-facts.tsx` | The six-fact block. |
-| `components/locations/suburb-directory.tsx` | Grouped suburb link lists. |
+| File                                               | Responsibility                                                 |
+| -------------------------------------------------- | -------------------------------------------------------------- |
+| `lib/geo/haversine.ts`                             | Distance and bearing between two coordinates. Pure, no deps.   |
+| `lib/geo/anchors.ts`                               | The four anchors as typed constants. Single source.            |
+| `lib/locations/types.ts`                           | `Locality`, `Region`, `StateKey`, `Tier`, `GeneratedLocality`. |
+| `lib/locations/regions.ts`                         | Region definitions and the council → region rules.             |
+| `lib/locations/index.ts`                           | Read API over the generated data: lookups, grouping, tiering.  |
+| `content/councils.ts`                              | 49 hand-authored council notes.                                |
+| `content/locations.overrides.ts`                   | Hand-written suburb copy + `qldPresence` flag.                 |
+| `content/locations.generated.json`                 | Generator output. Committed.                                   |
+| `scripts/build-locations.mts`                      | The generator.                                                 |
+| `app/locations/page.tsx`                           | National hub.                                                  |
+| `app/locations/[state]/page.tsx`                   | State hub.                                                     |
+| `app/locations/[state]/[region]/page.tsx`          | Region hub.                                                    |
+| `app/locations/[state]/[region]/[suburb]/page.tsx` | Suburb page.                                                   |
+| `components/locations/locality-facts.tsx`          | The six-fact block.                                            |
+| `components/locations/suburb-directory.tsx`        | Grouped suburb link lists.                                     |
 
 **Modified**
 
-| File | Change |
-|---|---|
-| `lib/site.ts` | Tagline, service area, QLD regions. |
-| `next.config.ts` | Make `X-Robots-Tag` conditional; replace redirects. |
-| `app/sitemap.ts` | Indexable-only across the new route tree. |
-| `components/navigation/nav-data.ts` | Remove residential; add Locations. |
-| `lib/content/types.ts` | Drop `'residential'` from `Audience`. |
+| File                                | Change                                              |
+| ----------------------------------- | --------------------------------------------------- |
+| `lib/site.ts`                       | Tagline, service area, QLD regions.                 |
+| `next.config.ts`                    | Make `X-Robots-Tag` conditional; replace redirects. |
+| `app/sitemap.ts`                    | Indexable-only across the new route tree.           |
+| `components/navigation/nav-data.ts` | Remove residential; add Locations.                  |
+| `lib/content/types.ts`              | Drop `'residential'` from `Audience`.               |
 
 **Deleted**
 
@@ -74,9 +74,11 @@
 ## Task 1: Scaffold the new repo
 
 **Files:**
+
 - Create: `../APMG-Commercial/` (full copy of site 2, minus build artefacts and git history)
 
 **Interfaces:**
+
 - Consumes: nothing.
 - Produces: a working Next.js repo at `../APMG-Commercial` whose `npm run verify` passes before any changes are made. **All later tasks run inside this directory.**
 
@@ -131,11 +133,13 @@ git add -A && git commit -q -m "chore: verified baseline scaffold"
 ## Task 2: Remove the residential surface
 
 **Files:**
+
 - Delete: `app/residential-painting/page.tsx`
 - Modify: `lib/content/types.ts`, `content/services.ts`, `content/faqs.ts`, `content/projects.ts`, `components/navigation/nav-data.ts`, `components/sections/index.tsx`, `lib/site.ts`
 - Test: `tests/unit/no-residential.test.ts`
 
 **Interfaces:**
+
 - Consumes: Task 1's repo.
 - Produces: `Audience = 'commercial'` (a one-member union — deliberate; it keeps every call site typed and makes a future re-widening a type change rather than a search). `ReviewWall` takes no `audience` prop.
 
@@ -244,10 +248,12 @@ git add -A && git commit -q -m "feat: remove residential surface, narrow Audienc
 ## Task 3: Make the sandbox lockdown switch as one unit
 
 **Files:**
+
 - Modify: `next.config.ts`, `app/robots.ts`
 - Test: `tests/unit/sandbox-lockdown.test.ts`
 
 **Interfaces:**
+
 - Consumes: `isSandbox` from `@/lib/site`.
 - Produces: `sandboxHeaders(): Array<{ source: string; headers: Array<{ key: string; value: string }> }>` exported from `next.config.ts` so it is testable without booting Next.
 
@@ -377,10 +383,12 @@ git add -A && git commit -q -m "fix: key X-Robots-Tag to isSandbox so all four n
 ## Task 4: Geo primitives
 
 **Files:**
+
 - Create: `lib/geo/haversine.ts`, `lib/geo/anchors.ts`
 - Test: `tests/unit/geo.test.ts`
 
 **Interfaces:**
+
 - Consumes: nothing.
 - Produces:
   - `type Coords = { lat: number; lng: number }`
@@ -466,7 +474,7 @@ describe('nearestAnchor', () => {
 
   it('returns null outside every radius', () => {
     // Bendigo: ~130 km from Bayswater North.
-    expect(nearestAnchor({ lat: -36.7570, lng: 144.2794 }, 'VIC')).toBeNull();
+    expect(nearestAnchor({ lat: -36.757, lng: 144.2794 }, 'VIC')).toBeNull();
   });
 });
 ```
@@ -601,10 +609,12 @@ git commit -q -m "feat: add haversine, bearing and nearest-anchor geo primitives
 ## Task 5: Region model and council rules
 
 **Files:**
+
 - Create: `lib/locations/types.ts`, `lib/locations/regions.ts`
 - Test: `tests/unit/regions.test.ts`
 
 **Interfaces:**
+
 - Consumes: `StateKey`, `Coords`, `bearingDeg`, `distanceKm` from Task 4.
 - Produces:
   - `type Tier = 1 | 3` — no tier 2; region hubs are a different entity
@@ -672,48 +682,93 @@ describe('resolveRegion', () => {
 
   it('maps a small council directly', () => {
     expect(
-      resolveRegion({ council: 'Monash', locality: 'CLAYTON', state: 'VIC', coords: at(-37.92, 145.12) }).slug,
+      resolveRegion({
+        council: 'Monash',
+        locality: 'CLAYTON',
+        state: 'VIC',
+        coords: at(-37.92, 145.12),
+      }).slug,
     ).toBe('south-east');
   });
 
   it('puts urban Yarra Ranges in Eastern, not the hinterland', () => {
     expect(
-      resolveRegion({ council: 'Yarra Ranges', locality: 'CHIRNSIDE PARK', state: 'VIC', coords: at(-37.75, 145.31) }).slug,
+      resolveRegion({
+        council: 'Yarra Ranges',
+        locality: 'CHIRNSIDE PARK',
+        state: 'VIC',
+        coords: at(-37.75, 145.31),
+      }).slug,
     ).toBe('eastern');
   });
 
   it('puts rural Yarra Ranges in the hinterland', () => {
     expect(
-      resolveRegion({ council: 'Yarra Ranges', locality: 'POWELLTOWN', state: 'VIC', coords: at(-37.86, 145.75) }).slug,
+      resolveRegion({
+        council: 'Yarra Ranges',
+        locality: 'POWELLTOWN',
+        state: 'VIC',
+        coords: at(-37.86, 145.75),
+      }).slug,
     ).toBe('yarra-valley-and-hinterland');
   });
 
   it('splits Brisbane City by distance then bearing', () => {
     // Brisbane CBD itself: inside 5 km, so Inner.
     expect(
-      resolveRegion({ council: 'Brisbane', locality: 'BRISBANE CITY', state: 'QLD', coords: at(-27.4698, 153.0251) }).slug,
+      resolveRegion({
+        council: 'Brisbane',
+        locality: 'BRISBANE CITY',
+        state: 'QLD',
+        coords: at(-27.4698, 153.0251),
+      }).slug,
     ).toBe('brisbane-inner');
     // Aspley: ~12 km due north.
     expect(
-      resolveRegion({ council: 'Brisbane', locality: 'ASPLEY', state: 'QLD', coords: at(-27.3639, 153.0164) }).slug,
+      resolveRegion({
+        council: 'Brisbane',
+        locality: 'ASPLEY',
+        state: 'QLD',
+        coords: at(-27.3639, 153.0164),
+      }).slug,
     ).toBe('brisbane-north');
     // Wynnum: ~14 km east.
     expect(
-      resolveRegion({ council: 'Brisbane', locality: 'WYNNUM', state: 'QLD', coords: at(-27.4436, 153.1728) }).slug,
+      resolveRegion({
+        council: 'Brisbane',
+        locality: 'WYNNUM',
+        state: 'QLD',
+        coords: at(-27.4436, 153.1728),
+      }).slug,
     ).toBe('brisbane-east');
     // Sunnybank: ~12 km south.
     expect(
-      resolveRegion({ council: 'Brisbane', locality: 'SUNNYBANK', state: 'QLD', coords: at(-27.5786, 153.0594) }).slug,
+      resolveRegion({
+        council: 'Brisbane',
+        locality: 'SUNNYBANK',
+        state: 'QLD',
+        coords: at(-27.5786, 153.0594),
+      }).slug,
     ).toBe('brisbane-south');
     // Indooroopilly: ~7 km west.
     expect(
-      resolveRegion({ council: 'Brisbane', locality: 'INDOOROOPILLY', state: 'QLD', coords: at(-27.4986, 152.9733) }).slug,
+      resolveRegion({
+        council: 'Brisbane',
+        locality: 'INDOOROOPILLY',
+        state: 'QLD',
+        coords: at(-27.4986, 152.9733),
+      }).slug,
     ).toBe('brisbane-west');
   });
 
   it('throws on an unmapped council rather than guessing', () => {
     expect(() =>
-      resolveRegion({ council: 'Atlantis', locality: 'NOWHERE', state: 'VIC', coords: at(-37.8, 145.0) }),
+      resolveRegion({
+        council: 'Atlantis',
+        locality: 'NOWHERE',
+        state: 'VIC',
+        coords: at(-37.8, 145.0),
+      }),
     ).toThrow(/unmapped council/i);
   });
 });
@@ -788,20 +843,46 @@ export const SINGLE_LOCALITY_COUNCIL_ALLOWLIST: readonly string[] = ['Melton', '
 
 /** Spec §5.2. Everything else in Cardinia is fringe. */
 export const CARDINIA_URBAN: readonly string[] = [
-  'PAKENHAM', 'PAKENHAM UPPER', 'OFFICER', 'OFFICER SOUTH', 'BEACONSFIELD',
-  'BEACONSFIELD UPPER', 'BUNYIP', 'KOO WEE RUP', 'LANG LANG', 'EMERALD', 'COCKATOO',
+  'PAKENHAM',
+  'PAKENHAM UPPER',
+  'OFFICER',
+  'OFFICER SOUTH',
+  'BEACONSFIELD',
+  'BEACONSFIELD UPPER',
+  'BUNYIP',
+  'KOO WEE RUP',
+  'LANG LANG',
+  'EMERALD',
+  'COCKATOO',
 ];
 
-/** Spec §5.2. Chirnside Park is here because it is APMG's own base. */
+/** Spec §5.2. Urban Yarra Ranges, on the allowlist on its own merits. */
 export const YARRA_RANGES_URBAN: readonly string[] = [
-  'LILYDALE', 'MOOROOLBARK', 'CHIRNSIDE PARK', 'MONTROSE', 'KILSYTH SOUTH',
-  'HEALESVILLE', 'YARRA GLEN', 'SEVILLE', 'WANDIN NORTH', 'WOORI YALLOCK',
-  'BELGRAVE', 'UPWEY', 'TECOMA', 'FERNY CREEK', 'OLINDA',
+  'LILYDALE',
+  'MOOROOLBARK',
+  'CHIRNSIDE PARK',
+  'MONTROSE',
+  'KILSYTH SOUTH',
+  'HEALESVILLE',
+  'YARRA GLEN',
+  'SEVILLE',
+  'WANDIN NORTH',
+  'WOORI YALLOCK',
+  'BELGRAVE',
+  'UPWEY',
+  'TECOMA',
+  'FERNY CREEK',
+  'OLINDA',
 ];
 
 /** Councils whose every locality is fringe. */
 const WHOLLY_FRINGE_COUNCILS: readonly string[] = [
-  'Scenic Rim', 'Nillumbik', 'Gympie', 'Murrindindi', 'Baw Baw', 'Somerset',
+  'Scenic Rim',
+  'Nillumbik',
+  'Gympie',
+  'Murrindindi',
+  'Baw Baw',
+  'Somerset',
 ];
 
 const SPLIT_COUNCIL_URBAN: Record<string, readonly string[]> = {
@@ -834,40 +915,144 @@ function brisbaneSubRegion(coords: Coords): string {
 
 export const REGIONS: readonly RegionDef[] = [
   // --- Victoria: 8 metropolitan + 1 hinterland ---
-  { slug: 'inner-melbourne', name: 'Inner Melbourne', state: 'VIC', ruralFringe: false,
-    councils: ['Melbourne', 'Port Phillip', 'Yarra'] },
-  { slug: 'inner-east', name: 'Inner East', state: 'VIC', ruralFringe: false,
-    councils: ['Boroondara', 'Stonnington'] },
-  { slug: 'eastern', name: 'Eastern Melbourne', state: 'VIC', ruralFringe: false,
-    councils: ['Whitehorse', 'Manningham', 'Maroondah', 'Knox', 'Yarra Ranges'] },
-  { slug: 'south-east', name: 'South East Melbourne', state: 'VIC', ruralFringe: false,
-    councils: ['Monash', 'Greater Dandenong', 'Casey', 'Cardinia'] },
-  { slug: 'bayside-and-peninsula', name: 'Bayside & Peninsula', state: 'VIC', ruralFringe: false,
-    councils: ['Bayside (Vic.)', 'Glen Eira', 'Kingston (Vic.)', 'Frankston', 'Mornington Peninsula'] },
-  { slug: 'northern', name: 'Northern Melbourne', state: 'VIC', ruralFringe: false,
-    councils: ['Darebin', 'Banyule', 'Whittlesea', 'Moreland'] },
-  { slug: 'north-west', name: 'North West Melbourne', state: 'VIC', ruralFringe: false,
-    councils: ['Hume', 'Moonee Valley', 'Melton', 'Mitchell'] },
-  { slug: 'western', name: 'Western Melbourne', state: 'VIC', ruralFringe: false,
-    councils: ['Brimbank', 'Maribyrnong', 'Hobsons Bay', 'Wyndham'] },
-  { slug: 'yarra-valley-and-hinterland', name: 'Yarra Valley & Hinterland', state: 'VIC', ruralFringe: true,
-    councils: ['Yarra Ranges', 'Nillumbik', 'Murrindindi', 'Baw Baw', 'Cardinia'] },
+  {
+    slug: 'inner-melbourne',
+    name: 'Inner Melbourne',
+    state: 'VIC',
+    ruralFringe: false,
+    councils: ['Melbourne', 'Port Phillip', 'Yarra'],
+  },
+  {
+    slug: 'inner-east',
+    name: 'Inner East',
+    state: 'VIC',
+    ruralFringe: false,
+    councils: ['Boroondara', 'Stonnington'],
+  },
+  {
+    slug: 'eastern',
+    name: 'Eastern Melbourne',
+    state: 'VIC',
+    ruralFringe: false,
+    councils: ['Whitehorse', 'Manningham', 'Maroondah', 'Knox', 'Yarra Ranges'],
+  },
+  {
+    slug: 'south-east',
+    name: 'South East Melbourne',
+    state: 'VIC',
+    ruralFringe: false,
+    councils: ['Monash', 'Greater Dandenong', 'Casey', 'Cardinia'],
+  },
+  {
+    slug: 'bayside-and-peninsula',
+    name: 'Bayside & Peninsula',
+    state: 'VIC',
+    ruralFringe: false,
+    councils: [
+      'Bayside (Vic.)',
+      'Glen Eira',
+      'Kingston (Vic.)',
+      'Frankston',
+      'Mornington Peninsula',
+    ],
+  },
+  {
+    slug: 'northern',
+    name: 'Northern Melbourne',
+    state: 'VIC',
+    ruralFringe: false,
+    councils: ['Darebin', 'Banyule', 'Whittlesea', 'Moreland'],
+  },
+  {
+    slug: 'north-west',
+    name: 'North West Melbourne',
+    state: 'VIC',
+    ruralFringe: false,
+    councils: ['Hume', 'Moonee Valley', 'Melton', 'Mitchell'],
+  },
+  {
+    slug: 'western',
+    name: 'Western Melbourne',
+    state: 'VIC',
+    ruralFringe: false,
+    councils: ['Brimbank', 'Maribyrnong', 'Hobsons Bay', 'Wyndham'],
+  },
+  {
+    slug: 'yarra-valley-and-hinterland',
+    name: 'Yarra Valley & Hinterland',
+    state: 'VIC',
+    ruralFringe: true,
+    councils: ['Yarra Ranges', 'Nillumbik', 'Murrindindi', 'Baw Baw', 'Cardinia'],
+  },
 
   // --- Queensland: 12 + 1 hinterland ---
-  { slug: 'brisbane-inner', name: 'Inner Brisbane', state: 'QLD', ruralFringe: false, councils: ['Brisbane'] },
-  { slug: 'brisbane-north', name: 'Brisbane North', state: 'QLD', ruralFringe: false, councils: ['Brisbane'] },
-  { slug: 'brisbane-east', name: 'Brisbane East', state: 'QLD', ruralFringe: false, councils: ['Brisbane'] },
-  { slug: 'brisbane-south', name: 'Brisbane South', state: 'QLD', ruralFringe: false, councils: ['Brisbane'] },
-  { slug: 'brisbane-west', name: 'Brisbane West', state: 'QLD', ruralFringe: false, councils: ['Brisbane'] },
+  {
+    slug: 'brisbane-inner',
+    name: 'Inner Brisbane',
+    state: 'QLD',
+    ruralFringe: false,
+    councils: ['Brisbane'],
+  },
+  {
+    slug: 'brisbane-north',
+    name: 'Brisbane North',
+    state: 'QLD',
+    ruralFringe: false,
+    councils: ['Brisbane'],
+  },
+  {
+    slug: 'brisbane-east',
+    name: 'Brisbane East',
+    state: 'QLD',
+    ruralFringe: false,
+    councils: ['Brisbane'],
+  },
+  {
+    slug: 'brisbane-south',
+    name: 'Brisbane South',
+    state: 'QLD',
+    ruralFringe: false,
+    councils: ['Brisbane'],
+  },
+  {
+    slug: 'brisbane-west',
+    name: 'Brisbane West',
+    state: 'QLD',
+    ruralFringe: false,
+    councils: ['Brisbane'],
+  },
   { slug: 'ipswich', name: 'Ipswich', state: 'QLD', ruralFringe: false, councils: ['Ipswich'] },
   { slug: 'logan', name: 'Logan', state: 'QLD', ruralFringe: false, councils: ['Logan'] },
   { slug: 'redlands', name: 'Redlands', state: 'QLD', ruralFringe: false, councils: ['Redland'] },
-  { slug: 'moreton-bay', name: 'Moreton Bay', state: 'QLD', ruralFringe: false, councils: ['Moreton Bay'] },
-  { slug: 'sunshine-coast', name: 'Sunshine Coast', state: 'QLD', ruralFringe: false, councils: ['Sunshine Coast'] },
+  {
+    slug: 'moreton-bay',
+    name: 'Moreton Bay',
+    state: 'QLD',
+    ruralFringe: false,
+    councils: ['Moreton Bay'],
+  },
+  {
+    slug: 'sunshine-coast',
+    name: 'Sunshine Coast',
+    state: 'QLD',
+    ruralFringe: false,
+    councils: ['Sunshine Coast'],
+  },
   { slug: 'noosa', name: 'Noosa', state: 'QLD', ruralFringe: false, councils: ['Noosa'] },
-  { slug: 'gold-coast', name: 'Gold Coast', state: 'QLD', ruralFringe: false, councils: ['Gold Coast'] },
-  { slug: 'seq-hinterland', name: 'South East Queensland Hinterland', state: 'QLD', ruralFringe: true,
-    councils: ['Scenic Rim', 'Gympie', 'Somerset'] },
+  {
+    slug: 'gold-coast',
+    name: 'Gold Coast',
+    state: 'QLD',
+    ruralFringe: false,
+    councils: ['Gold Coast'],
+  },
+  {
+    slug: 'seq-hinterland',
+    name: 'South East Queensland Hinterland',
+    state: 'QLD',
+    ruralFringe: true,
+    councils: ['Scenic Rim', 'Gympie', 'Somerset'],
+  },
 ] as const;
 
 const bySlug = new Map(REGIONS.map((r) => [r.slug, r]));
@@ -931,12 +1116,14 @@ git commit -q -m "feat: add 22-region model with council rules and Brisbane bear
 ## Task 6: The locality generator
 
 **Files:**
+
 - Create: `scripts/build-locations.mts`, `content/locations.generated.json`
 - Delete: `scripts/sort-legacy-suburbs.mjs`
 - Modify: `package.json`
 - Test: `tests/unit/generated-localities.test.ts`
 
 **Interfaces:**
+
 - Consumes: `REGIONS`, `resolveRegion`, `isRuralFringe`, `IMPOSSIBLE_COUNCILS`, `SINGLE_LOCALITY_COUNCIL_ALLOWLIST` (Task 5); `ANCHORS`, `nearestAnchor`, `distanceKm` (Task 4).
 - Produces: `content/locations.generated.json`, shape `{ generatedFrom: string; localities: GeneratedLocality[] }`. Committed.
 
@@ -971,7 +1158,7 @@ const localities = data.localities;
 describe('generated localities', () => {
   it('holds exactly the expected count', () => {
     // Spec §5. A change here is a review event, not a number to update.
-    expect(localities).toHaveLength(1516);
+    expect(localities).toHaveLength(1527);
   });
 
   it('gives every locality a unique slug', () => {
@@ -1060,7 +1247,7 @@ Expected: FAIL — `content/locations.generated.json` does not exist.
  *   npm run locations:build -- --fetch # re-download first
  *
  * This script FAILS rather than degrading. A council that suddenly contributes
- * one locality, or a total that moves off 1,516, is a data problem that must be
+ * one locality, or a total that moves off 1,527, is a data problem that must be
  * looked at — not something to absorb quietly.
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -1079,7 +1266,7 @@ const SOURCE_URL =
   'https://raw.githubusercontent.com/matthewproctor/australianpostcodes/master/australian_postcodes.json';
 const CACHE = resolve('.cache/australian_postcodes.json');
 const OUT = resolve('content/locations.generated.json');
-const EXPECTED_TOTAL = 1516;
+const EXPECTED_TOTAL = 1527;
 const NEIGHBOUR_COUNT = 6;
 
 /** Localities to exclude for reasons other than council. */
@@ -1090,9 +1277,21 @@ const EXCLUDED_REMOTENESS = new Set(['Remote Australia', 'Outer Regional Austral
  * while qldPresence is false, because Tier 1 implies local evidence.
  */
 const TIER_1_VIC = new Set([
-  'BAYSWATER', 'DANDENONG SOUTH', 'NOTTING HILL', 'PORT MELBOURNE', 'CLAYTON',
-  'BRAESIDE', 'TULLAMARINE', 'LAVERTON NORTH', 'CAMPBELLFIELD', 'VERMONT',
-  'CHIRNSIDE PARK', 'RINGWOOD', 'BOX HILL', 'RICHMOND', 'SOUTH MELBOURNE',
+  'BAYSWATER',
+  'DANDENONG SOUTH',
+  'NOTTING HILL',
+  'PORT MELBOURNE',
+  'CLAYTON',
+  'BRAESIDE',
+  'TULLAMARINE',
+  'LAVERTON NORTH',
+  'CAMPBELLFIELD',
+  'VERMONT',
+  'CHIRNSIDE PARK',
+  'RINGWOOD',
+  'BOX HILL',
+  'RICHMOND',
+  'SOUTH MELBOURNE',
 ]);
 
 type Row = {
@@ -1267,10 +1466,7 @@ if (localities.length !== EXPECTED_TOTAL) {
 
 localities.sort((a, b) => a.state.localeCompare(b.state) || a.slug.localeCompare(b.slug));
 
-writeFileSync(
-  OUT,
-  JSON.stringify({ generatedFrom: SOURCE_URL, localities }, null, 2) + '\n',
-);
+writeFileSync(OUT, JSON.stringify({ generatedFrom: SOURCE_URL, localities }, null, 2) + '\n');
 
 process.stdout.write(
   `Wrote ${localities.length} localities to ${OUT}\n` +
@@ -1288,7 +1484,7 @@ echo ".cache/" >> .gitignore
 npm run locations:build
 ```
 
-Expected: writes 1,516 localities, 15 Tier 1, ~243 rural fringe, ~47 councils.
+Expected: writes 1,527 localities, 15 Tier 1, ~243 rural fringe, ~45 councils.
 
 If it fails on the sanity check or the total, **do not edit the numbers to make it pass.** Read what it reports, decide whether the data or the rules are wrong, and fix that.
 
@@ -1304,7 +1500,7 @@ Expected: PASS, 10 tests.
 
 ```bash
 git add -A
-git commit -q -m "feat: generate 1,516 committed localities with failing sanity checks"
+git commit -q -m "feat: generate 1,527 committed localities with failing sanity checks"
 ```
 
 ---
@@ -1312,17 +1508,19 @@ git commit -q -m "feat: generate 1,516 committed localities with failing sanity 
 ## Task 7: Council notes
 
 **Files:**
+
 - Create: `content/councils.ts`
 - Test: `tests/unit/councils.test.ts`
 
 **Interfaces:**
+
 - Consumes: `content/locations.generated.json`.
 - Produces:
   - `type Council = { name: string; state: StateKey; buildingStock: string; note: string }`
   - `COUNCILS: readonly Council[]`
   - `getCouncil(name: string): Council | undefined`
 
-This is the leverage that makes 1,516 differentiated pages affordable: authored once per council, inherited by every suburb in it.
+This is the leverage that makes 1,527 differentiated pages affordable: authored once per council, inherited by every suburb in it.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1402,8 +1600,8 @@ export type Council = {
 /**
  * Authored once per council, inherited by every suburb in it.
  *
- * This is what makes 1,516 differentiated pages affordable: 47 pieces of real
- * writing instead of 1,516 name-swapped templates. Names match the dataset's
+ * This is what makes 1,527 differentiated pages affordable: 47 pieces of real
+ * writing instead of 1,527 name-swapped templates. Names match the dataset's
  * `lgaregion` verbatim, parenthesised disambiguators included.
  */
 export const COUNCILS: readonly Council[] = [
@@ -1412,16 +1610,14 @@ export const COUNCILS: readonly Council[] = [
     state: 'VIC',
     buildingStock:
       'Tilt-slab warehousing and factory units across the Dandenong South estate, with older brick-and-render showroom and retail frontage along Cheltenham and Princes Highway.',
-    note:
-      'Victoria\u2019s largest concentration of manufacturing floor space. Most work here is scoped around production that does not stop, so night and weekend access is normal rather than exceptional, and coating selection is driven by wash-down and forklift-impact exposure.',
+    note: 'Victoria\u2019s largest concentration of manufacturing floor space. Most work here is scoped around production that does not stop, so night and weekend access is normal rather than exceptional, and coating selection is driven by wash-down and forklift-impact exposure.',
   },
   {
     name: 'Boroondara',
     state: 'VIC',
     buildingStock:
       'Interwar and Victorian-era commercial frontage through Camberwell, Hawthorn and Kew, plus post-war office and medical conversions on the arterials.',
-    note:
-      'One of the most heavily heritage-overlaid municipalities in metropolitan Melbourne. Exterior colour changes on a contributory building frequently need a planning permit, which has to be allowed for in the programme rather than discovered mid-job.',
+    note: 'One of the most heavily heritage-overlaid municipalities in metropolitan Melbourne. Exterior colour changes on a contributory building frequently need a planning permit, which has to be allowed for in the programme rather than discovered mid-job.',
   },
   // ... continue for every council from Step 3.
 ] as const;
@@ -1453,11 +1649,13 @@ git commit -q -m "feat: add per-council building stock and operational notes"
 ## Task 8: Overrides and the read API
 
 **Files:**
+
 - Create: `content/locations.overrides.ts`, `lib/locations/index.ts`
 - Delete: `content/locations.ts`
 - Test: `tests/unit/locations-api.test.ts`
 
 **Interfaces:**
+
 - Consumes: Tasks 5–7.
 - Produces:
   - `type Locality = GeneratedLocality & { council: Council; intro?: string; localNotes?: readonly string[]; indexable: boolean; href: string }`
@@ -1661,11 +1859,7 @@ export function allLocalities(): readonly Locality[] {
   return ALL;
 }
 
-export function getLocality(
-  state: string,
-  region: string,
-  suburb: string,
-): Locality | undefined {
+export function getLocality(state: string, region: string, suburb: string): Locality | undefined {
   return BY_URL.get(`/locations/${state}/${region}/${suburb}/`);
 }
 
@@ -1719,10 +1913,12 @@ git add -A && git commit -q -m "feat: add locality read API with derived indexab
 ## Task 9: The locality facts component
 
 **Files:**
+
 - Create: `components/locations/locality-facts.tsx`
 - Test: `tests/unit/locality-facts.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `Locality` (Task 8), `getProject` from `@/content/projects`.
 - Produces: `<LocalityFacts locality={...} />`, and `driveBand(distanceKm: number): string`.
 
@@ -1858,9 +2054,9 @@ function nearestProject(locality: Locality) {
 
 function Fact({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="border-t border-ink-100 py-4">
+    <div className="border-ink-100 border-t py-4">
       <dt className="text-xs font-semibold uppercase tracking-label text-brand-600">{label}</dt>
-      <dd className="mt-1 text-sm text-ink-700">{children}</dd>
+      <dd className="text-ink-700 mt-1 text-sm">{children}</dd>
     </div>
   );
 }
@@ -1925,12 +2121,14 @@ git commit -q -m "feat: add six-fact locality block"
 ## Task 10: Suburb pages
 
 **Files:**
+
 - Create: `app/locations/[state]/[region]/[suburb]/page.tsx`
 - Test: `tests/unit/suburb-page.test.ts`
 
 **Interfaces:**
+
 - Consumes: Tasks 8, 9; `buildMetadata` from `@/lib/seo/metadata`; `breadcrumbSchema` from `@/lib/schema`.
-- Produces: 1,516 static routes.
+- Produces: 1,527 static routes.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1944,14 +2142,12 @@ import { allLocalities } from '@/lib/locations';
 describe('suburb routes', () => {
   it('generates one param set per locality', async () => {
     const params = await generateStaticParams();
-    expect(params).toHaveLength(1516);
+    expect(params).toHaveLength(1527);
   });
 
   it('generates params that match each locality href exactly', async () => {
     const params = await generateStaticParams();
-    const built = new Set(
-      params.map((p) => `/locations/${p.state}/${p.region}/${p.suburb}/`),
-    );
+    const built = new Set(params.map((p) => `/locations/${p.state}/${p.region}/${p.suburb}/`));
     for (const l of allLocalities()) {
       expect(built.has(l.href), l.name).toBe(true);
     }
@@ -2061,11 +2257,13 @@ export default async function SuburbPage({ params }: Props) {
             ) : (
               <p>
                 APMG Painting services commercial property in {name} and across{' '}
-                {locality.council.name}. We work on offices, retail tenancies, industrial
-                buildings, healthcare and education sites, and body corporate common property.
+                {locality.council.name}. We work on offices, retail tenancies, industrial buildings,
+                healthcare and education sites, and body corporate common property.
               </p>
             )}
-            {locality.localNotes?.map((note) => <p key={note}>{note}</p>)}
+            {locality.localNotes?.map((note) => (
+              <p key={note}>{note}</p>
+            ))}
           </Prose>
 
           <div className="mt-10">
@@ -2095,7 +2293,7 @@ Expected: PASS, 3 tests.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add -A && git commit -q -m "feat: add suburb pages for all 1,516 localities"
+git add -A && git commit -q -m "feat: add suburb pages for all 1,527 localities"
 ```
 
 ---
@@ -2103,10 +2301,12 @@ git add -A && git commit -q -m "feat: add suburb pages for all 1,516 localities"
 ## Task 11: Region, state and national hubs
 
 **Files:**
+
 - Create: `components/locations/suburb-directory.tsx`, `app/locations/[state]/[region]/page.tsx`, `app/locations/[state]/page.tsx`, `app/locations/page.tsx`
 - Test: `tests/unit/location-hubs.test.ts`
 
 **Interfaces:**
+
 - Consumes: Task 8.
 - Produces: `<SuburbDirectory localities={...} />`; three route levels; `generateStaticParams` on each.
 
@@ -2258,9 +2458,9 @@ export default async function RegionPage({ params }: Props) {
         <Container>
           <Prose>
             <p>
-              APMG Painting works across {def.name} on commercial property — offices and
-              tenancies, retail, industrial and warehouse, healthcare, education, aged care and
-              body corporate common property.
+              APMG Painting works across {def.name} on commercial property — offices and tenancies,
+              retail, industrial and warehouse, healthcare, education, aged care and body corporate
+              common property.
             </p>
           </Prose>
           <SectionHeading className="mb-6 mt-12">Suburbs we service</SectionHeading>
@@ -2352,7 +2552,7 @@ export default async function StatePage({ params }: Props) {
                     {r.name}
                   </Link>
                 </h3>
-                <p className="mt-2 text-sm text-ink-600">
+                <p className="text-ink-600 mt-2 text-sm">
                   {localitiesInRegion(r.slug).length} suburbs
                 </p>
               </Card>
@@ -2389,8 +2589,18 @@ export const metadata: Metadata = buildMetadata({
 });
 
 const STATES = [
-  { slug: 'victoria', key: 'VIC', name: 'Victoria', blurb: 'Metropolitan Melbourne, from our Chirnside Park base.' },
-  { slug: 'queensland', key: 'QLD', name: 'Queensland', blurb: 'Brisbane, the Sunshine Coast and the Gold Coast.' },
+  {
+    slug: 'victoria',
+    key: 'VIC',
+    name: 'Victoria',
+    blurb: 'Metropolitan Melbourne, from our Bayswater North base.',
+  },
+  {
+    slug: 'queensland',
+    key: 'QLD',
+    name: 'Queensland',
+    blurb: 'Brisbane, the Sunshine Coast and the Gold Coast.',
+  },
 ] as const;
 
 export default function LocationsPage() {
@@ -2399,9 +2609,7 @@ export default function LocationsPage() {
       <Section tone="sunken" className="py-10">
         <Container width="wide">
           <h1 className="font-display text-4xl tracking-tight sm:text-5xl">Where we work</h1>
-          <Lede className="mt-4">
-            {allLocalities().length} suburbs across two states.
-          </Lede>
+          <Lede className="mt-4">{allLocalities().length} suburbs across two states.</Lede>
         </Container>
       </Section>
 
@@ -2419,8 +2627,8 @@ export default function LocationsPage() {
                       {s.name}
                     </Link>
                   </h2>
-                  <p className="mt-2 text-sm text-ink-600">{s.blurb}</p>
-                  <p className="mt-3 text-sm text-ink-500">
+                  <p className="text-ink-600 mt-2 text-sm">{s.blurb}</p>
+                  <p className="text-ink-500 mt-3 text-sm">
                     {total} suburbs · {regions.length} regions
                   </p>
                 </Card>
@@ -2459,10 +2667,12 @@ git add -A && git commit -q -m "feat: add national, state and region location hu
 ## Task 12: Sitemap and navigation
 
 **Files:**
+
 - Modify: `app/sitemap.ts`, `components/navigation/nav-data.ts`
 - Test: `tests/unit/sitemap.test.ts`
 
 **Interfaces:**
+
 - Consumes: Tasks 8, 11.
 - Produces: a sitemap containing only indexable URLs; nav with a Locations entry and no residential column.
 
@@ -2490,7 +2700,10 @@ describe('sitemap', () => {
     const { allLocalities } = await import('@/lib/locations');
     const urls = new Set((await loadSitemap()).map((e) => e.url));
     for (const l of allLocalities().filter((x) => !x.indexable)) {
-      expect([...urls].some((u) => u.endsWith(l.href)), l.name).toBe(false);
+      expect(
+        [...urls].some((u) => u.endsWith(l.href)),
+        l.name,
+      ).toBe(false);
     }
   });
 
@@ -2498,7 +2711,10 @@ describe('sitemap', () => {
     const { indexableLocalities } = await import('@/lib/locations');
     const urls = (await loadSitemap()).map((e) => e.url);
     for (const l of indexableLocalities()) {
-      expect(urls.some((u) => u.endsWith(l.href)), l.name).toBe(true);
+      expect(
+        urls.some((u) => u.endsWith(l.href)),
+        l.name,
+      ).toBe(true);
     }
   });
 
@@ -2514,7 +2730,10 @@ describe('sitemap', () => {
     expect(urls.some((u) => u.endsWith('/locations/victoria/'))).toBe(true);
     expect(urls.some((u) => u.endsWith('/locations/queensland/'))).toBe(true);
     for (const r of REGIONS.filter((x) => !x.ruralFringe)) {
-      expect(urls.some((u) => u.includes(`/${r.slug}/`)), r.slug).toBe(true);
+      expect(
+        urls.some((u) => u.includes(`/${r.slug}/`)),
+        r.slug,
+      ).toBe(true);
     }
   });
 
@@ -2553,7 +2772,7 @@ import { REGIONS, indexableLocalities, stateSlug } from '@/lib/locations';
  * Sitemap.
  *
  * Indexable URLs only. Listing a noindex URL sends Google two contradictory
- * instructions, and with ~1,466 Tier 3 suburb pages that mistake would be the
+ * instructions, and with ~1,462 Tier 3 suburb pages that mistake would be the
  * dominant signal the site sends.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -2678,10 +2897,12 @@ git add -A && git commit -q -m "feat: rebuild sitemap and navigation around the 
 ## Task 13: Service-area schema
 
 **Files:**
+
 - Modify: `lib/schema/index.ts`
 - Test: `tests/unit/schema-service-area.test.ts`
 
 **Interfaces:**
+
 - Consumes: `qldPresence`, `ANCHORS`.
 - Produces: `localBusinessSchema()` emitting `areaServed` as a `GeoCircle` for VIC plus three `AdministrativeArea` entries for QLD.
 
@@ -2705,9 +2926,7 @@ describe('LocalBusiness', () => {
   it('names the three Queensland regions as areaServed', () => {
     const served = lb.areaServed as Array<Record<string, unknown>>;
     const names = served.map((a) => a.name).filter(Boolean);
-    expect(names).toEqual(
-      expect.arrayContaining(['Brisbane', 'Sunshine Coast', 'Gold Coast']),
-    );
+    expect(names).toEqual(expect.arrayContaining(['Brisbane', 'Sunshine Coast', 'Gold Coast']));
   });
 
   it('emits a GeoCircle for the Victorian radius', () => {
@@ -2749,7 +2968,7 @@ import { ANCHORS } from '@/lib/geo/anchors';
 /**
  * Service area.
  *
- * A GeoCircle for Victoria, because the radius around the Chirnside Park base
+ * A GeoCircle for Victoria, because the radius around the Bayswater North base
  * is a real, evidenced claim. Queensland is three named AdministrativeAreas
  * and nothing more: with no QLD address there is no second LocalBusiness and
  * no GeoCircle to anchor (spec §9). Naming a region we service is true;
@@ -2797,9 +3016,11 @@ git add -A && git commit -q -m "feat: emit VIC GeoCircle and named QLD service a
 ## Task 14: Queensland copy discipline test
 
 **Files:**
+
 - Test: `tests/unit/qld-copy-discipline.test.ts`
 
 **Interfaces:**
+
 - Consumes: everything.
 - Produces: nothing. This is a guard.
 
@@ -2892,12 +3113,14 @@ git commit -q -m "test: fail the build on any claim of Queensland local presence
 ## Task 15: Full build and E2E
 
 **Files:**
+
 - Modify: `tests/e2e/critical-flows.spec.ts`
 - Test: the whole suite
 
 **Interfaces:**
+
 - Consumes: all prior tasks.
-- Produces: a green `npm run verify` and a measured build time for 1,516 static pages.
+- Produces: a green `npm run verify` and a measured build time for 1,527 static pages.
 
 - [ ] **Step 1: Run the production build and record the numbers**
 
@@ -2907,7 +3130,7 @@ time npm run build 2>&1 | tee build.log
 grep -cE "^\s*[├└]?\s*●|/locations/" build.log
 ```
 
-Expected: build succeeds; ≥ 1,516 location routes prerendered.
+Expected: build succeeds; ≥ 1,527 location routes prerendered.
 
 Record wall-clock time. Spec §15 flags build time as a risk: if it exceeds roughly 10 minutes, stop and raise it rather than pressing on — the mitigation is moving Tier 3 to on-demand ISR, and that is a design change, not a tweak.
 
@@ -2938,10 +3161,7 @@ test('navigates national -> state -> region -> suburb', async ({ page }) => {
 test('every page is noindex in sandbox mode', async ({ page }) => {
   const response = await page.goto('/locations/victoria/eastern/chirnside-park/');
   expect(response?.headers()['x-robots-tag']).toBe('noindex, nofollow');
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
-    'content',
-    /noindex/,
-  );
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
 });
 
 test('robots.txt blocks everything in sandbox mode', async ({ request }) => {
@@ -2983,7 +3203,7 @@ git commit -q -m "test: cover location navigation and sandbox lockdown end to en
 
 Append to `docs/CLIENT-BRIEF.md` under a new heading `## 8. Location coverage`:
 
-- 1,516 suburb pages exist across VIC and QLD
+- 1,527 suburb pages exist across VIC and QLD
 - ~72 are indexable at launch (22 region hubs minus 2 fringe, plus 15 Tier 1 VIC suburbs); the rest are noindex pending evidence
 - No Queensland page is indexable until APMG supplies a QLD address or a documented QLD project
 - The Tier 1 seed list needs APMG's confirmation that those are the precincts worth targeting
@@ -2999,27 +3219,27 @@ git commit -q -m "docs: record location coverage and what unlocks each tier"
 
 **Spec coverage**
 
-| Spec section | Task |
-|---|---|
-| §2 goals 1, 5 | 2, 14 |
-| §3 non-goals | 2 (residential), plan scope (no sector × suburb) |
-| §5 anchors, filter chain | 4, 6 |
-| §5.1 bad data, sanity check | 5, 6 |
-| §5.2 rural fringe, urban allowlists | 5 |
-| §6 information architecture | 10, 11, 12 |
-| §6.1 22 regions, Brisbane split | 5 |
-| §7 tiers, indexability | 6, 8, 12 |
-| §8 six facts | 7, 9 |
-| §8.1 generator pipeline | 6 |
-| §9 QLD honesty | 8, 13, 14 |
-| §10 structured data | 13 |
-| §11 four-layer lockdown | 3, 15 |
-| §12 SEO improvements | 12, 13 |
-| §13 content inventory | 2, 6, 8, 12 |
-| §14 testing | every task |
-| §15 build-time risk | 15 |
-| §16 client brief | 15 |
-| §17 phases 1–3 | this plan |
+| Spec section                        | Task                                             |
+| ----------------------------------- | ------------------------------------------------ |
+| §2 goals 1, 5                       | 2, 14                                            |
+| §3 non-goals                        | 2 (residential), plan scope (no sector × suburb) |
+| §5 anchors, filter chain            | 4, 6                                             |
+| §5.1 bad data, sanity check         | 5, 6                                             |
+| §5.2 rural fringe, urban allowlists | 5                                                |
+| §6 information architecture         | 10, 11, 12                                       |
+| §6.1 22 regions, Brisbane split     | 5                                                |
+| §7 tiers, indexability              | 6, 8, 12                                         |
+| §8 six facts                        | 7, 9                                             |
+| §8.1 generator pipeline             | 6                                                |
+| §9 QLD honesty                      | 8, 13, 14                                        |
+| §10 structured data                 | 13                                               |
+| §11 four-layer lockdown             | 3, 15                                            |
+| §12 SEO improvements                | 12, 13                                           |
+| §13 content inventory               | 2, 6, 8, 12                                      |
+| §14 testing                         | every task                                       |
+| §15 build-time risk                 | 15                                               |
+| §16 client brief                    | 15                                               |
+| §17 phases 1–3                      | this plan                                        |
 
 Not covered here, by design: §10's `Service` and `FAQPage` schema on service and sector pages, and §12's internal-linking matrix — both are phase 4/5 work.
 

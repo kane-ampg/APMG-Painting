@@ -51,22 +51,31 @@ describe('structured data', () => {
     expect(served).toContain('Victoria');
   });
 
-  it('omits geo, hours and Google Business Profile until they are confirmed', () => {
-    // These three are the highest-value local signals on the site, which is
-    // exactly why a guessed value is dangerous: a wrong latitude moves the
-    // business, invented hours tell people to call an empty office, and a
-    // wrong sameAs claims an entity APMG does not own. Structure ships now,
-    // values ship when APMG supplies them.
+  it('omits geo and hours until they are confirmed', () => {
+    // Both are high-value local signals, which is exactly why a guessed value
+    // is dangerous: a wrong latitude moves the business, and invented hours
+    // tell people to call an empty office. Structure ships now, values ship
+    // when APMG supplies them.
     const schema = localBusinessSchema();
 
     expect(site.coords).toBeNull();
     expect(site.openingHours).toBeNull();
-    expect(site.social.google).toBeNull();
 
     expect(schema.geo).toBeUndefined();
     expect(schema.openingHoursSpecification).toBeUndefined();
     expect(JSON.stringify(schema.areaServed)).not.toContain('GeoCircle');
     expect(schema.sameAs).not.toContain(null);
+  });
+
+  it('links the Google Business Profile through sameAs', () => {
+    // The single largest map-pack signal the site can emit: it is how Google is
+    // told that this entity and that profile are the same business. Resolved
+    // from the review widget on apmgpainting.com.au, so it is APMG's own
+    // profile rather than a guessed one.
+    const schema = localBusinessSchema();
+
+    expect(site.social.google).toContain('place_id:');
+    expect(schema.sameAs).toContain(site.social.google);
   });
 
   it('offers the same service area on a service as on the business', () => {

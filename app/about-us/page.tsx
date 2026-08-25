@@ -2,13 +2,13 @@ import type { Metadata } from 'next';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import { ContentBlock, CtaBand, Hero, TrustBar } from '@/components/sections';
-import { Container, Placeholder, Prose, Section, SectionHeading } from '@/components/ui';
-import { accreditations, formattedAddress, site } from '@/lib/site';
+import { Container, Prose, Section, SectionHeading } from '@/components/ui';
+import { accreditations, addressNote, formattedAddress, previousAddress, site } from '@/lib/site';
 
 export const metadata: Metadata = buildMetadata({
   title: 'About APMG Painting | Melbourne Painting Contractor',
   description:
-    'APMG Painting is a Melbourne painting and property maintenance contractor founded in 2015, based in Chirnside Park and working across commercial and residential sites.',
+    'APMG Painting is a Melbourne commercial painting and property maintenance contractor founded in 2015, based in Bayswater North and working across schools, healthcare, strata, retail and industrial sites.',
   path: '/about-us/',
 });
 
@@ -18,7 +18,7 @@ export default function AboutPage() {
       <Hero
         eyebrow="About"
         heading="A painting contractor built around how sites actually run"
-        lede={`Founded in ${site.founded} and based in ${site.address.suburb}, APMG Painting works across commercial and residential projects throughout metropolitan Melbourne.`}
+        lede={`Founded in ${site.founded} and based in ${site.address.suburb}, APMG Painting works across commercial and industrial projects throughout metropolitan Melbourne.`}
         primaryCta={{ label: 'See our projects', href: '/projects/' }}
         secondaryCta={{ label: 'Get in touch', href: '/contact-us/' }}
         image={{
@@ -47,8 +47,8 @@ export default function AboutPage() {
           </p>
           <p>
             Today we run multiple projects across Melbourne at once while keeping the finish and the
-            service consistent. Whether it is detailed residential work or a larger commercial or
-            industrial programme, the same care and attention goes in.
+            service consistent. Whether it is a single tenancy or a larger commercial or industrial
+            programme, the same care and attention goes in.
           </p>
         </Prose>
       </ContentBlock>
@@ -57,13 +57,10 @@ export default function AboutPage() {
         <Container>
           <SectionHeading className="mb-3">Accreditations and checks</SectionHeading>
           <p className="mb-6 max-w-prose text-ink-soft">
-            These are the credentials APMG holds. Each is listed here only once a current
-            certificate has been supplied.
+            These are the credentials APMG holds. The screening checks are held per person rather
+            than by the company, so they are named here rather than badged — ask and the current
+            checks for the crew attending your site will be provided.
           </p>
-
-          <div className="mb-6">
-            <Placeholder note="none of the accreditations below are displayed as verified yet. The live site names the Master Painters body five different ways, cites a non-existent body ('registered with Workplace Safety'), and describes an 'NDIS Accreditation' where the actual credential is an NDIS Worker Screening Check. Certificates are needed before any of this is published as fact." />
-          </div>
 
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {accreditations.map((item) => (
@@ -73,13 +70,11 @@ export default function AboutPage() {
               >
                 <span className="font-semibold text-ink">{item.label}</span>
                 <span className="text-sm text-ink-soft">{item.detail}</span>
-                <span
-                  className={`mt-1 text-xs font-semibold uppercase tracking-label ${
-                    item.verified ? 'text-ink-muted' : 'text-signal-600'
-                  }`}
-                >
-                  {item.verified ? 'Verified' : 'Awaiting certificate'}
-                </span>
+                {!item.verified && (
+                  <span className="mt-1 text-xs font-semibold uppercase tracking-label text-signal-600">
+                    Awaiting certificate
+                  </span>
+                )}
               </li>
             ))}
           </ul>
@@ -89,6 +84,12 @@ export default function AboutPage() {
       <ContentBlock heading="Where we are">
         <Prose>
           <p>{formattedAddress}. We work across metropolitan Melbourne from there.</p>
+          {addressNote() && (
+            <p>
+              APMG moves into the Bayswater North office in October 2026. Until then the team works
+              from {previousAddress} — same phone, same crews, same jobs.
+            </p>
+          )}
           <p>
             {site.abn
               ? `ABN ${site.abn}.`
@@ -99,7 +100,7 @@ export default function AboutPage() {
 
       <CtaBand
         heading="Work with us"
-        body="Commercial site assessments and residential quotes both start the same way — tell us what needs painting."
+        body="Every enquiry starts the same way — tell us what needs painting, where it is, and when we are allowed on site."
         cta={{ label: 'Get in touch', href: '/contact-us/' }}
       />
     </>

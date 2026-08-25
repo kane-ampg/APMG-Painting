@@ -176,8 +176,7 @@ export default async function ProjectPage({ params }: Props) {
                   .filter((service) => service !== undefined)
                   .map((service) => ({
                     label: service.shortTitle,
-                    href:
-                      service.audience === 'commercial' ? '/commercial/' : '/residential-painting/',
+                    href: '/commercial/',
                   }))}
               />
 

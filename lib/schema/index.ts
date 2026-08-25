@@ -1,5 +1,5 @@
 import { formattedAddress, site, siteUrl, verifiedAccreditations } from '@/lib/site';
-import { averageRating, verifiedReviews } from '@/content/reviews';
+import { averageRating, firstPartyReviews } from '@/content/reviews';
 import { locations } from '@/content/locations';
 import { services } from '@/content/services';
 import type { Project } from '@/lib/content/types';
@@ -12,12 +12,12 @@ export const brandLogoPath = '/images/brand/apmg-logo-ink.webp';
  *
  * Rules held here deliberately:
  *  - Structured data represents visible, verified content only.
- *  - aggregateRating is emitted ONLY from verified first-party reviews in
- *    content/reviews.ts, which is currently empty. The live site displays
- *    "5.0, based on 70 reviews" from a Google widget; review markup must
- *    reflect reviews the site itself hosts and can evidence, so nothing is
- *    emitted from that widget. Populate reviews.ts and this lights up on its
- *    own.
+ *  - aggregateRating is emitted ONLY from verified FIRST-PARTY reviews in
+ *    content/reviews.ts, which currently holds none. The seven Google reviews
+ *    in that file render on the page with attribution but are excluded here:
+ *    review markup must reflect reviews the site itself collected, and marking
+ *    up reviews read back off a Google profile is a well-worn route to a manual
+ *    action. Add a first-party review and this lights up on its own.
  *  - No telephone is emitted from CallRail's dynamic number insertion — only
  *    the canonical business number.
  *  - Accreditations appear only once verified.
@@ -49,7 +49,9 @@ export function organizationSchema(): JsonLdValue {
       postalCode: site.address.postcode,
       addressCountry: site.address.country,
     },
-    sameAs: [site.social.instagram, site.social.facebook],
+    // Same three profiles as the LocalBusiness node, so both nodes point Google
+    // at one entity rather than two half-described ones.
+    sameAs: [site.social.instagram, site.social.facebook, site.social.google].filter(Boolean),
     ...(knowsAbout.length > 0 ? { knowsAbout } : {}),
   };
 }
@@ -176,12 +178,12 @@ export function localBusinessSchema(): JsonLdValue {
       : {}),
     areaServed: areaServedFragment(),
     // The Google Business Profile is the entity link that matters most for the
-    // map pack, and it is absent until APMG supplies it.
+    // map pack. Resolved from the review widget on the live site.
     sameAs: [site.social.instagram, site.social.facebook, site.social.google].filter(Boolean),
-    description: `${site.name} is a commercial and residential painting contractor based in ${site.address.suburb}, serving metropolitan Melbourne.`,
+    description: `${site.name} is a commercial painting contractor based in ${site.address.suburb}, serving metropolitan Melbourne.`,
     ...offerCatalogFragment(),
     ...openingHoursFragment(),
-    // Spreads to nothing while content/reviews.ts holds no verified entries.
+    // Spreads to nothing while content/reviews.ts holds no first-party entries.
     // priceRange stays absent until APMG supplies a defensible band.
     ...aggregateRatingFragment(),
   };
@@ -189,8 +191,8 @@ export function localBusinessSchema(): JsonLdValue {
 
 /**
  * The aggregateRating + review block, derived from verified first-party
- * reviews. Returns an empty object when there are none, so the spread above is
- * a no-op rather than a zero-star business.
+ * reviews only. Returns an empty object when there are none, so the spread
+ * above is a no-op rather than a zero-star business.
  *
  * The average and the count are computed, never typed. A hand-written
  * aggregate that disagrees with the reviews under it is exactly what earns a
@@ -204,15 +206,15 @@ function aggregateRatingFragment(): JsonLdValue {
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: average,
-      reviewCount: verifiedReviews.length,
+      reviewCount: firstPartyReviews.length,
       bestRating: 5,
       worstRating: 1,
     },
-    review: verifiedReviews.map((entry) => ({
+    review: firstPartyReviews.map((entry) => ({
       '@type': 'Review',
       reviewRating: { '@type': 'Rating', ratingValue: entry.rating, bestRating: 5, worstRating: 1 },
       author: { '@type': 'Person', name: entry.attribution },
-      datePublished: entry.date,
+      ...(entry.date ? { datePublished: entry.date } : {}),
       reviewBody: entry.quote,
     })),
   };

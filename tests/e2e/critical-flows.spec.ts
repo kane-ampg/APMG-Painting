@@ -88,7 +88,7 @@ test.describe('navigation', () => {
 
     // The last thing in the drawer has to be reachable without the panel
     // clipping it — the failure mode that hid every link before.
-    await expect(drawer.getByRole('link', { name: /request a free quote/i })).toBeInViewport();
+    await expect(drawer.getByRole('link', { name: /1300 97 97 40/ })).toBeInViewport();
   });
 
   test('reaches the commercial page and it targets the commercial query', async ({ page }) => {
@@ -99,11 +99,6 @@ test.describe('navigation', () => {
     );
   });
 
-  test('reaches the residential page', async ({ page }) => {
-    await page.goto('/residential-painting/');
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText(/House painters/i);
-  });
-
   test('the homepage no longer competes for the commercial query', async ({ page }) => {
     await page.goto('/');
     const title = await page.title();
@@ -112,13 +107,7 @@ test.describe('navigation', () => {
   });
 
   test('every page has exactly one h1', async ({ page }) => {
-    for (const path of [
-      '/',
-      '/commercial/',
-      '/residential-painting/',
-      '/projects/',
-      '/about-us/',
-    ]) {
+    for (const path of ['/', '/commercial/', '/projects/', '/about-us/']) {
       await page.goto(path);
       await expect(page.locator('h1'), `h1 count on ${path}`).toHaveCount(1);
     }
@@ -182,32 +171,8 @@ test.describe('commercial enquiry', () => {
   });
 });
 
-test.describe('residential enquiry', () => {
-  test('accepts valid data', async ({ page }, testInfo) => {
-    await withOwnClientIp(page, testInfo, 2);
-    await page.goto('/contact-us/#residential');
-
-    const form = page.locator('form').filter({ has: page.getByLabel('Suburb') });
-    await form.getByLabel('Your name').fill('Jo Smith');
-    await form.getByLabel('Phone').fill('0400 000 000');
-    await form.getByLabel('Email').fill('jo@example.com');
-    await form.getByLabel('Suburb').fill('Camberwell');
-    await form.getByLabel('Property type').selectOption('house');
-    await form.getByLabel('What needs painting?').selectOption('both');
-    await form.getByLabel('Approximate timeframe').selectOption('1-3-months');
-    await form
-      .getByLabel('Tell us about the job')
-      .fill('Weatherboard exterior, peeling on the north face.');
-
-    await page.waitForTimeout(3500);
-    await form.getByRole('button', { name: /request a free quote/i }).click();
-
-    await expect(form.getByRole('status')).toBeVisible();
-  });
-});
-
 test.describe('quote chat', () => {
-  test('is absent from the contact page, where the full forms already are', async ({ page }) => {
+  test('is absent from the contact page, where the full form already is', async ({ page }) => {
     await page.goto('/contact-us/');
     await expect(page.getByRole('button', { name: /get a quote|quote chat/i })).toHaveCount(0);
   });
@@ -221,13 +186,13 @@ test.describe('quote chat', () => {
 
     // Quoted from content/faqs.ts, not generated.
     await expect(panel.getByRole('log')).toContainText(
-      'We work across metropolitan Melbourne from our base at Chirnside Park.',
+      'We work across metropolitan Melbourne from our base at Bayswater North.',
     );
     // The quote flow is still right there.
-    await expect(panel.getByRole('button', { name: 'My home' })).toBeVisible();
+    await expect(panel.getByLabel('Organisation')).toBeVisible();
   });
 
-  test('walks the residential flow and states plainly that nothing was delivered', async ({
+  test('walks the commercial flow and states plainly that nothing was delivered', async ({
     page,
   }, testInfo) => {
     await withOwnClientIp(page, testInfo, 3);
@@ -240,16 +205,25 @@ test.describe('quote chat', () => {
     // from the moment the panel opened.
     await page.waitForTimeout(3500);
 
-    await panel.getByRole('button', { name: 'My home' }).click();
-    await panel.getByLabel('Suburb').fill('Chirnside Park');
+    await panel.getByLabel('Organisation').fill('Vermont Secondary College');
     await panel.getByRole('button', { name: 'Next', exact: true }).click();
 
-    await panel.getByRole('button', { name: 'Both', exact: true }).click();
-    await panel.getByRole('button', { name: 'House', exact: true }).click();
-    await panel.getByRole('button', { name: 'As soon as possible' }).click();
+    await panel.getByRole('button', { name: 'School or childcare' }).click();
 
-    await panel.getByLabel('About the job').fill('Weatherboard exterior plus three bedrooms.');
+    await panel.getByLabel('Project location').fill('Vermont');
     await panel.getByRole('button', { name: 'Next', exact: true }).click();
+
+    await panel
+      .getByLabel('Scope summary')
+      .fill('Internal common areas and two external elevations.');
+    await panel.getByRole('button', { name: 'Next', exact: true }).click();
+
+    await panel.getByRole('button', { name: 'Still planning' }).click();
+
+    await panel.getByLabel('Operating-hours constraints').fill('Term breaks only.');
+    await panel.getByRole('button', { name: 'Next', exact: true }).click();
+
+    await panel.getByRole('button', { name: 'Yes, please' }).click();
 
     await panel.getByLabel('Your name').fill('Sam Taylor');
     await panel.getByLabel('Phone').fill('0400 000 000');
@@ -267,12 +241,11 @@ test.describe('quote chat', () => {
     await page.getByRole('button', { name: 'Get a quote' }).click();
 
     const panel = page.getByRole('dialog', { name: 'Get a quote' });
-    await panel.getByRole('button', { name: 'My home' }).click();
-    await panel.getByLabel('Suburb').fill('a');
+    await panel.getByLabel('Organisation').fill('a');
     await panel.getByRole('button', { name: 'Next', exact: true }).click();
 
-    await expect(panel.getByLabel('Suburb')).toHaveAttribute('aria-invalid', 'true');
-    await expect(panel.getByText('Enter your suburb.')).toBeVisible();
+    await expect(panel.getByLabel('Organisation')).toHaveAttribute('aria-invalid', 'true');
+    await expect(panel.getByText('Enter your organisation.')).toBeVisible();
   });
 
   test('closes on Escape and returns focus to the launcher', async ({ page }) => {
@@ -302,19 +275,20 @@ test.describe('quote chat under reduced motion', () => {
     await page.getByRole('button', { name: 'Get a quote' }).click();
 
     const panel = page.getByRole('dialog', { name: 'Get a quote' });
-    await expect(panel.getByRole('button', { name: 'My home' })).toBeVisible();
+    await expect(panel.getByLabel('Organisation')).toBeVisible();
 
-    await panel.getByRole('button', { name: 'My home' }).click();
+    await panel.getByLabel('Organisation').fill('Vermont Secondary College');
+    await panel.getByRole('button', { name: 'Next', exact: true }).click();
 
     // The turn that arrived, and the control that came with it.
-    await expect(panel.getByRole('log')).toContainText('Whereabouts is the property?');
-    await expect(panel.getByLabel('Suburb')).toBeVisible();
-    await expect(panel.getByRole('button', { name: 'Next', exact: true })).toBeVisible();
+    await expect(panel.getByRole('log')).toContainText('What kind of site is it?');
+    await expect(panel.getByRole('button', { name: 'School or childcare' })).toBeVisible();
+    await expect(panel.getByRole('button', { name: 'Back', exact: true })).toBeVisible();
 
     // Visible in the layout sense is not enough — assert it is actually painted.
     for (const locator of [
       panel.getByRole('log').locator('p').last(),
-      panel.getByRole('button', { name: 'Next', exact: true }),
+      panel.getByRole('button', { name: 'School or childcare' }),
     ]) {
       await expect(locator).toHaveCSS('opacity', '1');
     }

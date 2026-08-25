@@ -9,43 +9,50 @@ import { getService } from '@/content/services';
 import { tradeFaqs } from '@/content/faqs';
 
 /**
- * Trade services. 287 words on the live site — the thinnest page of the lot.
+ * Painting for builders and head contractors. 287 words on the live site —
+ * the thinnest page of the lot.
  */
 export const metadata: Metadata = buildMetadata({
-  title: 'Trade & Property Maintenance Services Melbourne | APMG Painting',
+  title: 'Painting for Builders & Head Contractors Melbourne | APMG Painting',
   description:
-    'Plastering, rendering, tiling, flooring and making good across Melbourne — the adjacent trades that sit around a painting scope, run under one programme.',
+    'Painting delivered into a construction programme across Melbourne — staged to the build, sequenced around other trades, and carried through to handover.',
   path: '/trade-services/',
 });
 
-const service = getService('property-maintenance');
+const service = getService('builders-and-head-contractors');
 
 const TRADES = [
   {
-    name: 'Plastering and patching',
-    body: 'Repairs to damaged plasterboard, cornice and set joints, brought back to a paintable finish.',
+    name: 'New-build painting',
+    body: 'Painting packages for new construction, staged to follow the build rather than run as a single visit.',
   },
   {
-    name: 'Rendering',
-    body: 'Render repairs and new render, most often as preparation ahead of an exterior coating.',
+    name: 'Defect rectification and touch-up',
+    body: 'Touch-up and defect painting ahead of handover, matched to the original coating system.',
   },
-  { name: 'Tiling', body: 'Wall and floor tiling as part of a wider refurbishment scope.' },
-  { name: 'Flooring', body: 'Floor coverings coordinated with the painting programme.' },
   {
-    name: 'Making good',
-    body: 'The small repairs that hold up a handover — filling, sealing, trims and fixings.',
+    name: 'Practical completion and defects liability',
+    body: 'Painting carried through practical completion and into the defects-liability period as items are raised.',
+  },
+  {
+    name: 'Sequencing around other trades',
+    body: 'Painting programmed around the trades ahead of it and the trades that follow, rather than assumed to fit in the gaps.',
+  },
+  {
+    name: 'Substrate preparation',
+    body: 'New plasterboard, fresh render and previously worked surfaces filled, sanded, sealed and primed ahead of coating.',
   },
 ];
 
 /**
- * Trade content: how a mixed scope is actually sequenced. General building
- * knowledge, not a claim about APMG's record.
+ * Trade content: how painting sits inside a construction sequence. General
+ * building knowledge, not a claim about APMG's record.
  */
 const SEQUENCE = [
-  'The order is not negotiable, and most delays come from getting it wrong. Structural and services work first, because everything after it gets damaged if it runs late. Then wet trades — rendering, plastering, patching — which need drying time that cannot be compressed. Then sealing and coating. Then floor coverings, because a finished floor laid before the painting is a floor that gets protected, walked on and eventually argued about.',
-  'Drying time is the constraint people underestimate. Fresh render and new plaster hold moisture, and coating over either before it has dried through traps that moisture behind the film. What follows is blistering, patchy sheen or adhesion failure a few months later — a defect that looks like bad paint and is actually a scheduling decision. In a Melbourne winter those drying windows are meaningfully longer than in summer, and the programme has to say so.',
-  'Making good is a bigger line than most scopes allow for. On a tenancy that has been through several fit-outs, the walls carry old fixings, partition scars, cable penetrations, removed signage and layers of previous patching that never matched. Cutting that back and bringing it to a consistent substrate is frequently more work than the coating over it, and it is the item most often under-scoped in a competing quote.',
-  'What cannot be seen cannot be priced firm. Water damage, unstable render, rusted fixings and previous poor repairs are usually hidden under a coating and only surface once preparation starts. The honest way to handle that is a labelled provisional sum against the areas that cannot be assessed until they are opened, with anything found reported and priced before it is carried out.',
+  'The order is not negotiable, and most delays come from getting it wrong. Structural and services work first, because everything after it gets damaged if it runs late. Wet trades ahead of painting — render, plaster and set — need drying time that cannot be compressed. Painting follows once the substrate is dry and prepared, and other trades that could mark a finished surface are scheduled to follow it rather than precede it.',
+  'Drying time is the constraint people underestimate. Fresh render and new plasterboard set hold moisture, and coating over either before it has dried through traps that moisture behind the film. What follows is blistering, patchy sheen or adhesion failure a few months later — a defect that looks like bad paint and is actually a scheduling decision. In a Melbourne winter those drying windows are meaningfully longer than in summer, and the programme has to say so.',
+  'Substrate preparation is a bigger line than most scopes allow for. New plasterboard needs its joints set and sanded flush before it will take a finish evenly, and surfaces already handled by other trades carry fixings, marks and patching that need bringing to a consistent, paintable surface. Getting that stage right is frequently more work than the coating that follows it, and it is the item most often under-scoped in a competing quote.',
+  'What cannot be seen cannot be priced firm. Water damage, unstable render and previous poor repairs are usually hidden under a coating and only surface once preparation starts. The honest way to handle that is a labelled provisional sum against the areas that cannot be assessed until they are opened, with anything found reported and priced before it is carried out.',
 ];
 
 export default function TradeServicesPage() {
@@ -53,39 +60,39 @@ export default function TradeServicesPage() {
     <>
       <JsonLd
         data={serviceSchema({
-          name: 'Trade and property maintenance services',
+          name: 'Painting for builders and head contractors',
           description:
-            'Plastering, patching, rendering, tiling, flooring and making good, coordinated alongside a painting programme across Melbourne.',
+            'Painting delivered into a construction programme — staged to the build, sequenced around other trades, and carried through to handover, across Melbourne.',
           path: '/trade-services/',
         })}
       />
       <JsonLd data={faqSchema(tradeFaqs)} />
 
       <Hero
-        eyebrow="Property maintenance"
-        heading="Trade and maintenance services"
-        lede="Painting scopes rarely arrive on their own. Running the adjacent trades under one programme removes the gap between contractors that usually stalls a job."
+        eyebrow="Builders & head contractors"
+        heading="Painting for builders and head contractors"
+        lede="Painting delivered into a construction programme rather than a single site visit — staged to the build, sequenced around other trades, and carried through to handover."
         primaryCta={{ label: 'Discuss a scope', href: '/contact-us/#commercial' }}
         secondaryCta={{ label: 'Commercial painting', href: '/commercial/' }}
         image={{
-          src: '/images/work/fascia-gutter-ladder.webp',
-          alt: 'An APMG tradesperson on a ladder working along the fascia and gutter line of a weatherboard house',
+          src: '/images/work/office-partition-cutting-in.webp',
+          alt: 'An APMG painter cutting in above a glazed partition in an open-plan office, working around the fit-out already in place',
         }}
       />
 
       <Container width="wide">
-        <Breadcrumbs crumbs={[{ name: 'Trade services', path: '/trade-services/' }]} />
+        <Breadcrumbs crumbs={[{ name: 'Builders & head contractors', path: '/trade-services/' }]} />
       </Container>
 
-      <ContentBlock heading="Why these sit alongside painting">
+      <ContentBlock heading="Painting on a construction programme">
         <Prose className="mb-8">
           {service?.body.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
           <p>
-            On commercial sites this matters more than it sounds. A repaint held up waiting on a
-            plasterer is a zone the client cannot use, and on a staged programme one delay moves
-            everything behind it.
+            On commercial sites this matters more than it sounds. A finish held up waiting on the
+            trade ahead of it is a zone the head contractor cannot hand over, and on a staged
+            programme one delay moves everything behind it.
           </p>
         </Prose>
 
@@ -103,10 +110,10 @@ export default function TradeServicesPage() {
         tone="sunken"
         src="/images/work/office-partition-cutting-in.webp"
         alt="A wide view of an office floor mid-repaint, a painter cutting in a partition head while the desks around him stay in place"
-        caption="An office floor part-way through a repaint. On a tenancy that has been through several fit-outs, cutting back the old fixings, partition scars and mismatched patching is frequently more work than the coating that follows it."
+        caption="A tenancy fit-out ahead of practical completion. Bringing fixings, partition heads and previous patching to a consistent, paintable surface is frequently more work than the coating that follows it."
       />
 
-      <ContentBlock tone="sunken" heading="How a mixed scope is sequenced">
+      <ContentBlock tone="sunken" heading="How painting sits in the sequence">
         <Prose>
           {SEQUENCE.map((paragraph) => (
             <p key={paragraph.slice(0, 48)}>{paragraph}</p>
@@ -114,13 +121,13 @@ export default function TradeServicesPage() {
         </Prose>
       </ContentBlock>
 
-      <ContentBlock heading="Trade and maintenance questions">
+      <ContentBlock heading="Builder and head contractor questions">
         <FaqList items={tradeFaqs} />
       </ContentBlock>
 
       <CtaBand
-        heading="Scope covering more than paint?"
-        body="Tell us what is involved and we will tell you what we can run under one programme."
+        heading="Painting on your build?"
+        body="Tell us where painting sits in the programme and we will tell you how we fit around it."
         cta={{ label: 'Get in touch', href: '/contact-us/' }}
       />
     </>

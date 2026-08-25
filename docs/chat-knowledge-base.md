@@ -49,17 +49,18 @@ does. Do not say "we'll be in touch" while that is true.
 
 Canonical source: [lib/site.ts](../lib/site.ts).
 
-| Field             | Value                                                       |
-| ----------------- | ----------------------------------------------------------- |
-| Trading name      | APMG Painting                                               |
-| Registered entity | APMG Painting Services Pty Ltd                              |
-| ABN               | **Not published.** Do not state one.                        |
-| Founded           | 2015                                                        |
-| Phone             | 1300 97 97 40 (`tel:1300979740`)                            |
-| Email             | info@apmgpainting.com.au                                    |
-| Address           | Factory 15/30 Ramset Dr, Chirnside Park VIC 3116, Australia |
-| Instagram         | https://www.instagram.com/apmgpainting/                     |
-| Facebook          | https://www.facebook.com/apmgpainting/                      |
+| Field             | Value                                              |
+| ----------------- | -------------------------------------------------- |
+| Trading name      | APMG Painting                                      |
+| Registered entity | APMG Painting Services Pty Ltd                     |
+| ABN               | **Not published.** Do not state one.               |
+| Founded           | 2015                                               |
+| Phone             | 1300 97 97 40 (`tel:1300979740`)                   |
+| Email             | info@apmgpainting.com.au                           |
+| Address           | 1 Turbo Drive, Bayswater North VIC 3153, Australia |
+| Instagram         | https://www.instagram.com/apmgpainting/            |
+| Facebook          | https://www.facebook.com/apmgpainting/             |
+| Google profile    | Place ID `ChIJnV9lqRIw1moRftY3Ankvfdw`             |
 
 One name, always: **APMG Painting** in prose. "APMG Painting Services Pty Ltd" only where the legal
 entity is the point. The live WordPress site used four variants plus the typo "AMPG" — none of those
@@ -69,7 +70,12 @@ are correct.
 
 ## 3. Service area
 
-Metropolitan Melbourne, roughly 60 km around the Chirnside Park base.
+Metropolitan Melbourne, roughly 60 km around the Bayswater North base.
+
+APMG moves from Factory 15/30 Ramset Dr, Chirnside Park into 1 Turbo Drive, Bayswater North in
+October 2026. Both are in Melbourne's outer east, roughly fifteen minutes apart, so nothing about
+the service area changes. If asked where the office is, give the Bayswater North address and say the
+move is happening — do not present Chirnside Park as current.
 
 Suburb pages exist for Vermont, Brighton, Glen Iris, Armadale, Parkdale, Travancore and Gardenvale
 ([content/locations.ts](../content/locations.ts)). A page existing is not a claim of exclusivity, and
@@ -80,25 +86,38 @@ its absence is not a refusal — for anything borderline, the honest answer is t
 
 ---
 
-## 4. What is NOT verified — never claim these
+## 4. What IS verified — and the edge of it
 
-Every credential below is awaiting a certificate from APMG. Until `verified` flips to `true` in
-[lib/site.ts](../lib/site.ts), the site does not render it and the chat does not mention it.
+APMG confirmed the credential set on 24 August 2026 and nominated apmgpainting.com.au as the source.
+These are sayable, in exactly these words:
 
 - Master Painters Australia — Registered Master Painter
-- Dulux Accredited Painter (and the 5-year workmanship warranty that depends on it)
+- Dulux Accredited Painter, which supports a 5-year workmanship warranty
+- Cm3 prequalified — contractor OHS prequalification
+- Haymes Paint — accredited applicator
 - Fully insured — public liability and workers compensation
-- Working with Children Checks
-- Police checks
-- NDIS Worker Screening Check
+- Working with Children Checks — held by personnel on education and childcare sites
+- Police checks — held by personnel on healthcare and aged care sites
+- NDIS Worker Screening Check — held by personnel on NDIS sites
 
-If someone asks directly — "are you insured?", "do your painters have WWCCs?" — do not say yes, do
-not say no, and do not hedge into an implication. Say the documentation is provided directly and
-route them to the phone. For commercial work, §5 covers what is genuinely documented per site.
+Two things to hold onto. The screening checks are held **per person**, not by the company, so say
+"the crew attending your site hold current checks and we provide them on request" rather than
+implying a company-level certification. And no certificate of currency is on file for the insurance
+— it rests on APMG's word — so if someone asks for documentation, route them to the phone rather
+than promising a document you cannot see.
 
-Also unverified, so also unsayable: any warranty period, any "award-winning" claim, any staff or crew
-count, any customer-satisfaction figure, and any testimonial. The NDIS case study notes the source
-page claimed client praise but published no attributable quotation — that quotation does not exist.
+The single correction that survives from the original audit: the NDIS credential is a **Worker
+Screening Check**, not an "NDIS Accreditation", and there is no body called "Workplace Safety".
+
+Still unverified, so still unsayable: any ABN, any "award-winning" claim, any staff or crew count,
+and any price. The NDIS case study notes the source page claimed client praise but published no
+attributable quotation — that quotation does not exist.
+
+### Reviews
+
+APMG's Google Business Profile shows 5.0 from 70 reviews (read 24 August 2026). The site reproduces
+seven of them — the commercial ones — with attribution. Quote those seven freely. State the 5.0 as
+**Google's** figure, never as the site's own rating, and never invent a review or a client count.
 
 ---
 
@@ -118,11 +137,11 @@ Eight commercial sectors ([content/sectors.ts](../content/sectors.ts)):
 education and childcare · healthcare · aged care and retirement living · body corporate and strata ·
 retail · hospitality · leisure and sports facilities · industrial and warehouse
 
-Plus residential work, and office fit-outs as their own page.
+Office fit-outs also have their own page.
 
 The positioning, in one line: painting buildings that cannot stop running — schools mid-term, clinics
-between patients, warehouses mid-shift, and homes people are still living in. Commercial programmes
-are staged around the site: after hours, overnight, in term breaks, or zone by zone.
+between patients, warehouses mid-shift. Programmes are staged around the site: after hours, overnight,
+in term breaks, or zone by zone.
 
 For commercial sites, Safe Work Method Statements, insurance certificates and site-specific
 compliance documentation are prepared before work begins, with a pre-start meeting to confirm
@@ -133,7 +152,7 @@ requirements. Describe that as process — it is not a substitute for the unveri
 
 ## 6. Evidence — the complete list
 
-Five case studies ([content/projects.ts](../content/projects.ts)). Nothing outside this list may be
+Four case studies ([content/projects.ts](../content/projects.ts)). Nothing outside this list may be
 cited as work APMG has done.
 
 | Project                                                        | Type                                          |
@@ -142,7 +161,6 @@ cited as work APMG has done.
 | Factory exterior repaint, Noble Park                           | Manufacturing facility                        |
 | Repaint of 11 NDIS offices across Melbourne                    | Disability services provider, 11 office sites |
 | Medical clinic fit-out and painting — Newbay Medical, Brighton | Medical clinic                                |
-| House painting, Glen Iris                                      | Detached home                                 |
 
 Useful specifics, all sourced: the NDIS programme was eleven occupied workplaces under one contract
 with fixed budget accountability; the Noble Park factory was repainted in the client's brand colours
@@ -153,27 +171,26 @@ one job — ladders, scaffolding, scissor lifts, boom lift — planned per eleva
 
 ## 7. The published FAQ corpus
 
-[content/faqs.ts](../content/faqs.ts) is the answer pool: `faqs` (commercial, residential and
-both-audience), plus `officeFaqs`, `tradeFaqs` and `homeFaqs`. Answer from it verbatim.
+[content/faqs.ts](../content/faqs.ts) is the answer pool: `faqs` (all commercial), plus `officeFaqs`,
+`tradeFaqs` and `homeFaqs`. Answer from it verbatim.
 
 The five surfaced in the chat today
 ([lib/enquiry/chat-faqs.ts](../lib/enquiry/chat-faqs.ts)) — reproduced here so this document stands
 alone:
 
 **Which areas of Melbourne do you cover?**
-We work across metropolitan Melbourne from our base at Chirnside Park. If you are unsure whether your
+We work across metropolitan Melbourne from our base at Bayswater North. If you are unsure whether your
 property is within range, call and ask — it is a quicker answer than a form.
 
-**What actually drives the price of a house repaint?**
-Preparation, access and the number of colours, roughly in that order. A sound wall that needs a wash
-and two coats is inexpensive; the same wall with failing render, filled cracks and a sealant
-replacement is not. Second-storey or steep-site access adds equipment. Every additional colour adds
-cutting-in time. Floor area on its own is a poor predictor, which is why the quote follows a site
-visit.
+**What documentation do you provide before starting?**
+Safe Work Method Statements, insurance certificates and site-specific compliance documentation are
+prepared before work begins, and we hold a pre-start meeting to confirm requirements and safety
+expectations for each site.
 
-**Do I need to move out?**
-For most interior work, no. We stage the job room by room and protect flooring, furniture and
-fittings as we go, so you keep using the rest of the house.
+**Do you quote per site or per programme?**
+Either. For multi-site work we provide an itemised breakdown covering labour, materials and
+scheduling per location, so budget holders can see where the cost sits rather than receiving a single
+figure.
 
 **Can you work outside our operating hours?**
 Yes. Most commercial programmes we run are staged around the site rather than the other way round —
@@ -185,12 +202,6 @@ working.
 For commercial work, yes. A site assessment is how scope, access constraints and operating-hours
 limitations get established before a number is put on the job.
 
-Frequently asked and worth knowing verbatim from the pool: exterior paint life depends on substrate,
-exposure and preparation far more than product, and condition (chalking, hairline cracking, failed
-sealant, paint lifting at board bottoms) is a more useful signal than a number of years. Timing
-depends on surface temperature and moisture, not the calendar. Wallpaper may be sealed and coated
-only if firmly adhered with tight seams; that call is made on site.
-
 ---
 
 ## 8. Taking an enquiry
@@ -198,9 +209,6 @@ only if firmly adhered with tight seams; that call is made on site.
 The chat collects exactly what the enquiry forms collect, because it posts to the same Server Action
 and is validated by the same schema ([lib/validation/enquiry.ts](../lib/validation/enquiry.ts)).
 Never ask for anything beyond these, and never ask for payment details.
-
-**Residential** — suburb; interior/exterior/both; house, apartment, townhouse or other; timeframe
-(ASAP, 1–3 months, 3+ months, still planning); a description of the job; name, phone, email.
 
 **Commercial** — organisation; sector (the eight in §5, or other); project location; scope summary;
 timeframe (as above plus "going to tender"); operating-hours constraints (optional); whether a site

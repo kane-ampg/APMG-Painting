@@ -1,15 +1,17 @@
 import { z } from 'zod';
 
 /**
- * Enquiry schemas.
+ * Enquiry schema.
  *
- * Two audiences, two schemas. The live WordPress site runs one Contact Form 7
+ * Commercial only. The live WordPress site ran one generic Contact Form 7
  * instance on every page — name, phone, email, address, suburb, a service
- * dropdown and a message — which asks a facilities manager and a homeowner the
- * same questions and gets useful answers from neither.
+ * dropdown and a message — which asked a facilities manager useful questions
+ * for almost none of that. This schema asks what a commercial enquiry
+ * actually needs: organisation, sector, project location, scope, timeframe
+ * and operating-hours constraints.
  *
- * These schemas are shared by the client and the server. The server always
- * re-validates; client validation is a convenience, never a control.
+ * Shared by the client and the server. The server always re-validates; client
+ * validation is a convenience, never a control.
  */
 
 const name = z.string().trim().min(2, 'Enter your name.').max(100, 'That name is too long.');
@@ -38,29 +40,6 @@ const antiSpam = {
   company_website: z.string().max(0, 'Rejected.').optional().default(''),
   renderedAt: z.coerce.number().int().nonnegative(),
 };
-
-export const residentialEnquirySchema = z.object({
-  ...antiSpam,
-  formType: z.literal('residential'),
-  name,
-  phone,
-  email,
-  suburb: z.string().trim().min(2, 'Enter your suburb.').max(80),
-  propertyType: z.enum(['house', 'apartment', 'townhouse', 'other'], {
-    errorMap: () => ({ message: 'Choose a property type.' }),
-  }),
-  workType: z.enum(['interior', 'exterior', 'both'], {
-    errorMap: () => ({ message: 'Choose interior, exterior or both.' }),
-  }),
-  timeframe: z.enum(['asap', '1-3-months', '3-plus-months', 'planning'], {
-    errorMap: () => ({ message: 'Choose an approximate timeframe.' }),
-  }),
-  description: z
-    .string()
-    .trim()
-    .min(10, 'Tell us a little about the job — 10 characters or more.')
-    .max(4000, 'Please keep this under 4000 characters.'),
-});
 
 export const commercialEnquirySchema = z.object({
   ...antiSpam,
@@ -102,14 +81,10 @@ export const commercialEnquirySchema = z.object({
   siteAssessmentRequested: z.coerce.boolean().optional().default(false),
 });
 
-export const enquirySchema = z.discriminatedUnion('formType', [
-  residentialEnquirySchema,
-  commercialEnquirySchema,
-]);
-
-export type ResidentialEnquiry = z.infer<typeof residentialEnquirySchema>;
 export type CommercialEnquiry = z.infer<typeof commercialEnquirySchema>;
-export type Enquiry = z.infer<typeof enquirySchema>;
+/** One schema now — kept as its own alias so callers describe the payload
+ *  generically rather than naming the (single) audience it comes from. */
+export type Enquiry = CommercialEnquiry;
 
 /** Minimum seconds between form render and submit. Below this it is a bot. */
 export const MIN_COMPLETION_SECONDS = 3;

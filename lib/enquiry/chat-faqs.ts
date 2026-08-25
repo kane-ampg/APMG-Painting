@@ -12,17 +12,14 @@ import { faqs } from '@/content/faqs';
  * had verified; a chat bubble is not a lower standard of publication than a
  * page, so it draws from the same reviewed pool.
  *
- * Chosen to span both audiences, because the opening turn does not yet know
- * whether it is talking to a homeowner or a facilities manager.
- *
  * When this becomes model-backed, `docs/chat-knowledge-base.md` is the grounding
  * document, and the same rule carries over: quote the source or say you do not
  * know and offer the phone number.
  */
 export const QUICK_QUESTIONS: readonly string[] = [
   'Which areas of Melbourne do you cover?',
-  'What actually drives the price of a house repaint?',
-  'Do I need to move out?',
+  'What documentation do you provide before starting?',
+  'Do you quote per site or per programme?',
   'Can you work outside our operating hours?',
   'Will you attend site before quoting?',
 ] as const;
