@@ -115,3 +115,83 @@ test.describe('page transitions', () => {
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   });
 });
+
+test.describe('deep links into /areas/', () => {
+  test('breadcrumb, one h1 and Service Areas marking hold from the hub down to a suburb', async ({
+    page,
+    isMobile,
+  }) => {
+    // Service Areas is only ever marked in the accessibility tree by the
+    // desktop bar: on mobile it is either hidden (nav collapsed) or lives in
+    // the drawer, which only exists in the DOM while open. The drawer's own
+    // marking is covered above ("the drawer opens with your section already
+    // unfolded and marked").
+    test.skip(isMobile, 'Desktop bar only.');
+
+    const nav = mainNav(page);
+
+    // Areas -> Victoria -> Eastern -> Vermont. The first level is the page
+    // itself; every level below it is a URL descendant, so Service Areas
+    // switches from "this is the page" to "this is the section" exactly once,
+    // on the way down, and never switches back.
+    const levels: { path: string; navState: 'page' | 'section' }[] = [
+      { path: '/areas/', navState: 'page' },
+      { path: '/areas/victoria/', navState: 'section' },
+      { path: '/areas/victoria/eastern/', navState: 'section' },
+      { path: '/areas/victoria/eastern/vermont/', navState: 'section' },
+    ];
+
+    for (const { path, navState } of levels) {
+      await test.step(path, async () => {
+        const response = await page.goto(path);
+        expect(response?.status()).toBe(200);
+
+        // The breadcrumb trail is the only landmark rendered inside <main> on
+        // these pages — the header, the main nav and the drawer all live
+        // outside it — so asserting it is first proves it opens the content
+        // rather than trailing the hero underneath it.
+        const main = page.locator('#main');
+        const firstLandmark = main.locator('nav, header, aside').first();
+        await expect(firstLandmark).toHaveAttribute('aria-label', 'Breadcrumb');
+
+        await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+
+        const button = nav.getByRole('button', { name: /^Service Areas/ });
+        if (navState === 'page') {
+          await expect(button).toHaveAttribute('aria-current', 'page');
+        } else {
+          // A section is styled the same way a current page is (the
+          // `text-brand-700` trigger colour) but never carries
+          // `aria-current` — only one thing in the menu may claim to be the
+          // page itself (components/navigation/desktop-nav.tsx).
+          await expect(button).not.toHaveAttribute('aria-current', 'page');
+          await expect(button).toHaveClass(/text-brand-700/);
+        }
+      });
+    }
+  });
+
+  test('a Queensland Tier 3 suburb page renders and is noindex', async ({ page }) => {
+    const response = await page.goto('/areas/queensland/gold-coast/molendinar/');
+    expect(response?.status()).toBe(200);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+
+    /*
+     * The site runs sandboxed by default (`NEXT_PUBLIC_SANDBOX` unset, or set
+     * to anything other than exactly "false"), and the sandbox lockdown forces
+     * `noindex, nofollow` on every single page regardless of what it asks for
+     * — so a bare "is this noindex" assertion would pass on any URL on this
+     * site and prove nothing about Molendinar in particular.
+     *
+     * What actually makes this page noindex is `locality.indexable`, which is
+     * false for every Queensland locality while `qldPresence` is false — and
+     * that half of the claim is already checked directly, independent of the
+     * sandbox flag, in tests/unit/content-integrity.test.ts ("no Queensland
+     * locality is indexable while qldPresence is false") and
+     * tests/unit/locations-tiers.test.ts. What those unit tests cannot cover
+     * is whether the computed value actually reaches the rendered page, which
+     * is the integration concern this assertion exists for.
+     */
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+  });
+});

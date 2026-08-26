@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { COUNCILS, getCouncil } from '@/content/councils';
+import { FORBIDDEN } from './qld-copy.test';
 
 /**
  * Council notes.
@@ -8,21 +9,12 @@ import { COUNCILS, getCouncil } from '@/content/councils';
  *
  * 1. No claimed presence in Queensland. APMG has no Queensland address,
  *    projects or phone number, so a QLD note may describe the place and how
- *    work is scoped there but never a footprint in it.
+ *    work is scoped there but never a footprint in it. The phrase list this
+ *    checks against is `FORBIDDEN`, imported from tests/unit/qld-copy.test.ts
+ *    rather than duplicated here — one list, one place to strengthen.
  * 2. Real writing, not a filled-in template. A note short enough to be a
  *    label is not differentiation.
  */
-
-const PRESENCE_CLAIMS = [
-  'based in',
-  'our brisbane',
-  'our gold coast',
-  'our sunshine coast',
-  'local to',
-  'our team in',
-  'our office in',
-  'we are located',
-];
 
 describe('COUNCILS', () => {
   it('holds 45 councils', () => {
@@ -54,7 +46,7 @@ describe('no Queensland council note claims a presence', () => {
     '%s',
     (name, council) => {
       const text = `${council.buildingStock} ${council.note}`.toLowerCase();
-      for (const claim of PRESENCE_CLAIMS) {
+      for (const claim of FORBIDDEN) {
         expect(text, `${name} claims "${claim}"`).not.toContain(claim);
       }
     },
