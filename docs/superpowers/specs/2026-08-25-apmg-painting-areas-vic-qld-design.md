@@ -1,16 +1,40 @@
 # APMG Painting — `/areas/` expanded to VIC + South East Queensland
 
 **Date:** 2026-08-25
-**Status:** Approved, pending implementation plan
+**Status:** Implemented 2026-08-26. See the revision note below.
 **Repo:** `APMG-Painting` (site 2)
 **Related:** `docs/superpowers/specs/2026-08-24-apmg-commercial-vic-qld-design.md` — the site 3 design this build ports its locality subsystem from
+
+---
+
+## Revision — 2026-08-26
+
+Implemented. Two things moved from the figures below and are corrected throughout.
+
+**The locality total is 1,387, not 1,440.** The final whole-branch review found ~53 non-suburb
+rows surviving the generator's artifact filter — post offices (`TUNSTALL SQUARE PO`), delivery
+facilities (`HEATHWOOD DF`), shopping centres (`CHADSTONE CENTRE`, `PACIFIC FAIR`),
+street-address delivery rows (`BEDFORD ROAD`, `BRENTFORD SQUARE`) and one detention centre
+(`WACOL EAST IMMIGRATION CENTRE`). They were rendering as suburb pages and, worse, being listed
+as suburbs on the **indexable** region hubs — the exact doorway signal §7 exists to prevent,
+on the 41 pages that are actually indexed. Six pattern rules replaced the hand list. Four
+further candidate rules were tested and rejected because each destroyed a real locality
+(`/ CITY$/` → Brisbane City; `/ CENTRAL$/` → Springfield/Wynnum/Logan/Hamilton/Kinglake Central;
+`/ GARDENS$/` → Aspendale/Florida/Cypress Gardens; `/ TERRACE$/` → Petrie Terrace); the
+rejections are documented in the generator and pinned by a test.
+
+**41 indexable pages is unchanged.** None of the 53 was a Tier 1 entry or a redirect target, so
+the tiering figures move only in the Tier 3 denominator.
+
+Derived: 1,412 pages (was 1,465), Tier 3 1,371 (was 1,424), VIC 583 / QLD 804 (was 612 / 828),
+fringe 207 (was 209), anchors 583/482/167/155 (was 612/501/172/155).
 
 ---
 
 ## 1. Purpose
 
 Add `Areas` to the main navigation and expand `/areas/` from 7 flat suburb pages to
-the full locality set inside four service radii: 1,440 suburbs across Victoria and
+the full locality set inside four service radii: 1,387 suburbs across Victoria and
 South East Queensland, arranged state → region → suburb, with indexability tiered so
 that scale does not read as a doorway network.
 
@@ -28,14 +52,18 @@ Confirmed with the client before design:
 | Repo         | This one (`APMG-Painting`), not `APMG-Commercial` | Site 3 already has an equivalent build; this one now ships                             |
 | URL base     | `/areas/` retained                                | Renaming to `/locations/` — rejected, moves indexed URLs for no gain                   |
 | URL shape    | Nested `state → region → suburb`                  | Flat `/areas/painters-{suburb}/` — see §4.1, it cannot hold the set                    |
-| Indexability | Tiered                                            | Index all 1,440 — see §7                                                               |
+| Indexability | Tiered                                            | Index all 1,387 — see §7                                                               |
 | Data         | Port the generator from site 3                    | Copy generated JSON (unregenerable); rewrite from scratch (re-earns every data defect) |
 
 ## 3. Non-goals
 
-- **Sector × suburb pages.** 8 sectors × 1,440 suburbs = 11,520 pages. Not built, not
+- **Sector × suburb pages.** 8 sectors × 1,387 suburbs = 11,096 pages. Not built, not
   in a later phase, not ever at suburb granularity.
-- **Going live.** The sandbox stays locked down (§10). This build does not launch.
+- ~~**Going live.** The sandbox stays locked down (§10). This build does not launch.~~
+  **Superseded 2026-08-26** — the site went live in commit `7d7129f`, which removed all four
+  noindex layers deliberately. §10.1 is now history rather than active guidance: the defect it
+  describes was fixed first, so the four layers released together as designed rather than
+  leaving a header-level `noindex` behind.
 - **A Queensland presence.** See §9.
 - **Re-sorting the 68 legacy suburb pages on traffic data.** `scripts/sort-legacy-suburbs.mjs`
   already exists for that and needs a Search Console export APMG has not supplied.
@@ -53,7 +81,7 @@ Confirmed with the client before design:
 /areas/queensland/{region}/{suburb}/        suburb
 ```
 
-1,440 suburbs + 22 region hubs + 2 state hubs + 1 national hub = **1,465 pages**.
+1,387 suburbs + 22 region hubs + 2 state hubs + 1 national hub = **1,412 pages**.
 
 ### 4.1 Why nesting is forced, not preferred
 
@@ -61,15 +89,15 @@ Two independent reasons, either sufficient:
 
 1. **Slug collisions.** 13 locality names exist in both states — Albion, Brighton,
    Burnside, Clifton Hill, Donnybrook, Fairfield, Gilberton, Heathwood, Middle Park,
-   Newport, Sumner, Windsor, Wishart. A flat namespace resolves 1,440 localities to
-   1,427 slugs. `painters-brighton` already exists in this repo for Brighton VIC, which
+   Newport, Sumner, Windsor, Wishart. A flat namespace resolves 1,387 localities to
+   1,374 slugs. `painters-brighton` already exists in this repo for Brighton VIC, which
    carries a real documented project; a flat scheme would either overwrite it or need
    ad-hoc state suffixes on an arbitrary 13.
 2. **Next.js routing.** `app/areas/[slug]/` and `app/areas/[state]/` cannot be siblings —
    two different dynamic segment names at one level is a build error. Adding the state
    tier therefore _requires_ deleting `app/areas/[slug]/`.
 
-The hub layer is also the point: 1,440 leaves hanging directly off one index page is the
+The hub layer is also the point: 1,387 leaves hanging directly off one index page is the
 weakest possible internal-link shape. Region hubs are what make the set crawlable and
 what give each suburb page somewhere to pass equity to.
 
@@ -79,13 +107,13 @@ Geographic first, council second. Ported verbatim from site 3 §6.1. Brisbane Ci
 Council is 307 localities in one LGA, so it splits into five regions by bearing from the
 CBD (Inner ≤5km, then North 315°–45°, East 45°–135°, South 135°–225°, West 225°–315°).
 
-**Victoria (8 + 1):** Inner Melbourne 45, Inner East 36, Eastern 78, South East 63,
-Bayside & Peninsula 97, Northern 79, North West 32, Western 74, _Yarra Valley &
-Hinterland 108 (fringe)_.
+**Victoria (8 + 1):** Inner Melbourne 38, Inner East 36, Eastern 73, South East 61,
+Bayside & Peninsula 90, Northern 76, North West 32, Western 71, _Yarra Valley &
+Hinterland 106 (fringe)_. Sums to 583.
 
-**Queensland (12 + 1):** Brisbane Inner 65, Brisbane North 54, Brisbane East 40,
-Brisbane South 82, Brisbane West 41, Ipswich 32, Logan 50, Redlands 20, Moreton Bay 77,
-Sunshine Coast 97, Noosa 29, Gold Coast 140, _SEQ Hinterland 101 (fringe)_.
+**Queensland (12 + 1):** Brisbane Inner 60, Brisbane North 51, Brisbane East 39,
+Brisbane South 79, Brisbane West 40, Ipswich 31, Logan 49, Redlands 20, Moreton Bay 73,
+Sunshine Coast 97, Noosa 29, Gold Coast 135, _SEQ Hinterland 101 (fringe)_. Sums to 804.
 
 ## 5. Legacy URLs
 
@@ -139,9 +167,9 @@ Used verbatim. Do not round.
 
 | Anchor          | Coordinates            | Radius | Localities |
 | --------------- | ---------------------- | ------ | ---------- |
-| Bayswater North | −37.845116, 145.270141 | 50 km  | 612        |
-| Brisbane CBD    | −27.4698, 153.0251     | 40 km  | 501        |
-| Southport       | −27.9680, 153.4000     | 40 km  | 172        |
+| Bayswater North | −37.845116, 145.270141 | 50 km  | 583        |
+| Brisbane CBD    | −27.4698, 153.0251     | 40 km  | 482        |
+| Southport       | −27.9680, 153.4000     | 40 km  | 167        |
 | Maroochydore    | −26.6600, 153.0930     | 40 km  | 155        |
 
 Assignment is nearest-anchor **within the same state**, so overlapping radii (Brisbane
@@ -176,7 +204,7 @@ It carries data cleanup that is expensive to rediscover and invisible when absen
 
 The generator **fails** rather than degrading:
 
-- Total ≠ 1,440 → build error. Changing this number is a decision, not a fix.
+- Total ≠ 1,387 → build error. Changing this number is a decision, not a fix.
 - Any council contributing ≤2 localities and not on `SINGLE_LOCALITY_COUNCIL_ALLOWLIST`
   (`Melton`, `Mitchell`, `Somerset` — human-reviewed, never auto-populated) → build error.
 
@@ -186,13 +214,14 @@ The generator **fails** rather than degrading:
   hence the gate. Somerset contributes two, legitimately: it is a rural-fringe council whose
   in-radius portion is genuinely that small (§7.3). Verified against the generated data —
   Melton 1, Mitchell 1, Somerset 2, and no other council sits at or below the threshold.
+
 - A locality whose council has no note in `content/councils.ts` → throws at import.
 
 This turns a silent data regression into a red build.
 
 ## 7. Indexability
 
-The mechanism that makes 1,465 pages safe.
+The mechanism that makes 1,412 pages safe.
 
 | Tier          | Count | Sitemap | robots         | Content                       |
 | ------------- | ----- | ------- | -------------- | ----------------------------- |
@@ -200,9 +229,9 @@ The mechanism that makes 1,465 pages safe.
 | State hub     | 2     | ✅      | index,follow   | Hand-written                  |
 | Region hub    | 22    | ✅      | index,follow   | 800–1,200 words, hand-written |
 | Tier 1 suburb | 16    | ✅      | index,follow   | Hand-written, unique          |
-| Tier 3 suburb | 1,424 | ❌      | noindex,follow | Data-differentiated (§8)      |
+| Tier 3 suburb | 1,371 | ❌      | noindex,follow | Data-differentiated (§8)      |
 
-**41 indexable pages, not 1,440.** Google sees a small strong site with a large
+**41 indexable pages, not 1,387.** Google sees a small strong site with a large
 crawlable substrate beneath it.
 
 `noindex,follow` rather than `noindex,nofollow` is deliberate: the page passes no
@@ -242,7 +271,7 @@ Promoted to Tier 1 in this build, bringing Tier 1 to **16** and total indexable 
 
 ### 7.3 Rural fringe
 
-209 localities across Scenic Rim, Nillumbik, Murrindindi, Baw Baw, Gympie, Somerset and
+207 localities across Scenic Rim, Nillumbik, Murrindindi, Baw Baw, Gympie, Somerset and
 the rural parts of Cardinia and Yarra Ranges are farmland with no commercial building
 stock worth targeting. They:
 
@@ -275,7 +304,7 @@ what separates the build from a name-swapped template.
 | Postcode(s)                       | Dataset                                                            |
 | Region and state                  | Assigned (§4.2)                                                    |
 
-45 pieces of real writing carry 1,440 pages. That is the leverage that makes genuine
+45 pieces of real writing carry 1,387 pages. That is the leverage that makes genuine
 differentiation affordable.
 
 Neighbour links are stored as **full hrefs, not bare slugs** — a bare slug is ambiguous
@@ -297,7 +326,7 @@ number. Therefore:
   otherwise.
 - **Copy discipline.** QLD pages say "we service". Never "based in", "our Brisbane team",
   or "local to the Gold Coast".
-- **All 828 QLD suburbs are Tier 3** while `qldPresence === false`.
+- **All 804 QLD suburbs are Tier 3** while `qldPresence === false`.
 - **QLD region hubs stay indexable** on genuine service and sector content — what the
   work involves, how it is scoped and sequenced — which is true regardless of where it
   is performed.
@@ -352,7 +381,7 @@ a `lastmod` that is always "now" is one Google learns to ignore.
 ### 10.4 Internal linking
 
 Suburb → region hub → state hub → `/areas/`, plus suburb → nearest documented project,
-suburb → six nearest suburbs, and region hub → sector pages. This is what turns 1,424
+suburb → six nearest suburbs, and region hub → sector pages. This is what turns 1,371
 `noindex,follow` pages from dead weight into a crawl substrate that feeds the 41 indexable
 ones.
 
@@ -423,7 +452,7 @@ trade rankings and none of them can be built:
 | Sandbox  | All four lockdown layers active when `NEXT_PUBLIC_SANDBOX` unset; **all four absent when `"false"`**; sitemap contains no noindex URL                               |
 | Copy     | No QLD page contains "based in", "our Brisbane", "local to"                                                                                                         |
 | E2E      | Suburb → region → state → sector navigation; `Areas` nav on desktop and mobile; enquiry form; 404                                                                   |
-| Build    | 1,465 static pages generate; build time recorded                                                                                                                    |
+| Build    | 1,412 static pages generate; build time recorded                                                                                                                    |
 
 The copy test is unusual but load-bearing: §9 is the constraint most likely to be broken
 by a later well-meaning edit, and a lint rule catches it where a review will not.
@@ -432,8 +461,8 @@ by a later well-meaning edit, and a lint rule catches it where a review will not
 
 | Risk                                    | Mitigation                                                                                                   |
 | --------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| 1,465 pages read as a doorway network   | Tier 3 is noindex and absent from the sitemap. Google sees 41 pages                                          |
-| Build time at 1,465 static pages        | Measure early. If unacceptable, Tier 3 moves to on-demand ISR — noindex and low-traffic, so it costs nothing |
+| 1,412 pages read as a doorway network   | Tier 3 is noindex and absent from the sitemap. Google sees 41 pages                                          |
+| Build time at 1,412 static pages        | Measure early. If unacceptable, Tier 3 moves to on-demand ISR — noindex and low-traffic, so it costs nothing |
 | Third-party dataset is imperfect        | Output committed; sanity check fails the build; corrupt columns unused; defect rules documented in §6.2      |
 | QLD honesty erodes over time            | Automated copy test, plus `qldPresence` as the single switch                                                 |
 | Tier 3 never gets promoted              | §11 lists exactly what promotes a page; `indexabilityReason` recorded per suburb                             |
