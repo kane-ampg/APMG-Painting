@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { isSandbox, site, siteUrl } from '@/lib/site';
+import { site, siteUrl } from '@/lib/site';
 
 type BuildMetadataArgs = {
   title: string;
@@ -47,12 +47,11 @@ export function buildMetadata({
 }: BuildMetadataArgs): Metadata {
   const url = `${siteUrl}${path}`;
 
-  // The sandbox is never indexable or crawlable, whatever the page asks for —
-  // this is layer 3 of the lockdown and it must stay all-or-nothing. Off the
-  // sandbox the two directives are independent: an indexable page is
-  // `index, follow`, a Tier 3 page is `noindex, follow`.
-  const shouldIndex = index && !isSandbox;
-  const shouldFollow = follow && !isSandbox;
+  // The two directives are independent on purpose: an indexable page is
+  // `index, follow`, a Tier 3 page is `noindex, follow` — kept out of the
+  // index but still crawlable, so its links carry equity up to the region hub.
+  const shouldIndex = index;
+  const shouldFollow = follow;
 
   return {
     // `absolute` opts out of the root layout's `%s | APMG Painting`

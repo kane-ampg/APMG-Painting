@@ -76,29 +76,18 @@ describe('the page count the spec commits to', () => {
  * links out of them carry equity up to the 22 region hubs. `buildMetadata`
  * originally derived `follow` from `index`, which quietly shipped
  * `noindex, nofollow` on all 1,424 of them and made every one a dead end.
- *
- * The sandbox case is asserted alongside it because the fix must not punch a
- * hole in layer 3 of the lockdown: while sandboxed, everything stays
- * `noindex, nofollow` whatever the page asks for.
  */
 type Robots = { index: boolean; follow: boolean };
 
-async function robotsFor(href: string, sandbox: 'true' | 'false'): Promise<Robots> {
+async function robotsFor(href: string): Promise<Robots> {
   vi.resetModules();
-  const previous = process.env.NEXT_PUBLIC_SANDBOX;
-  process.env.NEXT_PUBLIC_SANDBOX = sandbox;
 
-  try {
-    const page = await import('@/app/areas/[state]/[region]/[suburb]/page');
-    const [, , state = '', region = '', suburb = ''] = href.split('/');
-    const meta = await page.generateMetadata({
-      params: Promise.resolve({ state, region, suburb }),
-    });
-    return meta.robots as Robots;
-  } finally {
-    if (previous === undefined) delete process.env.NEXT_PUBLIC_SANDBOX;
-    else process.env.NEXT_PUBLIC_SANDBOX = previous;
-  }
+  const page = await import('@/app/areas/[state]/[region]/[suburb]/page');
+  const [, , state = '', region = '', suburb = ''] = href.split('/');
+  const meta = await page.generateMetadata({
+    params: Promise.resolve({ state, region, suburb }),
+  });
+  return meta.robots as Robots;
 }
 
 afterEach(() => {
@@ -115,23 +104,14 @@ describe('suburb page robots directives', () => {
   });
 
   it('leaves a Tier 3 page crawlable at launch — noindex, follow', async () => {
-    await expect(robotsFor(tier3!.href, 'false')).resolves.toEqual(
+    await expect(robotsFor(tier3!.href)).resolves.toEqual(
       expect.objectContaining({ index: false, follow: true }),
     );
   });
 
   it('indexes and follows a Tier 1 page at launch', async () => {
-    await expect(robotsFor(indexable!.href, 'false')).resolves.toEqual(
+    await expect(robotsFor(indexable!.href)).resolves.toEqual(
       expect.objectContaining({ index: true, follow: true }),
-    );
-  });
-
-  it('holds both shut while sandboxed, whatever the page asks for', async () => {
-    await expect(robotsFor(tier3!.href, 'true')).resolves.toEqual(
-      expect.objectContaining({ index: false, follow: false }),
-    );
-    await expect(robotsFor(indexable!.href, 'true')).resolves.toEqual(
-      expect.objectContaining({ index: false, follow: false }),
     );
   });
 });

@@ -1,4 +1,4 @@
-import { accreditations, formattedAddress, isSandbox, site, siteUrl } from '@/lib/site';
+import { accreditations, formattedAddress, site, siteUrl } from '@/lib/site';
 import { googleAggregate, googleReviews } from '@/content/reviews';
 import { services } from '@/content/services';
 import { sectors } from '@/content/sectors';
@@ -25,20 +25,10 @@ import {
  * beside it, because an answer engine that repeats "5.0 from 70 reviews" should
  * be able to attribute it — and because the site itself hosts seven of them,
  * not seventy.
- *
- * Suppressed entirely while the sandbox flag is on — a preview build should not
- * be handing answer engines a tidy summary of itself.
  */
 export const dynamic = 'force-static';
 
 export function GET(): Response {
-  if (isSandbox) {
-    return new Response('User-agent: *\n# Preview build. No content published.\n', {
-      status: 404,
-      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-    });
-  }
-
   const verified = accreditations.filter((a) => a.verified);
 
   const regionLines = (state: 'VIC' | 'QLD'): string =>

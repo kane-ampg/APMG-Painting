@@ -7,7 +7,7 @@ import { QuoteChat } from '@/components/chat/quote-chat';
 import { ScrollReveal } from '@/components/motion/scroll-reveal';
 import { JsonLd } from '@/components/seo/json-ld';
 import { localBusinessSchema, organizationSchema } from '@/lib/schema';
-import { isSandbox, site, siteUrl } from '@/lib/site';
+import { site, siteUrl } from '@/lib/site';
 
 /**
  * Fonts are self-hosted and subset by next/font at build time — no runtime
@@ -34,8 +34,6 @@ export const metadata: Metadata = {
   },
   description:
     'APMG Painting is a Melbourne commercial painting contractor, working across schools, healthcare, aged care, strata, retail and industrial sites.',
-  // Sandbox-wide guard. Flipped only at production go-live.
-  robots: isSandbox ? { index: false, follow: false } : undefined,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

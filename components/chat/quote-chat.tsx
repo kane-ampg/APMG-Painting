@@ -25,7 +25,7 @@ import {
 import { QUICK_ANSWERS } from '@/lib/enquiry/chat-faqs';
 import { initialEnquiryState } from '@/lib/enquiry/state';
 import { microLabel } from '@/components/ui';
-import { isSandbox, site } from '@/lib/site';
+import { site } from '@/lib/site';
 import { cn } from '@/lib/utils';
 
 /**
@@ -377,13 +377,6 @@ export function QuoteChat() {
               <span className="sr-only">Close</span>
             </button>
           </header>
-
-          {isSandbox && (
-            <p className="border-b border-signal-400/40 bg-signal-400/15 px-4 py-2 text-xs text-ink-soft">
-              Preview build — enquiries are not delivered. Call {site.phone.display} to reach the
-              team.
-            </p>
-          )}
 
           <div
             ref={transcriptRef}

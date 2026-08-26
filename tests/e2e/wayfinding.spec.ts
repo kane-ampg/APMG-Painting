@@ -177,16 +177,10 @@ test.describe('deep links into /areas/', () => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
 
     /*
-     * The site runs sandboxed by default (`NEXT_PUBLIC_SANDBOX` unset, or set
-     * to anything other than exactly "false"), and the sandbox lockdown forces
-     * `noindex, nofollow` on every single page regardless of what it asks for
-     * — so a bare "is this noindex" assertion would pass on any URL on this
-     * site and prove nothing about Molendinar in particular.
-     *
-     * What actually makes this page noindex is `locality.indexable`, which is
+     * What makes this page noindex is `locality.indexable`, which is
      * false for every Queensland locality while `qldPresence` is false — and
-     * that half of the claim is already checked directly, independent of the
-     * sandbox flag, in tests/unit/content-integrity.test.ts ("no Queensland
+     * that half of the claim is already checked directly in
+     * tests/unit/content-integrity.test.ts ("no Queensland
      * locality is indexable while qldPresence is false") and
      * tests/unit/locations-tiers.test.ts. What those unit tests cannot cover
      * is whether the computed value actually reaches the rendered page, which

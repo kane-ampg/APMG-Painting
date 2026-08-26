@@ -347,5 +347,3 @@ export const siteUrl =
   ) ??
   'http://localhost:3000';
 
-/** Sandbox guard — defaults to ON so the mock-up cannot be indexed. */
-export const isSandbox = process.env.NEXT_PUBLIC_SANDBOX !== 'false';
