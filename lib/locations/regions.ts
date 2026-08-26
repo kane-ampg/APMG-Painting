@@ -26,7 +26,7 @@ export const CARDINIA_URBAN: readonly string[] = [
   'COCKATOO',
 ];
 
-/** Spec §5.2. Chirnside Park is here because it is APMG's own base. */
+/** Spec §5.2. Chirnside Park is here on its own merits as an urban Yarra Ranges locality. */
 export const YARRA_RANGES_URBAN: readonly string[] = [
   'LILYDALE',
   'MOOROOLBARK',

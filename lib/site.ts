@@ -39,19 +39,19 @@ export const site = {
   email: 'info@apmgpainting.com.au',
 
   /**
-   * The Bayswater North office.
+   * The office.
    *
-   * APMG confirmed the move on 24 August 2026: out of Factory 15/30 Ramset Dr,
-   * Chirnside Park VIC 3116, into 1 Turbo Drive, Bayswater North VIC 3153.
-   * The site publishes the destination rather than the origin so that nothing
-   * has to be rewritten on moving day.
+   * 1 Turbo Drive, Bayswater North VIC 3153, confirmed by APMG on
+   * 25 August 2026 as the company's address — not a future one. An earlier
+   * revision carried an `effectiveFrom` date and a self-expiring "we are
+   * moving" qualifier beside the address on every surface that showed it;
+   * that qualifier is gone, because there is no longer a transition to
+   * describe. The address is simply the address.
    *
-   * `effectiveFrom` exists because until the move completes this address
-   * disagrees with the Google Business Profile, and an unexplained NAP
-   * mismatch is a local-ranking cost. Surfaces that show the address render
-   * the qualifier from `addressNote` alongside it while that date is in the
-   * future, and drop it silently once the date passes — no follow-up edit,
-   * no stale "we are moving" line left on the contact page a year later.
+   * The one outstanding job this creates is external: the Google Business
+   * Profile in `social.google` is still registered to Chirnside Park. Until
+   * it is updated the site and the profile disagree on the fact the map pack
+   * weighs most heavily, and no amount of on-site markup fixes that.
    */
   address: {
     street: '1 Turbo Drive',
@@ -59,8 +59,6 @@ export const site = {
     state: 'VIC',
     postcode: '3153',
     country: 'AU',
-    /** ISO date APMG occupies the new office. Client said "a couple of months". */
-    effectiveFrom: '2026-10-01',
   },
 
   /**
@@ -83,10 +81,10 @@ export const site = {
    * worse than none, because it moves the entity to a place APMG does not
    * work from. Geocode the published street address and paste the result.
    *
-   * Still null after the August 2026 address change. The VIC + QLD commercial
-   * spec carries a suburb-level geocode for Bayswater North
-   * (-37.845116, 145.270141), but that is the suburb centroid, not 1 Turbo
-   * Drive, and this field is what a GeoCircle is built from.
+   * Still null. The VIC + QLD commercial spec carries a suburb-level geocode
+   * for Bayswater North (-37.845116, 145.270141), but that is the suburb
+   * centroid, not 1 Turbo Drive, and this field is what a GeoCircle is built
+   * from.
    */
   coords: null as { latitude: number; longitude: number } | null,
 
@@ -122,8 +120,8 @@ export const site = {
      * for map-pack visibility.
      *
      * NOTE: the profile is still registered to Chirnside Park. It has to be
-     * updated to Bayswater North when APMG moves, or the site and the profile
-     * will disagree on the one fact the map pack cares most about.
+     * updated to the Bayswater North address above, or the site and the
+     * profile will disagree on the one fact the map pack cares most about.
      */
     google: 'https://www.google.com/maps/place/?q=place_id:ChIJnV9lqRIw1moRftY3Ankvfdw',
   },
@@ -182,7 +180,7 @@ export const accreditations: readonly Accreditation[] = [
     verified: true,
     evidence: CLIENT_CONFIRMED,
     logo: {
-      src: '/images/accreditations/master-painters-australia.webp',
+      src: '/images/accreditations/master-painters-australia.png',
       width: 444,
       height: 390,
       alt: 'Master Painters Australia',
@@ -195,10 +193,35 @@ export const accreditations: readonly Accreditation[] = [
     verified: true,
     evidence: CLIENT_CONFIRMED,
     logo: {
-      src: '/images/accreditations/dulux-accredited-painter.webp',
+      src: '/images/accreditations/dulux-accredited-painter.png',
       width: 197,
       height: 98,
       alt: 'Dulux Accredited Painter',
+    },
+  },
+  {
+    id: 'workmanship-warranty',
+    label: "Painter's workmanship warranty",
+    detail: 'Five years, covering peeling, flaking and blistering',
+    verified: true,
+    /*
+     * The one mark on this list that was on APMG's live site and nowhere on
+     * the rebuild. It arrives from that site as one file with the Dulux badge
+     * beside it — two marks set side by side with 14px of clear space between
+     * them, not a designed lockup — so it is split back into its two halves
+     * here and each is framed on its own.
+     *
+     * Kept whole, the pair had to render at a third the height of a single
+     * mark to fit one frame, and the shield's own wording stopped being
+     * readable. Split, both sit at the size the rest of the row does.
+     */
+    evidence:
+      'APMG confirmed 2026-08-24; mark taken from apmgpainting.com.au 2026-08-25, split from the Dulux + warranty pair used there',
+    logo: {
+      src: '/images/accreditations/painters-workmanship-warranty.png',
+      width: 95,
+      height: 107,
+      alt: "Painter's workmanship warranty, five year",
     },
   },
   {
@@ -208,7 +231,7 @@ export const accreditations: readonly Accreditation[] = [
     verified: true,
     evidence: CLIENT_CONFIRMED,
     logo: {
-      src: '/images/accreditations/cm3.webp',
+      src: '/images/accreditations/cm3.png',
       width: 182,
       height: 84,
       alt: 'Cm3 contractor OHS prequalification',
@@ -221,7 +244,7 @@ export const accreditations: readonly Accreditation[] = [
     verified: true,
     evidence: CLIENT_CONFIRMED,
     logo: {
-      src: '/images/accreditations/haymes-paint.webp',
+      src: '/images/accreditations/haymes-paint.png',
       width: 178,
       height: 92,
       alt: 'Haymes Paint',
@@ -277,41 +300,18 @@ export const formattedAddress = [
   `${site.address.suburb} ${site.address.state} ${site.address.postcode}`,
 ].join(', ');
 
-/** The address APMG occupies until the Bayswater North move completes. */
-export const previousAddress = 'Factory 15/30 Ramset Dr, Chirnside Park VIC 3116';
-
-const MONTHS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-] as const;
-
 /**
- * The qualifier that runs beside the address until the move completes, or null
- * once it has.
+ * Directions to the office, as Google's documented `dir` deep link.
  *
- * Formatted by hand rather than through `toLocaleDateString`, because month
- * names from ICU differ between the build container and a developer's machine
- * and this string is baked into static HTML.
- *
- * `now` is injectable so the expiry is testable without touching the clock.
+ * Built from the street address rather than from `site.social.google`. That
+ * profile still carries the Chirnside Park place ID, so a place-ID link would
+ * route a visitor to the previous premises — the one navigation error on this
+ * page that actually costs somebody a morning. A plain address query is
+ * resolved by Maps itself and cannot go stale behind us.
  */
-export function addressNote(now: Date = new Date()): string | null {
-  const effective = new Date(`${site.address.effectiveFrom}T00:00:00Z`);
-  if (Number.isNaN(effective.getTime()) || now >= effective) return null;
-
-  const month = MONTHS[effective.getUTCMonth()];
-  return `Our office from ${month} ${effective.getUTCFullYear()}. Until then we work from ${previousAddress}.`;
-}
+export const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+  `${formattedAddress}, Australia`,
+)}`;
 
 /**
  * Canonical origin, resolved in priority order.

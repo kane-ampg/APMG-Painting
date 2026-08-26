@@ -182,3 +182,29 @@ export type Faq = {
   answer: string;
   audience: Audience;
 };
+
+/**
+ * One buying criterion in the homepage differentiation grid.
+ *
+ * Question-shaped by design. An answer engine asked "how do I choose a
+ * commercial painter in Melbourne" fans the query out into sub-questions and
+ * retrieves passages that answer them; a heading phrased as the question and a
+ * body that answers it in one self-contained paragraph is the shape that gets
+ * extracted. A heading like "Our commitment to quality" is not.
+ *
+ * `credentials` and `projects` are provenance, not presentation. They record
+ * which entries in lib/site.ts and content/projects.ts a body relies on, so a
+ * test can fail the build if a card names a credential that is no longer
+ * verified or a project that no longer exists. That is the mechanism that keeps
+ * the rule stated at the top of app/page.tsx true once the copy names things.
+ */
+export type Differentiator = {
+  /** The buyer's question, verbatim. Rendered as the card heading. */
+  question: string;
+  /** A self-contained answer. Must stand alone if lifted out of the page. */
+  answer: string;
+  /** Accreditation ids from lib/site.ts that `answer` relies on. */
+  credentials?: readonly string[];
+  /** Project slugs from content/projects.ts that `answer` relies on. */
+  projects?: readonly string[];
+};

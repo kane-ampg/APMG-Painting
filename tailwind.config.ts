@@ -85,15 +85,49 @@ const config: Config = {
           from: { opacity: '0', transform: 'translateY(4px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
+        /*
+         * The desktop panel grows out of its launcher — `origin-bottom-right`
+         * on the panel puts the scale's anchor on the button it came from, so
+         * the movement explains itself the way the sheet and drawer do.
+         *
+         * Opacity is finished by 55%, well before the transform is. A panel
+         * that fades and moves on the same curve reads as arriving twice; this
+         * way it is fully painted while it is still settling, which is what
+         * makes the last few pixels feel like easing rather than lag.
+         */
         'panel-in': {
-          from: { opacity: '0', transform: 'translateY(8px) scale(0.985)' },
-          to: { opacity: '1', transform: 'translateY(0) scale(1)' },
+          '0%': { opacity: '0', transform: 'translateY(10px) scale(0.96)' },
+          '55%': { opacity: '1' },
+          '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
         },
         // The mobile panel is a bottom sheet, so it comes from the edge it is
         // attached to rather than fading in place.
         'sheet-in': {
           from: { transform: 'translateY(100%)' },
           to: { transform: 'translateY(0)' },
+        },
+        /*
+         * Leaving. The counterpart of the two above, and the reason the panel
+         * outlives its own close by one animation — see `closing` in
+         * components/chat/quote-chat.tsx.
+         *
+         * These are the one exception to the no-fill rule above: an exit that
+         * does not hold its last frame snaps back to a fully visible panel for
+         * the frame between the animation ending and React unmounting it, which
+         * is precisely the flash the animation exists to remove.
+         *
+         * Shorter than the entrances, and on an accelerating curve rather than
+         * a decelerating one. Something arriving is worth watching; something
+         * being dismissed has already been decided about, and a leisurely exit
+         * is just a delay before the page is usable again.
+         */
+        'panel-out': {
+          from: { opacity: '1', transform: 'translateY(0) scale(1)' },
+          to: { opacity: '0', transform: 'translateY(6px) scale(0.97)' },
+        },
+        'sheet-out': {
+          from: { transform: 'translateY(0)' },
+          to: { transform: 'translateY(100%)' },
         },
         /*
          * Navigation drawer. Same reasoning as the sheet above — it enters
@@ -116,8 +150,14 @@ const config: Config = {
       animation: {
         'turn-in': 'turn-in 220ms cubic-bezier(0.16, 1, 0.3, 1)',
         'controls-in': 'controls-in 200ms cubic-bezier(0.16, 1, 0.3, 1)',
-        'panel-in': 'panel-in 220ms cubic-bezier(0.16, 1, 0.3, 1)',
-        'sheet-in': 'sheet-in 260ms cubic-bezier(0.16, 1, 0.3, 1)',
+        // The panel is the one element here that changes the screen rather than
+        // adding a line to it, so it gets a little longer than the ~250ms the
+        // note above sets for turns and controls — at 220ms a scale that starts
+        // at 0.96 arrives before the eye has followed it.
+        'panel-in': 'panel-in 300ms cubic-bezier(0.16, 1, 0.3, 1)',
+        'sheet-in': 'sheet-in 300ms cubic-bezier(0.16, 1, 0.3, 1)',
+        'panel-out': 'panel-out 170ms cubic-bezier(0.4, 0, 1, 1) forwards',
+        'sheet-out': 'sheet-out 200ms cubic-bezier(0.4, 0, 1, 1) forwards',
         'drawer-in': 'drawer-in 300ms cubic-bezier(0.16, 1, 0.3, 1)',
         'scrim-in': 'scrim-in 220ms ease-out',
       },
@@ -147,6 +187,21 @@ const config: Config = {
         '2xl': '0',
         '3xl': '0',
         full: '9999px',
+        /*
+         * The quote chat is the documented exception, and it is named rather
+         * than hand-rolled so it stays one exception instead of becoming the
+         * beginning of a second, softer scale.
+         *
+         * It earns it by not being page furniture. The page is the contractor's
+         * work — tape lines and flat slabs; the chat is a conversation floating
+         * over it, and every convention a visitor has for that surface, from
+         * every messaging app they own, is round. Square there does not read as
+         * disciplined, it reads as unfinished. Nothing outside
+         * components/chat/quote-chat.tsx may use these.
+         */
+        chat: '1rem',
+        'chat-bubble': '0.875rem',
+        'chat-control': '0.5rem',
       },
 
       letterSpacing: {

@@ -72,10 +72,9 @@ are correct.
 
 Metropolitan Melbourne, roughly 60 km around the Bayswater North base.
 
-APMG moves from Factory 15/30 Ramset Dr, Chirnside Park into 1 Turbo Drive, Bayswater North in
-October 2026. Both are in Melbourne's outer east, roughly fifteen minutes apart, so nothing about
-the service area changes. If asked where the office is, give the Bayswater North address and say the
-move is happening — do not present Chirnside Park as current.
+The office is 1 Turbo Drive, Bayswater North VIC 3153. If asked where APMG is based, give that
+address plainly — there is no transitional wording to add, and Chirnside Park is not to be
+presented as current or as a second location.
 
 Suburb pages exist for Vermont, Brighton, Glen Iris, Armadale, Parkdale, Travancore and Gardenvale
 ([content/locations.ts](../content/locations.ts)). A page existing is not a claim of exclusivity, and
@@ -93,6 +92,8 @@ These are sayable, in exactly these words:
 
 - Master Painters Australia — Registered Master Painter
 - Dulux Accredited Painter, which supports a 5-year workmanship warranty
+- Painter's workmanship warranty — five years, covering peeling, flaking and blistering, and
+  backed by that Dulux programme rather than standing on its own
 - Cm3 prequalified — contractor OHS prequalification
 - Haymes Paint — accredited applicator
 - Fully insured — public liability and workers compensation

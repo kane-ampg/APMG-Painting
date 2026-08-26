@@ -1223,9 +1223,16 @@ Deletes `app/areas/[slug]/` — Next.js will not accept `[slug]` and `[state]` a
 - Create: `app/areas/[state]/[region]/[suburb]/page.tsx`
 - Create: `components/sections/locality.tsx`
 - Delete: `app/areas/[slug]/page.tsx`
-- Delete: `content/locations.ts`
-- Modify: `app/projects/[slug]/page.tsx:13` (drop the `getLocation` import and its use)
+- Modify: `lib/locations/index.ts` (add `hrefForVicSlug`, Step 5)
 - Test: `tests/unit/locality-pages.test.ts`
+
+**`content/locations.ts` is NOT deleted in this task.** It has seven consumers. This task
+repairs the two under `app/areas/`; the other five plus two test files are Task 10's. Deleting it
+here would leave `lib/schema/index.ts`, `app/sitemap.ts`, `app/llms.txt/route.ts`, `app/page.tsx`,
+`app/projects/[slug]/page.tsx` and two test files importing a module that no longer exists — so
+Step 7's typecheck and Step 8's build would both fail, and Tasks 8 and 9 would inherit a red
+build. It stays in place, orphaned but compiling, until Task 10 removes it together with every
+consumer in one commit. `app/projects/[slug]/page.tsx` is likewise Task 10's, not this task's.
 
 **Interfaces:**
 
@@ -1326,18 +1333,18 @@ npx vitest run tests/unit/locality-pages.test.ts
 
 Expected: FAIL — cannot resolve `@/app/areas/[state]/page`.
 
-- [ ] **Step 4: Delete the flat route and the old content file**
+- [ ] **Step 4: Delete the flat route**
 
 ```bash
 git rm -r 'app/areas/[slug]'
-git rm content/locations.ts
 ```
 
-In `app/projects/[slug]/page.tsx`, remove the `import { getLocation } from '@/content/locations';` line and whichever block consumed it. Read the surrounding code first and replace the lookup with the new layer if the block is load-bearing:
+This one deletion is forced: Next.js will not accept `app/areas/[slug]/` and `app/areas/[state]/`
+as siblings — two different dynamic segment names at one routing level is a build error. The
+legacy `/areas/painters-{suburb}/` URLs it used to serve become redirects in Task 8.
 
-```ts
-import { getLocalityByHref } from '@/lib/locations';
-```
+Leave `content/locations.ts` alone. It still has five page consumers and two test consumers that
+Task 10 migrates; removing it now turns Step 7 and Step 8 red. See the Files note above.
 
 - [ ] **Step 5: Build the shared suburb sections**
 
@@ -1732,7 +1739,7 @@ Append to `tests/unit/nav-active.test.ts`:
 import { footerNav, mainNav } from '@/components/navigation/nav-data';
 
 describe('Areas in the navigation', () => {
-  const areas = mainNav.find((item) => item.label === 'Areas');
+  const areas = mainNav.find((item) => item.label === 'Service Areas');
 
   it('appears in the main nav', () => {
     expect(areas).toBeDefined();
@@ -1791,10 +1798,10 @@ In `components/navigation/nav-data.ts`, insert after the `Commercial` item:
 
 ```ts
   {
-    label: 'Areas',
+    label: 'Service Areas',
     href: '/areas/',
     children: [
-      { label: 'Areas we service', href: '/areas/', description: 'Overview' },
+      { label: 'Service areas', href: '/areas/', description: 'Overview' },
       { label: 'Victoria', href: '/areas/victoria/' },
       { label: 'Queensland', href: '/areas/queensland/' },
     ],
@@ -1805,13 +1812,33 @@ And in `footerNav`, add:
 
 ```ts
   areas: [
-    { label: 'Areas we service', href: '/areas/' },
+    { label: 'Service areas', href: '/areas/' },
     { label: 'Victoria', href: '/areas/victoria/' },
     { label: 'Queensland', href: '/areas/queensland/' },
   ],
 ```
 
 Remove `{ label: 'Areas we service', href: '/areas/' }` from `footerNav.company` — it now has its own column and should not appear twice.
+
+- [ ] **Step 3b: Relabel the breadcrumb root to match**
+
+The four `/areas/` pages Task 7 shipped hardcode `{ name: 'Areas we service', path: '/areas/' }` as the
+first crumb. Breadcrumbs are navigation, and a trail reading "Areas we service" underneath a nav
+item reading "Service Areas" is exactly the kind of small incoherence that survives forever. Change
+that crumb's `name` to **`Service areas`** in all four:
+
+```
+app/areas/page.tsx
+app/areas/[state]/page.tsx
+app/areas/[state]/[region]/page.tsx
+app/areas/[state]/[region]/[suburb]/page.tsx
+```
+
+`path` does not change — the URL stays `/areas/`. The `BreadcrumbList` JSON-LD is generated from the
+same array, so the structured data follows automatically and cannot disagree with the visible trail.
+
+Leave the `<h1>` on `/areas/` as **"Areas we service"**. That is page copy, not a label, and it reads
+better as a headline than the nav wording would.
 
 - [ ] **Step 4: Render the footer column**
 
@@ -1834,26 +1861,51 @@ git commit -m "Add Areas to the main nav and give it its own footer column"
 
 ### Task 10: Move the remaining consumers off `content/locations.ts`
 
-Four files still import the deleted module. The `areaServed` rewrite is the substantive one — the current implementation enumerates every location as a `City` node, which at 1,440 would bloat the sitewide JSON-LD and label every Queensland suburb `addressRegion: 'VIC'`.
+Seven consumers still import `content/locations.ts`. **This task deletes that module and migrates
+all seven in one commit** — that is why they are one task and not seven: the deletion and its
+consumers have to land together or the build is red between them.
+
+The `areaServed` rewrite is the substantive one. The current implementation enumerates every
+location as a `City` node with a hardcoded `addressRegion: 'VIC'`; at 1,440 that would bloat the
+sitewide JSON-LD and label all 828 Queensland suburbs Victorian.
 
 **Files:**
 
+- Delete: `content/locations.ts`
 - Modify: `lib/schema/index.ts:3,73-105` (`areaServedFragment`)
 - Modify: `app/sitemap.ts:5`
 - Modify: `app/llms.txt/route.ts:6,61-67`
 - Modify: `app/page.tsx:24,257`
+- Modify: `app/projects/[slug]/page.tsx:13` (drop the `getLocation` import and its use)
 - Modify: `components/sections/index.tsx:805-835` (`ServiceAreas`)
 - Modify: `tests/unit/content-integrity.test.ts:7,22,44-51,63-75`
 - Modify: `tests/unit/schema.test.ts:10`
 
-- [ ] **Step 1: Confirm the full list of broken imports**
+Note on `app/page.tsx` and `components/sections/index.tsx`: both carry uncommitted changes from
+unrelated design work. Stage explicit paths, read the current state of each file before editing,
+and do not revert or fold in anything you did not change.
+
+- [ ] **Step 1: Inventory the consumers, then delete the module**
 
 ```bash
 grep -rn "content/locations'" --include=*.ts --include=*.tsx . | grep -v node_modules | grep -v '\.next'
+```
+
+Expect seven hits: `lib/schema/index.ts`, `app/sitemap.ts`, `app/llms.txt/route.ts`,
+`app/page.tsx`, `app/projects/[slug]/page.tsx`, `tests/unit/content-integrity.test.ts`,
+`tests/unit/schema.test.ts`. Write the list down — every one must be resolved before you commit.
+
+Then delete the module, which turns the build red on purpose:
+
+```bash
+git rm content/locations.ts
 npm run typecheck 2>&1 | head -30
 ```
 
-Every hit must be resolved in this task.
+The typecheck now fails with one error per consumer. That list is your worklist for Steps 3–7,
+and it is a better worklist than the grep because it names the exact symbol each file wanted.
+Work until it is empty. **Do not commit a partial migration** — the whole point of doing this as
+one task is that the deletion and its seven consumers land in a single commit.
 
 - [ ] **Step 2: Write the failing schema test**
 
@@ -2013,10 +2065,26 @@ import { COUNCILS } from '@/content/councils';
  * reads as good marketing copy, and is false.
  */
 
-const FORBIDDEN = [
+/**
+ * Phrases that assert a Queensland footprint.
+ *
+ * Exported, and imported by tests/unit/councils.test.ts rather than duplicated
+ * there — one list, one place to strengthen. Task 4 shipped its own shorter
+ * copy; replace that copy with an import of this.
+ *
+ * The list was stress-tested by running ten fabricated evasive claims through
+ * the original version: only one was caught. Everything below the first block
+ * exists because of a specific phrasing that slipped through. The failure mode
+ * is not a marketer writing "we are based in Brisbane" — it is a well-meaning
+ * edit adding "our crews here know the estates", which reads as ordinary trade
+ * copy and is false.
+ */
+export const FORBIDDEN = [
+  // Explicit location claims.
   'based in brisbane',
   'based in queensland',
   'based on the gold coast',
+  'based on the sunshine coast',
   'our brisbane',
   'our gold coast',
   'our sunshine coast',
@@ -2024,6 +2092,20 @@ const FORBIDDEN = [
   'local to the gold coast',
   'local to brisbane',
   'our team in queensland',
+  // Implied presence — the phrasings that got through the first version.
+  'our crews here',
+  'our crew here',
+  'our team here',
+  'our painters here',
+  'servicing from',
+  'our depot',
+  'our branch',
+  'our office in',
+  'our local',
+  'we have completed',
+  "we've completed",
+  'projects we have completed in',
+  'years working in queensland',
 ];
 
 describe('no Queensland copy claims a presence', () => {

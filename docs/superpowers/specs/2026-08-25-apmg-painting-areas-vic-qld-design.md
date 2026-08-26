@@ -178,7 +178,14 @@ The generator **fails** rather than degrading:
 
 - Total ≠ 1,440 → build error. Changing this number is a decision, not a fix.
 - Any council contributing ≤2 localities and not on `SINGLE_LOCALITY_COUNCIL_ALLOWLIST`
-  (`Melton`, `Mitchell` — human-reviewed, never auto-populated) → build error.
+  (`Melton`, `Mitchell`, `Somerset` — human-reviewed, never auto-populated) → build error.
+
+  Somerset is on the list for a different reason than the other two and the difference is worth
+  keeping. Melton and Mitchell each contribute a single locality because only the very edge of
+  the council falls inside the radius, which is exactly the shape a coordinate error also takes —
+  hence the gate. Somerset contributes two, legitimately: it is a rural-fringe council whose
+  in-radius portion is genuinely that small (§7.3). Verified against the generated data —
+  Melton 1, Mitchell 1, Somerset 2, and no other council sits at or below the threshold.
 - A locality whose council has no note in `content/councils.ts` → throws at import.
 
 This turns a silent data regression into a red build.

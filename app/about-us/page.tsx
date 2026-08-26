@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
-import { ContentBlock, CtaBand, Hero, TrustBar } from '@/components/sections';
+import { ContentBlock, CtaBand, Hero } from '@/components/sections';
 import { Container, Prose, Section, SectionHeading } from '@/components/ui';
-import { accreditations, addressNote, formattedAddress, previousAddress, site } from '@/lib/site';
+import { accreditations, directionsUrl, formattedAddress, site } from '@/lib/site';
 
 export const metadata: Metadata = buildMetadata({
   title: 'About APMG Painting | Melbourne Painting Contractor',
@@ -30,8 +30,6 @@ export default function AboutPage() {
       <Container width="wide">
         <Breadcrumbs crumbs={[{ name: 'About', path: '/about-us/' }]} />
       </Container>
-
-      <TrustBar />
 
       <ContentBlock heading="How the business started">
         <Prose>
@@ -83,13 +81,18 @@ export default function AboutPage() {
 
       <ContentBlock heading="Where we are">
         <Prose>
-          <p>{formattedAddress}. We work across metropolitan Melbourne from there.</p>
-          {addressNote() && (
-            <p>
-              APMG moves into the Bayswater North office in October 2026. Until then the team works
-              from {previousAddress} — same phone, same crews, same jobs.
-            </p>
-          )}
+          <p>
+            {formattedAddress}. We work across metropolitan Melbourne from there —{' '}
+            <a
+              href={directionsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-brand-700 hover:underline"
+            >
+              directions
+            </a>
+            .
+          </p>
           <p>
             {site.abn
               ? `ABN ${site.abn}.`

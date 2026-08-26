@@ -150,13 +150,17 @@ function Tape({ className }: { className: string }) {
  * rather than a tinted off-white, or the Dulux badge's baked-in white shows as
  * a seam inside its own chip.
  *
- * A four-column grid, not a wrapping flex row: at tablet widths the row used
- * to break 3 + 1 and leave one mark stranded under a centred line of three.
- * Fixed columns give every chip the same frame regardless of how wide its mark
- * is, and 2 x 2 on phones keeps the marks legible instead of shrinking four
- * across. The row is held to max-w-2xl and the chips to h-20 so the marks fill
- * their frames — wider than that and the white reads as the element and the
- * logo as an afterthought floating in it.
+ * Five marks, which no column count divides evenly, so this is a centred
+ * wrapping row rather than a grid: an orphan on the last line sits under the
+ * middle of the line above and reads as deliberate, where a grid would push it
+ * hard against one edge. The three max-widths then fix where it breaks instead
+ * of leaving it to the viewport — 2 + 2 + 1 on phones, 3 + 2 on tablets, all
+ * five across from 1024. Each is the exact width of that many chips plus their
+ * gaps, so the row cannot break anywhere unintended.
+ *
+ * Chips are h-20 with a fixed width, so every mark gets the same frame however
+ * wide it is. Both are kept tight on purpose: give them more room and the
+ * white reads as the element and the logo as an afterthought floating in it.
  *
  * Square corners, per the borderRadius override in tailwind.config.ts: the
  * whole system is flat slabs and hard rules, and a softened chip here would be
@@ -186,11 +190,11 @@ function FooterAccreditations() {
       <h2 className={cn(microLabel, 'mb-6 text-center text-white/60')}>
         Accredited, prequalified and insured
       </h2>
-      <ul className="mx-auto grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+      <ul className="mx-auto flex max-w-[18.5rem] flex-wrap justify-center gap-3 sm:max-w-[31rem] sm:gap-4 lg:max-w-[52rem]">
         {accreditationLogos.map((item) => (
           <li
             key={item.id}
-            className="relative flex h-20 items-center justify-center bg-white px-4"
+            className="relative flex h-20 w-[8.5rem] items-center justify-center bg-white px-3 sm:w-[9.5rem]"
           >
             <Tape className="tape-torn-a -left-1.5 -top-1.5 -rotate-[22deg]" />
             <Tape className="tape-torn-b -bottom-1.5 -right-1.5 -rotate-[22deg]" />

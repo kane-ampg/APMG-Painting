@@ -9,7 +9,6 @@ import {
   Hero,
   ProjectGrid,
   RelatedLinks,
-  TrustBar,
 } from '@/components/sections';
 import { Card, Container, Placeholder, Prose, Section, SectionHeading } from '@/components/ui';
 import { JsonLd } from '@/components/seo/json-ld';
@@ -85,8 +84,6 @@ export default async function SectorPage({ params }: Props) {
         primaryCta={{ label: 'Request a site assessment', href: '/contact-us/#commercial' }}
         secondaryCta={{ label: 'All commercial work', href: '/commercial/' }}
       />
-
-      <TrustBar />
 
       <Section tone="paper">
         <Container>

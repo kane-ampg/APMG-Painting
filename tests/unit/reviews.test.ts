@@ -9,7 +9,13 @@ import {
   reviews,
 } from '@/content/reviews';
 import { localBusinessSchema } from '@/lib/schema';
-import { accreditationLogos, accreditations, addressNote, site } from '@/lib/site';
+import {
+  accreditationLogos,
+  accreditations,
+  directionsUrl,
+  formattedAddress,
+  site,
+} from '@/lib/site';
 
 /**
  * The three claims APMG asked for on 24 August 2026 — accreditations, Google
@@ -122,24 +128,25 @@ describe('accreditations', () => {
   });
 });
 
-describe('the Bayswater North move', () => {
-  it('publishes the new address', () => {
+describe('the office address', () => {
+  it('publishes Bayswater North as the address, unqualified', () => {
     expect(site.address.street).toBe('1 Turbo Drive');
     expect(site.address.suburb).toBe('Bayswater North');
     expect(site.address.postcode).toBe('3153');
+    expect(formattedAddress).toBe('1 Turbo Drive, Bayswater North VIC 3153');
   });
 
-  it('qualifies the address until the move date', () => {
-    const note = addressNote(new Date('2026-09-01T00:00:00Z'));
-
-    expect(note).toContain('October 2026');
-    expect(note).toContain('Chirnside Park');
-  });
-
-  it('drops the qualifier once the move date passes', () => {
+  it('carries no move-in qualifier anywhere in the address surface', () => {
     // The failure mode this exists for is a "we're moving in October" line
-    // still sitting on the contact page in 2028. It expires on its own.
-    expect(addressNote(new Date('2026-10-01T00:00:00Z'))).toBeNull();
-    expect(addressNote(new Date('2028-01-01T00:00:00Z'))).toBeNull();
+    // outliving the move. There is no transition left to describe, so no
+    // effective-from date may creep back onto the address.
+    expect(site.address).not.toHaveProperty('effectiveFrom');
+  });
+
+  it('routes directions by street address, not by the stale place ID', () => {
+    // The Google Business Profile is still registered to Chirnside Park, so a
+    // place-ID deep link would navigate a visitor to the previous premises.
+    expect(directionsUrl).toContain(encodeURIComponent('1 Turbo Drive'));
+    expect(directionsUrl).not.toContain('place_id');
   });
 });

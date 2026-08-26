@@ -1,8 +1,17 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useActionState, useEffect, useId, useRef, useState, type FormEvent } from 'react';
+import {
+  useActionState,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type AnimationEvent,
+  type FormEvent,
+} from 'react';
 import { submitEnquiry } from '@/app/actions/enquiry';
 import { FormStatus } from '@/components/forms/form-status';
 import { QUOTE_HASH, QUOTE_PATH } from '@/components/navigation/quote-cta';
@@ -46,6 +55,17 @@ export function QuoteChat() {
   const pathname = usePathname();
 
   const [open, setOpen] = useState(false);
+  /**
+   * Dismissed, but still on screen playing its exit.
+   *
+   * The panel outlives its own close by one animation. For everything except
+   * the pixels it is already gone: `aria-hidden` and `inert` take it out of the
+   * accessibility tree and out of reach of the pointer the moment the visitor
+   * closes it, focus is already back on the launcher, and the launcher has
+   * already returned to its "Get a quote" state. What is left is a rectangle
+   * sliding away, which is the only part worth animating.
+   */
+  const [closing, setClosing] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -117,17 +137,17 @@ export function QuoteChat() {
   }, [formType, stepIndex, submitted, asked]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || closing) return;
 
     function onKeyDown(event: KeyboardEvent) {
       if (event.key !== 'Escape') return;
-      setOpen(false);
+      setClosing(true);
       launcherRef.current?.focus();
     }
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [open]);
+  }, [open, closing]);
 
   /**
    * Hidden where it would compete with the real thing: the contact page shows
@@ -138,8 +158,25 @@ export function QuoteChat() {
   /* --- transitions ----------------------------------------------------- */
 
   function close() {
-    setOpen(false);
+    setClosing(true);
     launcherRef.current?.focus();
+  }
+
+  /**
+   * The end of the exit, and the only place the panel is actually unmounted.
+   *
+   * `event.target !== event.currentTarget` guards against the transcript: every
+   * arriving turn and every set of controls runs its own animation, and those
+   * bubble up to here. Only the panel's own animation ends the panel.
+   *
+   * With motion disabled globals.css cuts every duration to 0.01ms, so this
+   * still fires — on the next frame rather than after 200ms. Nothing waits on
+   * an animation that will not happen.
+   */
+  function onPanelAnimationEnd(event: AnimationEvent<HTMLDivElement>) {
+    if (event.target !== event.currentTarget || !closing) return;
+    setOpen(false);
+    setClosing(false);
   }
 
   function advanceWith(patch: Record<string, string>) {
@@ -247,31 +284,44 @@ export function QuoteChat() {
 
   const subtitle = submitted ? 'Your answers' : `Question ${questionNumber} of ${questionCount}`;
 
+  /**
+   * Whether the panel is present *and* still the visitor's business. A closing
+   * panel is on its way out, so the launcher goes back to being a launcher
+   * while it goes.
+   */
+  const showing = open && !closing;
+
   return (
     <>
       <button
         ref={launcherRef}
         type="button"
-        aria-expanded={open}
+        aria-expanded={showing}
         aria-controls={panelId}
         onClick={() => {
-          if (open) {
+          if (showing) {
             close();
             return;
           }
           // Event handler, so Date.now() here is not an impure render.
           openedAt.current = Date.now();
+          // A tap during the exit is a change of mind: the same panel turns
+          // round rather than finishing its dismissal first.
+          setClosing(false);
           setOpen(true);
         }}
         className={cn(
-          'fixed bottom-5 right-5 flex items-center gap-2 rounded-full bg-brand-600 text-sm font-semibold text-white shadow-lg shadow-ink/25 transition hover:bg-brand-700',
+          'fixed bottom-5 right-5 flex items-center gap-2 rounded-full bg-brand-600 text-sm font-semibold text-white shadow-lg shadow-ink/25 hover:bg-brand-700',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2',
-          open ? 'h-12 w-12 justify-center' : 'py-3 pl-4 pr-5',
+          // Matched to the panel's own entrance, so the button and the thing it
+          // opens are visibly one movement rather than two.
+          'transition-all duration-200 ease-out',
+          showing ? 'h-12 w-12 justify-center' : 'py-3 pl-4 pr-5',
           'active:scale-95',
           LAYER,
         )}
       >
-        {open ? (
+        {showing ? (
           <>
             <CloseIcon />
             <span className="sr-only">Close quote chat</span>
@@ -291,10 +341,13 @@ export function QuoteChat() {
           role="dialog"
           aria-label="Get a quote"
           tabIndex={-1}
+          aria-hidden={closing || undefined}
+          inert={closing}
+          onAnimationEnd={onPanelAnimationEnd}
           className={cn(
             'fixed inset-x-0 bottom-0 flex flex-col overflow-hidden border-paper-edge bg-white shadow-2xl',
-            'rounded-t-2xl border-x border-t',
-            'sm:inset-x-auto sm:bottom-24 sm:right-5 sm:w-[23rem] sm:rounded-2xl sm:border',
+            'rounded-t-chat border-x border-t',
+            'sm:inset-x-auto sm:bottom-24 sm:right-5 sm:w-[26rem] sm:rounded-chat sm:border',
             /*
              * Capped, not free-growing. The transcript lengthens with every
              * turn, and an uncapped panel climbs behind the sticky header
@@ -302,7 +355,11 @@ export function QuoteChat() {
              * The height is bounded instead and the transcript scrolls inside.
              */
             'max-h-[88dvh] sm:max-h-[min(40rem,calc(100dvh-11rem))]',
-            'animate-sheet-in sm:animate-panel-in',
+            // The scale anchors on the launcher the panel came out of.
+            'sm:origin-bottom-right',
+            closing
+              ? 'animate-sheet-out sm:animate-panel-out'
+              : 'animate-sheet-in sm:animate-panel-in',
             LAYER,
           )}
         >
@@ -314,7 +371,7 @@ export function QuoteChat() {
             <button
               type="button"
               onClick={close}
-              className="-mr-1 -mt-1 rounded-md p-1.5 text-white/80 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="-mr-1 -mt-1 rounded-chat-control p-1.5 text-white/80 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               <CloseIcon />
               <span className="sr-only">Close</span>
@@ -335,22 +392,40 @@ export function QuoteChat() {
             aria-label="Conversation"
             className="flex-1 space-y-2 overflow-y-auto scroll-smooth px-4 py-4"
           >
-            {turns.map((turn, index) => (
-              <p
-                key={`${index}-${turn.text}`}
-                className={cn(
-                  // w-fit so a bubble hugs its text; a block <p> would
-                  // otherwise stretch to the full 85% whatever it says.
-                  'w-fit max-w-[85%] rounded-2xl px-3 py-2 text-sm',
-                  'animate-turn-in',
-                  turn.role === 'bot'
-                    ? 'bg-paper-sunken text-ink'
-                    : 'ml-auto bg-brand-600 text-white',
-                )}
-              >
-                {turn.text}
-              </p>
-            ))}
+            {turns.map((turn, index) => {
+              const isBot = turn.role === 'bot';
+              // The face leads a run of APMG turns, not every one of them: an
+              // answered FAQ is two bubbles from the same side, and repeating
+              // the photograph against each turns a conversation into a column
+              // of headshots.
+              const leadsRun = isBot && turns[index - 1]?.role !== 'bot';
+
+              return (
+                <div
+                  key={`${index}-${turn.text}`}
+                  className={cn('flex animate-turn-in items-end gap-2', !isBot && 'justify-end')}
+                >
+                  {isBot &&
+                    (leadsRun ? (
+                      <SimonAvatar className="mb-0.5 h-8 w-8 ring-1 ring-paper-edge" />
+                    ) : (
+                      // Keeps the following bubbles on the same indent as the
+                      // one that carries the face.
+                      <span aria-hidden className="mb-0.5 h-8 w-8 shrink-0" />
+                    ))}
+                  <p
+                    className={cn(
+                      // w-fit so a bubble hugs its text; a block <p> would
+                      // otherwise stretch to the full 85% whatever it says.
+                      'w-fit max-w-[85%] rounded-chat-bubble px-3 py-2 text-sm',
+                      isBot ? 'bg-paper-sunken text-ink' : 'bg-brand-600 text-white',
+                    )}
+                  >
+                    {turn.text}
+                  </p>
+                </div>
+              );
+            })}
           </div>
 
           <div className="border-t border-paper-edge bg-white px-4 py-3">
@@ -412,7 +487,7 @@ export function QuoteChat() {
                     <div className="flex items-center gap-2">
                       <button
                         type="submit"
-                        className="rounded-md bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 active:scale-95"
+                        className="rounded-chat-control bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 active:scale-95"
                       >
                         {stepIndex + 1 >= steps.length ? 'Send enquiry' : 'Next'}
                       </button>
@@ -423,7 +498,7 @@ export function QuoteChat() {
                           onClick={() =>
                             advanceWith(Object.fromEntries(step.fields.map((f) => [f.name, ''])))
                           }
-                          className="rounded-md px-3 py-2 text-sm font-semibold text-ink-muted transition hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
+                          className="rounded-chat-control px-3 py-2 text-sm font-semibold text-ink-muted transition hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
                         >
                           Skip
                         </button>
@@ -493,6 +568,35 @@ export function QuoteChat() {
 /* Pieces                                                               */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Simon Taranek, who receives these enquiries, against the APMG side of the
+ * transcript.
+ *
+ * Decorative, and deliberately unlabelled: `alt=""` and `aria-hidden`, with the
+ * panel's own "Get a quote" heading left as the only thing that identifies what
+ * the visitor is talking to. A named face beside a question would read as a
+ * person typing back, and nothing here is typing — the questions are the ones
+ * on the enquiry form and the answers are quoted from the site's FAQs. The
+ * photograph is warmth, not a claim, which is also why it stays inside the
+ * conversation rather than going on the launcher.
+ *
+ * 256px for a 32px slot: this is a face, and faces are where a soft resample
+ * shows. It costs 8KB, downloaded only when the panel is opened.
+ */
+function SimonAvatar({ className }: { className?: string }) {
+  return (
+    <Image
+      src="/images/company/simon-taranek.webp"
+      alt=""
+      aria-hidden
+      width={256}
+      height={256}
+      sizes="32px"
+      className={cn('shrink-0 rounded-full object-cover', className)}
+    />
+  );
+}
+
 function ChoiceButtons({
   field,
   onChoose,
@@ -517,7 +621,7 @@ function ChoiceButtons({
           type="button"
           data-chat-focus={index === 0 ? '' : undefined}
           onClick={() => onChoose(option.value)}
-          className="rounded-md border border-paper-edge bg-white px-3 py-2.5 text-left text-sm font-semibold text-ink transition hover:border-brand-600 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 active:scale-[0.98]"
+          className="rounded-chat-control border border-paper-edge bg-white px-3 py-2.5 text-left text-sm font-semibold text-ink transition hover:border-brand-600 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 active:scale-[0.98]"
         >
           {option.label}
         </button>
@@ -563,7 +667,7 @@ function QuickQuestions({
             key={entry.question}
             type="button"
             onClick={() => onAsk(entry.question, entry.answer)}
-            className="rounded-md px-2 py-1.5 text-left text-sm text-ink-soft underline decoration-paper-edge underline-offset-2 transition hover:bg-paper-sunken hover:text-ink hover:decoration-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
+            className="rounded-chat-control px-2 py-1.5 text-left text-sm text-ink-soft underline decoration-paper-edge underline-offset-2 transition hover:bg-paper-sunken hover:text-ink hover:decoration-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
           >
             {entry.question}
           </button>
@@ -605,7 +709,7 @@ function ChatTextField({
     'aria-describedby': describedBy,
     ...(autoFocus ? { 'data-chat-focus': '' } : {}),
     className: cn(
-      'w-full rounded-md border bg-white px-3 py-2 text-base text-ink',
+      'w-full rounded-chat-control border bg-white px-3 py-2 text-base text-ink',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600',
       error ? 'border-red-700' : 'border-paper-edge',
     ),
@@ -652,7 +756,7 @@ function BackButton({
       type="button"
       onClick={onClick}
       className={cn(
-        'rounded-md px-3 py-2 text-sm font-semibold text-ink-muted transition hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600',
+        'rounded-chat-control px-3 py-2 text-sm font-semibold text-ink-muted transition hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600',
         className,
       )}
     >

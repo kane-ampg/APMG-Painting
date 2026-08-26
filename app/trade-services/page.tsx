@@ -79,8 +79,8 @@ export default function TradeServicesPage() {
         primaryCta={{ label: 'Discuss a scope', href: '/contact-us/#commercial' }}
         secondaryCta={{ label: 'Commercial painting', href: '/commercial/' }}
         image={{
-          src: '/images/work/office-partition-cutting-in.webp',
-          alt: 'An APMG painter cutting in above a glazed partition in an open-plan office, working around the fit-out already in place',
+          src: '/images/work/supervisor-roof-walkthrough.webp',
+          alt: 'An APMG supervisor walking a roof with one of the painting crew, pointing out the next area of work',
         }}
       />
 
@@ -107,9 +107,9 @@ export default function TradeServicesPage() {
       </ContentBlock>
 
       <MediaBand
-        tone="sunken"
-        src="/images/work/office-partition-cutting-in.webp"
-        alt="A wide view of an office floor mid-repaint, a painter cutting in a partition head while the desks around him stay in place"
+        tone="ink"
+        src="/images/work/office-corridor-rolling.webp"
+        alt="An APMG painter rolling out a partition wall in an office fit-out, drop sheets down and the glazed partitions either side already in place"
         caption="A tenancy fit-out ahead of practical completion. Bringing fixings, partition heads and previous patching to a consistent, paintable surface is frequently more work than the coating that follows it."
       />
 

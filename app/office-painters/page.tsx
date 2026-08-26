@@ -8,7 +8,6 @@ import {
   FeatureGrid,
   Hero,
   ProjectGrid,
-  TrustBar,
 } from '@/components/sections';
 import { Container, Prose, Section, SectionHeading } from '@/components/ui';
 import { JsonLd } from '@/components/seo/json-ld';
@@ -103,8 +102,6 @@ export default function OfficePaintersPage() {
         primaryCta={{ label: 'Request a site assessment', href: '/contact-us/#commercial' }}
         secondaryCta={{ label: 'All commercial work', href: '/commercial/' }}
       />
-
-      <TrustBar />
 
       <ContentBlock heading="What we paint in an office">
         <div className="grid gap-8 lg:grid-cols-[1fr_18rem]">

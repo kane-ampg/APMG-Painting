@@ -9,7 +9,6 @@ import {
   ProcessSteps,
   ProjectGrid,
   SectorGrid,
-  TrustBar,
 } from '@/components/sections';
 import { Container, Prose, Section, SectionHeading } from '@/components/ui';
 import { JsonLd } from '@/components/seo/json-ld';
@@ -36,25 +35,30 @@ export const metadata: Metadata = buildMetadata({
 const PROCESS = [
   {
     step: 'Site assessment',
+    icon: 'site-visit',
     body: 'We attend site before quoting. Scope, substrate condition, access constraints and the hours we are allowed to work all get established there rather than assumed.',
   },
   {
     step: 'Documented scope and quotation',
+    icon: 'quote',
     body: 'An itemised quotation broken down by area, system and schedule — written so a committee, a board or a procurement lead can approve it without a second round of questions.',
   },
   {
     step: 'Pre-start and paperwork',
+    icon: 'documents',
     body: 'Safe Work Method Statements, insurance certificates and site-specific compliance documentation prepared in advance, with a pre-start meeting to confirm expectations.',
   },
   {
     step: 'Staged delivery',
+    icon: 'delivery',
     body: 'Work sequenced zone by zone or after hours so the building keeps operating. Access planned per elevation — ladders, scaffolding, scissor lift or EWP as each area requires.',
   },
   {
     step: 'Handover',
+    icon: 'handover',
     body: 'Areas cleaned down and handed back progressively rather than all at the end, so the site regains use of each space as it is finished.',
   },
-];
+] as const;
 
 export default function CommercialPage() {
   return (
@@ -86,8 +90,6 @@ export default function CommercialPage() {
           alt: 'An APMG painter working from a boom lift, harnessed, cutting the line between white and green tilt panels on a warehouse elevation',
         }}
       />
-
-      <TrustBar />
 
       <ContentBlock heading="What commercial work actually involves">
         <Prose>

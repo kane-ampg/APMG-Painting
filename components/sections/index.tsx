@@ -658,6 +658,18 @@ export function ContentBlock({
  * Wider than the reading measure on purpose — a band the same width as the
  * text reads as an illustration inside the argument, and this is meant to be a
  * pause in it.
+ *
+ * `tone` matters more here than anywhere else on the site, because interior
+ * trade photography is overwhelmingly high-key: white walls, white partitions,
+ * white shirts, and a ceiling full of blown highlights. Put one of those on
+ * `paper` or `sunken` and the photograph has no edge — its corners are within
+ * a few values of the page behind them and the whole band reads as a pale
+ * smear. `ink` is the tone for those, and it does the work no amount of
+ * grading would: the surround supplies the contrast the photograph does not
+ * have, and the same picture reads as a lit panel.
+ *
+ * The frame carries a hairline either way. It is the guarantee that the
+ * photograph's own edge is always visible, whatever lands inside it.
  */
 export function MediaBand({
   src,
@@ -668,13 +680,20 @@ export function MediaBand({
   src: string;
   alt: string;
   caption?: string;
-  tone?: 'paper' | 'sunken';
+  tone?: 'paper' | 'sunken' | 'ink';
 }) {
+  const onInk = tone === 'ink';
+
   return (
     <Section tone={tone} className="py-10 sm:py-12">
       <Container width="wide">
         <figure className="group">
-          <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-paper-sunken sm:aspect-[21/9]">
+          <div
+            className={cn(
+              'relative aspect-[16/10] overflow-hidden ring-1 sm:aspect-[21/9]',
+              onInk ? 'bg-ink-raised ring-white/15' : 'bg-paper-sunken ring-paper-edge',
+            )}
+          >
             <Image
               src={src}
               alt={alt}
@@ -685,7 +704,11 @@ export function MediaBand({
             />
           </div>
           {caption && (
-            <figcaption className="mt-3 max-w-prose text-sm text-ink-soft">{caption}</figcaption>
+            <figcaption
+              className={cn('mt-3 max-w-prose text-sm', onInk ? 'text-white/70' : 'text-ink-soft')}
+            >
+              {caption}
+            </figcaption>
           )}
         </figure>
       </Container>
@@ -833,7 +856,9 @@ export function FeatureGrid({ items }: { items: readonly { heading: string; body
  * links, which is the exact pattern the rebuild is undoing.
  */
 export function ServiceAreas({ locations }: { locations: readonly Locality[] }) {
-  const regionNames = [...new Set(locations.map((l) => getRegion(l.regionSlug)?.name ?? l.regionSlug))];
+  const regionNames = [
+    ...new Set(locations.map((l) => getRegion(l.regionSlug)?.name ?? l.regionSlug)),
+  ];
 
   return (
     <div className="flex flex-col gap-6">
