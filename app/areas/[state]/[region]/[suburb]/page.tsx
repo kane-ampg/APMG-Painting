@@ -14,7 +14,7 @@ import { sectors } from '@/content/sectors';
 import { allLocalities, displayName, getLocality, getRegion, stateSlug } from '@/lib/locations';
 
 /**
- * Suburb pages — 1,440 of them, one per locality in the merged dataset.
+ * Suburb pages — 1,387 of them, one per locality in the merged dataset.
  *
  * Flat `{ state, region, suburb }` objects covering all three segments, which
  * is the documented shape for multiple dynamic segments; no parent chaining is
@@ -22,7 +22,7 @@ import { allLocalities, displayName, getLocality, getRegion, stateSlug } from '@
  * 404 rather than a rendered page for a suburb we have no data for.
  *
  * Indexability comes from the data (`locality.indexable`), never from the
- * route: 16 of these are Tier 1. The other 1,424 are `noindex, follow` — they
+ * route: 16 of these are Tier 1. The other 1,371 are `noindex, follow` — they
  * must stay traversable, because the links out of them to the region hubs are
  * how the hubs earn their internal link equity.
  */

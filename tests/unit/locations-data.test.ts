@@ -18,21 +18,21 @@ const localities = generated.localities as GeneratedLocality[];
  */
 
 describe('coverage', () => {
-  it('holds 1,440 localities', () => {
-    expect(localities).toHaveLength(1440);
+  it('holds 1,387 localities', () => {
+    expect(localities).toHaveLength(1387);
   });
 
-  it('splits 612 Victorian and 828 Queensland', () => {
-    expect(localities.filter((l) => l.state === 'VIC')).toHaveLength(612);
-    expect(localities.filter((l) => l.state === 'QLD')).toHaveLength(828);
+  it('splits 583 Victorian and 804 Queensland', () => {
+    expect(localities.filter((l) => l.state === 'VIC')).toHaveLength(583);
+    expect(localities.filter((l) => l.state === 'QLD')).toHaveLength(804);
   });
 
   it('assigns every locality to one of the four anchors, in the right counts', () => {
     const counts = new Map<string, number>();
     for (const l of localities) counts.set(l.anchorKey, (counts.get(l.anchorKey) ?? 0) + 1);
-    expect(counts.get('bayswater-north')).toBe(612);
-    expect(counts.get('brisbane')).toBe(501);
-    expect(counts.get('southport')).toBe(172);
+    expect(counts.get('bayswater-north')).toBe(583);
+    expect(counts.get('brisbane')).toBe(482);
+    expect(counts.get('southport')).toBe(167);
     expect(counts.get('maroochydore')).toBe(155);
   });
 
@@ -112,8 +112,8 @@ describe('referential integrity', () => {
 });
 
 describe('rural fringe', () => {
-  it('flags 209 localities', () => {
-    expect(localities.filter((l) => l.ruralFringe)).toHaveLength(209);
+  it('flags 207 localities', () => {
+    expect(localities.filter((l) => l.ruralFringe)).toHaveLength(207);
   });
 
   it('puts every fringe locality in a fringe region', () => {
@@ -144,8 +144,81 @@ describe('data quality', () => {
     }
   });
 
-  it('keeps Airport West, which is a real suburb and not a postal artifact', () => {
-    expect(localities.some((l) => l.name === 'AIRPORT WEST')).toBe(true);
+  it('excludes the wider artifact class the BC/DC/MC sweep missed', () => {
+    /*
+     * 2026-08-26. These were rendering as suburbs on *indexable* region hubs —
+     * /areas/victoria/eastern/ listed "Bedford Road", "Brentford Square", "Knox
+     * City Centre" and "Tunstall Square Po" — and "Brentford Square" was a
+     * nearby-suburb link on the Tier 1 Vermont page. Asserted as patterns, not
+     * as a name list, so a new upstream artifact of the same shape fails here
+     * rather than shipping.
+     */
+    const patterns: [string, RegExp][] = [
+      ['post office / delivery facility suffix', / (PO|GPO|LPO|DF)$/],
+      ['spelled-out postal outlet', /(POST SHOP|POSTAL DEPOT|POST OFFICE)/],
+      ['shopping or institutional centre', / (SUPER)?CENTRE$/],
+      ['shopping centre named "... Fair"', / FAIR$/],
+      ['street-address delivery row', /(ROAD|STREET|SQUARE|PLAZA)/],
+      ['RAAF base', / RAAF$/],
+    ];
+    for (const [label, pattern] of patterns) {
+      const hits = localities.filter((l) => pattern.test(l.name)).map((l) => l.name);
+      expect(hits, label).toEqual([]);
+    }
+  });
+
+  it('excludes the named artifacts no safe pattern can reach', () => {
+    const names = new Set(localities.map((l) => l.name));
+    for (const excluded of [
+      'ASHMORE CITY',
+      'GARDEN CITY',
+      'HIGHPOINT CITY',
+      'STAFFORD CITY',
+      'STRATHPINE CITY',
+      'BOX HILL CENTRAL',
+      'FAIRFIELD GARDENS',
+      'VICTORIA GARDENS',
+      'WAVERLEY GARDENS',
+      'HOPETOUN GARDENS',
+      'BRISBANE MARKET',
+      'BRISBANE EXHIBITION',
+      'PORT OF BRISBANE',
+      'BRIGHTON EVENTIDE',
+      'HEIDELBERG RGH',
+      'PARLIAMENT HOUSE',
+    ]) {
+      expect(names, excluded).not.toContain(excluded);
+    }
+  });
+
+  it('keeps the real localities the rejected patterns would have destroyed', () => {
+    /*
+     * The other half of the filter's job. / CITY$/, / CENTRAL$/, / GARDENS$/
+     * and / TERRACE$/ were all considered and rejected because each takes a
+     * genuine suburb with it — these are those suburbs, and any future
+     * tightening of the rules has to keep them.
+     */
+    const names = new Set(localities.map((l) => l.name));
+    for (const kept of [
+      'AIRPORT WEST',
+      'BRISBANE CITY',
+      'BOX HILL',
+      'HAMILTON CENTRAL',
+      'LOGAN CENTRAL',
+      'SPRINGFIELD CENTRAL',
+      'WYNNUM CENTRAL',
+      'KINGLAKE CENTRAL',
+      'ASPENDALE GARDENS',
+      'CYPRESS GARDENS',
+      'FLORIDA GARDENS',
+      'PETRIE TERRACE',
+      'FAIRFIELD',
+      'FAIRNEY VIEW',
+      'BROADMEADOWS',
+      'BROADBEACH',
+    ]) {
+      expect(names, kept).toContain(kept);
+    }
   });
 
   it('drops the geographically impossible councils', () => {

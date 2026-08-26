@@ -59,9 +59,9 @@ export function organizationSchema(): JsonLdValue {
  * Where APMG works, as structured data.
  *
  * This used to enumerate every suburb with a page as a `City` node. At 7
- * locations that was merely verbose; at 1,440 it would put a megabyte of
+ * locations that was merely verbose; at 1,387 it would put a megabyte of
  * near-identical nodes into the JSON-LD on every page of the site, and it
- * hardcoded `addressRegion: VIC`, which would have labelled all 828
+ * hardcoded `addressRegion: VIC`, which would have labelled all 804
  * Queensland suburbs Victorian.
  *
  * Stated at the level the entity actually operates at instead: a GeoCircle for

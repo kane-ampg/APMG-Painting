@@ -153,9 +153,9 @@
         "/areas/queensland/brisbane-north/grange/",
         "/areas/queensland/brisbane-north/the-grange/",
         "/areas/queensland/brisbane-inner/newmarket/",
-        "/areas/queensland/moreton-bay/stafford-city/",
         "/areas/queensland/moreton-bay/stafford/",
-        "/areas/queensland/brisbane-inner/wilston/"
+        "/areas/queensland/brisbane-inner/wilston/",
+        "/areas/queensland/brisbane-inner/eildon-hill/"
       ]
     },
     {
@@ -325,12 +325,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/brisbane-inner/fairfield-gardens/",
         "/areas/queensland/brisbane-south/ekibin/",
         "/areas/queensland/brisbane-inner/fairfield/",
         "/areas/queensland/brisbane-south/clifton-hill/",
         "/areas/queensland/brisbane-inner/thompson-estate/",
-        "/areas/queensland/brisbane-south/yeronga/"
+        "/areas/queensland/brisbane-south/yeronga/",
+        "/areas/queensland/brisbane-south/yeronga-west/"
       ]
     },
     {
@@ -382,7 +382,7 @@
         "/areas/queensland/moreton-bay/everton-hills/",
         "/areas/queensland/brisbane-west/keperra/",
         "/areas/queensland/moreton-bay/mitchelton/",
-        "/areas/queensland/moreton-bay/brookside-centre/"
+        "/areas/queensland/moreton-bay/ferny-hills/"
       ]
     },
     {
@@ -484,9 +484,9 @@
         "/areas/queensland/gold-coast/parkwood/",
         "/areas/queensland/gold-coast/gaven/",
         "/areas/queensland/gold-coast/helensvale/",
-        "/areas/queensland/gold-coast/helensvale-town-centre/",
         "/areas/queensland/gold-coast/biggera-waters/",
-        "/areas/queensland/gold-coast/pacific-pines/"
+        "/areas/queensland/gold-coast/pacific-pines/",
+        "/areas/queensland/gold-coast/labrador/"
       ]
     },
     {
@@ -612,38 +612,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/gold-coast/ashmore-city/",
         "/areas/queensland/gold-coast/keebra-park/",
         "/areas/queensland/gold-coast/benowa/",
         "/areas/queensland/gold-coast/molendinar/",
         "/areas/queensland/gold-coast/southport-park/",
-        "/areas/queensland/gold-coast/southport/"
-      ]
-    },
-    {
-      "slug": "ashmore-city",
-      "name": "ASHMORE CITY",
-      "state": "QLD",
-      "postcodes": [
-        "4214"
-      ],
-      "coords": {
-        "lat": -27.986389,
-        "lng": 153.382222
-      },
-      "council": "Gold Coast",
-      "anchorKey": "southport",
-      "distanceKm": 2.69,
-      "regionSlug": "gold-coast",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/gold-coast/ashmore/",
-        "/areas/queensland/gold-coast/keebra-park/",
-        "/areas/queensland/gold-coast/benowa/",
-        "/areas/queensland/gold-coast/molendinar/",
-        "/areas/queensland/gold-coast/southport-park/",
-        "/areas/queensland/gold-coast/southport/"
+        "/areas/queensland/gold-coast/southport/",
+        "/areas/queensland/gold-coast/bundall/"
       ]
     },
     {
@@ -669,7 +643,7 @@
         "/areas/queensland/brisbane-north/craigslea/",
         "/areas/queensland/brisbane-north/fitzgibbon/",
         "/areas/queensland/brisbane-north/bridgeman-downs/",
-        "/areas/queensland/brisbane-north/chermside-centre/"
+        "/areas/queensland/brisbane-north/chermside/"
       ]
     },
     {
@@ -751,32 +725,6 @@
       ]
     },
     {
-      "slug": "australia-fair",
-      "name": "AUSTRALIA FAIR",
-      "state": "QLD",
-      "postcodes": [
-        "4215"
-      ],
-      "coords": {
-        "lat": -27.968589,
-        "lng": 153.41551
-      },
-      "council": "Gold Coast",
-      "anchorKey": "southport",
-      "distanceKm": 1.52,
-      "regionSlug": "gold-coast",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/gold-coast/sundale/",
-        "/areas/queensland/gold-coast/main-beach/",
-        "/areas/queensland/gold-coast/southport/",
-        "/areas/queensland/gold-coast/paradise-waters/",
-        "/areas/queensland/gold-coast/southport-park/",
-        "/areas/queensland/gold-coast/chirn-park/"
-      ]
-    },
-    {
       "slug": "bahrs-scrub",
       "name": "BAHRS SCRUB",
       "state": "QLD",
@@ -820,12 +768,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/moreton-bay/strathpine-centre/",
         "/areas/queensland/brisbane-north/bracken-ridge/",
         "/areas/queensland/moreton-bay/strathpine/",
-        "/areas/queensland/moreton-bay/strathpine-city/",
         "/areas/queensland/brisbane-north/carseldine/",
-        "/areas/queensland/moreton-bay/brendale/"
+        "/areas/queensland/moreton-bay/brendale/",
+        "/areas/queensland/brisbane-north/nashville/",
+        "/areas/queensland/moreton-bay/lawnton/"
       ]
     },
     {
@@ -1639,9 +1587,9 @@
         "/areas/queensland/gold-coast/bundall/",
         "/areas/queensland/gold-coast/sorrento/",
         "/areas/queensland/gold-coast/ashmore/",
-        "/areas/queensland/gold-coast/ashmore-city/",
         "/areas/queensland/gold-coast/carrara/",
-        "/areas/queensland/gold-coast/keebra-park/"
+        "/areas/queensland/gold-coast/keebra-park/",
+        "/areas/queensland/gold-coast/cypress-gardens/"
       ]
     },
     {
@@ -1922,11 +1870,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/queensland/ipswich/silkstone/",
-        "/areas/queensland/ipswich/booval-fair/",
         "/areas/queensland/ipswich/booval/",
         "/areas/queensland/ipswich/ebbw-vale/",
         "/areas/queensland/ipswich/new-chum/",
-        "/areas/queensland/ipswich/north-booval/"
+        "/areas/queensland/ipswich/north-booval/",
+        "/areas/queensland/ipswich/bundamba/"
       ]
     },
     {
@@ -2115,38 +2063,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/ipswich/booval-fair/",
         "/areas/queensland/ipswich/silkstone/",
         "/areas/queensland/ipswich/north-booval/",
         "/areas/queensland/ipswich/blackstone/",
         "/areas/queensland/ipswich/bundamba/",
-        "/areas/queensland/ipswich/ebbw-vale/"
-      ]
-    },
-    {
-      "slug": "booval-fair",
-      "name": "BOOVAL FAIR",
-      "state": "QLD",
-      "postcodes": [
-        "4304"
-      ],
-      "coords": {
-        "lat": -27.6159398,
-        "lng": 152.7900807
-      },
-      "council": "Ipswich",
-      "anchorKey": "brisbane",
-      "distanceKm": 28.3,
-      "regionSlug": "ipswich",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/ipswich/booval/",
-        "/areas/queensland/ipswich/silkstone/",
-        "/areas/queensland/ipswich/blackstone/",
-        "/areas/queensland/ipswich/north-booval/",
-        "/areas/queensland/ipswich/bundamba/",
-        "/areas/queensland/ipswich/ebbw-vale/"
+        "/areas/queensland/ipswich/ebbw-vale/",
+        "/areas/queensland/ipswich/new-chum/"
       ]
     },
     {
@@ -2216,8 +2138,8 @@
         "/areas/queensland/brisbane-inner/mayne/",
         "/areas/queensland/brisbane-inner/breakfast-creek/",
         "/areas/queensland/brisbane-inner/newstead/",
-        "/areas/queensland/brisbane-inner/brisbane-exhibition/",
-        "/areas/queensland/brisbane-inner/windsor/"
+        "/areas/queensland/brisbane-inner/windsor/",
+        "/areas/queensland/brisbane-inner/albion/"
       ]
     },
     {
@@ -2242,8 +2164,8 @@
         "/areas/queensland/brisbane-inner/mayne/",
         "/areas/queensland/brisbane-inner/breakfast-creek/",
         "/areas/queensland/brisbane-inner/newstead/",
-        "/areas/queensland/brisbane-inner/brisbane-exhibition/",
-        "/areas/queensland/brisbane-inner/windsor/"
+        "/areas/queensland/brisbane-inner/windsor/",
+        "/areas/queensland/brisbane-inner/albion/"
       ]
     },
     {
@@ -2314,7 +2236,7 @@
         "/areas/queensland/brisbane-north/nashville/",
         "/areas/queensland/brisbane-north/fitzgibbon/",
         "/areas/queensland/brisbane-north/deagon/",
-        "/areas/queensland/brisbane-north/brighton-nathan-street/"
+        "/areas/queensland/brisbane-north/taigum/"
       ]
     },
     {
@@ -2375,10 +2297,10 @@
       "neighbourHrefs": [
         "/areas/queensland/moreton-bay/lawnton/",
         "/areas/queensland/moreton-bay/warner/",
-        "/areas/queensland/moreton-bay/strathpine-city/",
         "/areas/queensland/moreton-bay/strathpine/",
         "/areas/queensland/moreton-bay/joyner/",
-        "/areas/queensland/moreton-bay/petrie/"
+        "/areas/queensland/moreton-bay/petrie/",
+        "/areas/queensland/moreton-bay/frenchs-forest/"
       ]
     },
     {
@@ -2446,10 +2368,10 @@
       "neighbourHrefs": [
         "/areas/queensland/brisbane-north/cashs-crossing/",
         "/areas/queensland/brisbane-north/albany-creek/",
-        "/areas/queensland/moreton-bay/strathpine-centre/",
         "/areas/queensland/moreton-bay/warner/",
-        "/areas/queensland/moreton-bay/strathpine-city/",
-        "/areas/queensland/moreton-bay/strathpine/"
+        "/areas/queensland/moreton-bay/strathpine/",
+        "/areas/queensland/brisbane-north/bridgeman-downs/",
+        "/areas/queensland/brisbane-north/bald-hills/"
       ]
     },
     {
@@ -2574,64 +2496,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/brisbane-north/brighton-eventide/",
-        "/areas/queensland/brisbane-north/brighton-nathan-street/",
         "/areas/queensland/brisbane-north/nashville/",
         "/areas/queensland/brisbane-north/sandgate/",
         "/areas/queensland/brisbane-north/deagon/",
-        "/areas/queensland/brisbane-north/shorncliffe/"
-      ]
-    },
-    {
-      "slug": "brighton-eventide",
-      "name": "BRIGHTON EVENTIDE",
-      "state": "QLD",
-      "postcodes": [
-        "4017"
-      ],
-      "coords": {
-        "lat": -27.297931,
-        "lng": 153.061821
-      },
-      "council": "Brisbane",
-      "anchorKey": "brisbane",
-      "distanceKm": 19.45,
-      "regionSlug": "brisbane-north",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/brisbane-north/brighton/",
-        "/areas/queensland/brisbane-north/brighton-nathan-street/",
-        "/areas/queensland/brisbane-north/nashville/",
-        "/areas/queensland/brisbane-north/sandgate/",
-        "/areas/queensland/brisbane-north/deagon/",
-        "/areas/queensland/brisbane-north/shorncliffe/"
-      ]
-    },
-    {
-      "slug": "brighton-nathan-street",
-      "name": "BRIGHTON NATHAN STREET",
-      "state": "QLD",
-      "postcodes": [
-        "4017"
-      ],
-      "coords": {
-        "lat": -27.3031821,
-        "lng": 153.0537419
-      },
-      "council": "Brisbane",
-      "anchorKey": "brisbane",
-      "distanceKm": 18.74,
-      "regionSlug": "brisbane-north",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/brisbane-north/brighton/",
-        "/areas/queensland/brisbane-north/nashville/",
-        "/areas/queensland/brisbane-north/brighton-eventide/",
-        "/areas/queensland/brisbane-north/deagon/",
-        "/areas/queensland/brisbane-north/sandgate/",
-        "/areas/queensland/brisbane-north/bracken-ridge/"
+        "/areas/queensland/brisbane-north/shorncliffe/",
+        "/areas/queensland/brisbane-north/bracken-ridge/",
+        "/areas/queensland/moreton-bay/griffin/"
       ]
     },
     {
@@ -2652,38 +2522,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/brisbane-inner/brisbane-adelaide-street/",
         "/areas/queensland/brisbane-inner/brisbane-city/",
-        "/areas/queensland/brisbane-inner/brisbane-gpo/",
         "/areas/queensland/brisbane-inner/spring-hill/",
         "/areas/queensland/brisbane-inner/kangaroo-point/",
-        "/areas/queensland/brisbane-inner/parliament-house/"
-      ]
-    },
-    {
-      "slug": "brisbane-adelaide-street",
-      "name": "BRISBANE ADELAIDE STREET",
-      "state": "QLD",
-      "postcodes": [
-        "4000"
-      ],
-      "coords": {
-        "lat": -27.4666186,
-        "lng": 153.027371
-      },
-      "council": "Brisbane",
-      "anchorKey": "brisbane",
-      "distanceKm": 0.42,
-      "regionSlug": "brisbane-inner",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/brisbane-inner/brisbane-gpo/",
-        "/areas/queensland/brisbane-inner/brisbane/",
-        "/areas/queensland/brisbane-inner/brisbane-city/",
-        "/areas/queensland/brisbane-inner/kangaroo-point/",
-        "/areas/queensland/brisbane-inner/spring-hill/",
-        "/areas/queensland/brisbane-inner/parliament-house/"
+        "/areas/queensland/brisbane-inner/petrie-terrace/",
+        "/areas/queensland/brisbane-inner/normanby/",
+        "/areas/queensland/brisbane-inner/south-brisbane/"
       ]
     },
     {
@@ -2704,90 +2548,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/brisbane-inner/brisbane-gpo/",
-        "/areas/queensland/brisbane-inner/brisbane-adelaide-street/",
         "/areas/queensland/brisbane-inner/brisbane/",
-        "/areas/queensland/brisbane-inner/parliament-house/",
         "/areas/queensland/brisbane-inner/kangaroo-point/",
-        "/areas/queensland/brisbane-inner/spring-hill/"
-      ]
-    },
-    {
-      "slug": "brisbane-exhibition",
-      "name": "BRISBANE EXHIBITION",
-      "state": "QLD",
-      "postcodes": [
-        "4006"
-      ],
-      "coords": {
-        "lat": -27.4508,
-        "lng": 153.033
-      },
-      "council": "Brisbane",
-      "anchorKey": "brisbane",
-      "distanceKm": 2.25,
-      "regionSlug": "brisbane-inner",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/brisbane-inner/fortitude-valley/",
-        "/areas/queensland/brisbane-inner/mayne/",
-        "/areas/queensland/brisbane-inner/bowen-bridge/",
-        "/areas/queensland/brisbane-inner/bowen-hills/",
         "/areas/queensland/brisbane-inner/spring-hill/",
-        "/areas/queensland/brisbane-inner/newstead/"
-      ]
-    },
-    {
-      "slug": "brisbane-gpo",
-      "name": "BRISBANE GPO",
-      "state": "QLD",
-      "postcodes": [
-        "4000"
-      ],
-      "coords": {
-        "lat": -27.4679,
-        "lng": 153.028
-      },
-      "council": "Brisbane",
-      "anchorKey": "brisbane",
-      "distanceKm": 0.36,
-      "regionSlug": "brisbane-inner",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/brisbane-inner/brisbane-adelaide-street/",
-        "/areas/queensland/brisbane-inner/brisbane-city/",
-        "/areas/queensland/brisbane-inner/brisbane/",
-        "/areas/queensland/brisbane-inner/kangaroo-point/",
-        "/areas/queensland/brisbane-inner/parliament-house/",
-        "/areas/queensland/brisbane-inner/spring-hill/"
-      ]
-    },
-    {
-      "slug": "brisbane-market",
-      "name": "BRISBANE MARKET",
-      "state": "QLD",
-      "postcodes": [
-        "4106"
-      ],
-      "coords": {
-        "lat": -27.5368394,
-        "lng": 153.0020535
-      },
-      "council": "Brisbane",
-      "anchorKey": "brisbane",
-      "distanceKm": 7.79,
-      "regionSlug": "brisbane-south",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/brisbane-south/tennyson/",
-        "/areas/queensland/brisbane-south/yeerongpilly/",
-        "/areas/queensland/brisbane-south/rocklea/",
-        "/areas/queensland/brisbane-south/corinda/",
-        "/areas/queensland/brisbane-south/moorvale/",
-        "/areas/queensland/brisbane-south/sherwood/"
+        "/areas/queensland/brisbane-inner/south-brisbane/",
+        "/areas/queensland/brisbane-inner/petrie-terrace/",
+        "/areas/queensland/brisbane-inner/south-bank/"
       ]
     },
     {
@@ -2809,11 +2575,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/queensland/gold-coast/miami-keys/",
-        "/areas/queensland/gold-coast/pacific-fair/",
         "/areas/queensland/gold-coast/rialto/",
         "/areas/queensland/gold-coast/florida-gardens/",
         "/areas/queensland/gold-coast/mermaid-beach/",
-        "/areas/queensland/gold-coast/moana-park/"
+        "/areas/queensland/gold-coast/moana-park/",
+        "/areas/queensland/gold-coast/rio-vista/"
       ]
     },
     {
@@ -2866,32 +2632,6 @@
         "/areas/queensland/brisbane-west/chapel-hill/",
         "/areas/queensland/brisbane-west/kenmore/",
         "/areas/queensland/brisbane-west/kenmore-east/"
-      ]
-    },
-    {
-      "slug": "brookside-centre",
-      "name": "BROOKSIDE CENTRE",
-      "state": "QLD",
-      "postcodes": [
-        "4053"
-      ],
-      "coords": {
-        "lat": -27.4092923,
-        "lng": 152.9792074
-      },
-      "council": "Moreton Bay",
-      "anchorKey": "brisbane",
-      "distanceKm": 8.11,
-      "regionSlug": "moreton-bay",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/moreton-bay/mitchelton/",
-        "/areas/queensland/brisbane-north/gaythorne/",
-        "/areas/queensland/moreton-bay/oxford-park/",
-        "/areas/queensland/moreton-bay/everton-park/",
-        "/areas/queensland/brisbane-north/grovely/",
-        "/areas/queensland/brisbane-west/enoggera/"
       ]
     },
     {
@@ -3151,7 +2891,7 @@
         "/areas/queensland/ipswich/north-booval/",
         "/areas/queensland/ipswich/new-chum/",
         "/areas/queensland/ipswich/riverview/",
-        "/areas/queensland/ipswich/booval-fair/"
+        "/areas/queensland/ipswich/booval/"
       ]
     },
     {
@@ -3898,8 +3638,8 @@
         "/areas/queensland/ipswich/gailes/",
         "/areas/queensland/ipswich/camira/",
         "/areas/queensland/brisbane-south/wacol/",
-        "/areas/queensland/brisbane-south/wacol-east-immigration-centre/",
-        "/areas/queensland/ipswich/goodna/"
+        "/areas/queensland/ipswich/goodna/",
+        "/areas/queensland/ipswich/goodna-east/"
       ]
     },
     {
@@ -4196,9 +3936,9 @@
         "/areas/queensland/brisbane-west/kenmore-hills/",
         "/areas/queensland/brisbane-west/kenmore/",
         "/areas/queensland/brisbane-west/kenmore-east/",
-        "/areas/queensland/brisbane-west/indooroopilly-centre/",
         "/areas/queensland/brisbane-west/indooroopilly/",
-        "/areas/queensland/brisbane-south/chelmer/"
+        "/areas/queensland/brisbane-south/chelmer/",
+        "/areas/queensland/brisbane-west/taringa/"
       ]
     },
     {
@@ -4249,8 +3989,8 @@
         "/areas/queensland/brisbane-south/graceville-east/",
         "/areas/queensland/brisbane-west/indooroopilly/",
         "/areas/queensland/brisbane-south/sherwood/",
-        "/areas/queensland/brisbane-west/indooroopilly-centre/",
-        "/areas/queensland/brisbane-south/fig-tree-pocket/"
+        "/areas/queensland/brisbane-south/fig-tree-pocket/",
+        "/areas/queensland/brisbane-south/lone-pine/"
       ]
     },
     {
@@ -4271,38 +4011,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/brisbane-north/chermside-centre/",
         "/areas/queensland/brisbane-north/chermside-south/",
         "/areas/queensland/brisbane-north/craigslea/",
         "/areas/queensland/brisbane-north/kedron/",
         "/areas/queensland/moreton-bay/kedron-upper/",
-        "/areas/queensland/moreton-bay/somerset-hills/"
-      ]
-    },
-    {
-      "slug": "chermside-centre",
-      "name": "CHERMSIDE CENTRE",
-      "state": "QLD",
-      "postcodes": [
-        "4032"
-      ],
-      "coords": {
-        "lat": -27.3830356,
-        "lng": 153.0320692
-      },
-      "council": "Brisbane",
-      "anchorKey": "brisbane",
-      "distanceKm": 9.67,
-      "regionSlug": "brisbane-north",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/brisbane-north/chermside/",
-        "/areas/queensland/brisbane-north/chermside-south/",
-        "/areas/queensland/brisbane-north/craigslea/",
-        "/areas/queensland/brisbane-north/wavell-heights-north/",
-        "/areas/queensland/moreton-bay/kedron-upper/",
-        "/areas/queensland/brisbane-north/kedron/"
+        "/areas/queensland/moreton-bay/somerset-hills/",
+        "/areas/queensland/brisbane-north/chermside-west/"
       ]
     },
     {
@@ -4324,11 +4038,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/queensland/brisbane-north/chermside/",
-        "/areas/queensland/brisbane-north/chermside-centre/",
         "/areas/queensland/moreton-bay/kedron-upper/",
         "/areas/queensland/brisbane-north/kedron/",
         "/areas/queensland/moreton-bay/somerset-hills/",
-        "/areas/queensland/brisbane-north/wavell-heights/"
+        "/areas/queensland/brisbane-north/wavell-heights/",
+        "/areas/queensland/brisbane-north/wavell-heights-north/"
       ]
     },
     {
@@ -4353,8 +4067,8 @@
         "/areas/queensland/moreton-bay/stafford-heights/",
         "/areas/queensland/brisbane-north/chermside/",
         "/areas/queensland/moreton-bay/somerset-hills/",
-        "/areas/queensland/brisbane-north/chermside-centre/",
-        "/areas/queensland/brisbane-north/aspley/"
+        "/areas/queensland/brisbane-north/aspley/",
+        "/areas/queensland/brisbane-north/chermside-south/"
       ]
     },
     {
@@ -4429,10 +4143,10 @@
       "neighbourHrefs": [
         "/areas/queensland/gold-coast/labrador/",
         "/areas/queensland/gold-coast/southport/",
-        "/areas/queensland/gold-coast/australia-fair/",
         "/areas/queensland/gold-coast/main-beach/",
         "/areas/queensland/gold-coast/biggera-waters/",
-        "/areas/queensland/gold-coast/sundale/"
+        "/areas/queensland/gold-coast/sundale/",
+        "/areas/queensland/gold-coast/keebra-park/"
       ]
     },
     {
@@ -4544,11 +4258,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/queensland/gold-coast/mermaid-keys/",
-        "/areas/queensland/gold-coast/q-supercentre/",
         "/areas/queensland/gold-coast/cypress-gardens/",
         "/areas/queensland/gold-coast/rio-vista/",
         "/areas/queensland/gold-coast/broadbeach-waters/",
-        "/areas/queensland/gold-coast/rialto/"
+        "/areas/queensland/gold-coast/rialto/",
+        "/areas/queensland/gold-coast/mermaid-waters/"
       ]
     },
     {
@@ -5216,7 +4930,7 @@
         "/areas/queensland/brisbane-south/lone-pine/",
         "/areas/queensland/brisbane-south/fig-tree-pocket/",
         "/areas/queensland/brisbane-south/rocklea/",
-        "/areas/queensland/brisbane-south/brisbane-market/"
+        "/areas/queensland/brisbane-south/seventeen-mile-rocks/"
       ]
     },
     {
@@ -5292,9 +5006,9 @@
         "/areas/queensland/brisbane-north/chermside-west/",
         "/areas/queensland/brisbane-north/chermside/",
         "/areas/queensland/moreton-bay/stafford-heights/",
-        "/areas/queensland/brisbane-north/chermside-centre/",
         "/areas/queensland/moreton-bay/somerset-hills/",
-        "/areas/queensland/brisbane-north/chermside-south/"
+        "/areas/queensland/brisbane-north/chermside-south/",
+        "/areas/queensland/brisbane-north/aspley/"
       ]
     },
     {
@@ -5319,8 +5033,8 @@
         "/areas/queensland/logan/park-ridge/",
         "/areas/queensland/logan/logan-reserve/",
         "/areas/queensland/logan/heritage-park/",
-        "/areas/queensland/logan/marsden-postal-depot/",
-        "/areas/queensland/brisbane-south/berrinba/"
+        "/areas/queensland/brisbane-south/berrinba/",
+        "/areas/queensland/logan/waterford-west/"
       ]
     },
     {
@@ -5555,7 +5269,7 @@
         "/areas/queensland/gold-coast/moana-park/",
         "/areas/queensland/gold-coast/rio-vista/",
         "/areas/queensland/gold-coast/mermaid-keys/",
-        "/areas/queensland/gold-coast/q-supercentre/"
+        "/areas/queensland/gold-coast/rialto/"
       ]
     },
     {
@@ -5685,7 +5399,7 @@
         "/areas/queensland/brisbane-north/nashville/",
         "/areas/queensland/brisbane-north/taigum/",
         "/areas/queensland/brisbane-north/boondall/",
-        "/areas/queensland/brisbane-north/brighton-nathan-street/"
+        "/areas/queensland/brisbane-north/brighton/"
       ]
     },
     {
@@ -5934,11 +5648,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/queensland/logan/forest-lake/",
-        "/areas/queensland/brisbane-south/heathwood-df/",
         "/areas/queensland/brisbane-south/heathwood/",
         "/areas/queensland/brisbane-south/inala-heights/",
         "/areas/queensland/brisbane-south/inala-west/",
-        "/areas/queensland/brisbane-south/larapinta/"
+        "/areas/queensland/brisbane-south/larapinta/",
+        "/areas/queensland/brisbane-south/willawong/"
       ]
     },
     {
@@ -6184,7 +5898,7 @@
         "/areas/queensland/brisbane-inner/highgate-hill/",
         "/areas/queensland/brisbane-inner/fairfield/",
         "/areas/queensland/brisbane-inner/buranda/",
-        "/areas/queensland/brisbane-inner/fairfield-gardens/"
+        "/areas/queensland/brisbane-inner/st-lucia-south/"
       ]
     },
     {
@@ -6809,11 +6523,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/queensland/moreton-bay/mcdowall/",
-        "/areas/queensland/moreton-bay/brookside-centre/",
         "/areas/queensland/moreton-bay/everton-hills/",
         "/areas/queensland/moreton-bay/mitchelton/",
         "/areas/queensland/moreton-bay/oxford-park/",
-        "/areas/queensland/moreton-bay/stafford-heights/"
+        "/areas/queensland/moreton-bay/stafford-heights/",
+        "/areas/queensland/brisbane-north/gaythorne/"
       ]
     },
     {
@@ -6834,38 +6548,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/brisbane-inner/fairfield-gardens/",
         "/areas/queensland/brisbane-inner/annerley/",
         "/areas/queensland/brisbane-south/yeronga/",
         "/areas/queensland/brisbane-inner/dutton-park/",
         "/areas/queensland/brisbane-inner/thompson-estate/",
-        "/areas/queensland/brisbane-south/yeronga-west/"
-      ]
-    },
-    {
-      "slug": "fairfield-gardens",
-      "name": "FAIRFIELD GARDENS",
-      "state": "QLD",
-      "postcodes": [
-        "4103"
-      ],
-      "coords": {
-        "lat": -27.5089965,
-        "lng": 153.0259502
-      },
-      "council": "Brisbane",
-      "anchorKey": "brisbane",
-      "distanceKm": 4.36,
-      "regionSlug": "brisbane-inner",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/brisbane-inner/fairfield/",
-        "/areas/queensland/brisbane-inner/annerley/",
-        "/areas/queensland/brisbane-south/yeronga/",
-        "/areas/queensland/brisbane-south/ekibin/",
         "/areas/queensland/brisbane-south/yeronga-west/",
-        "/areas/queensland/brisbane-inner/thompson-estate/"
+        "/areas/queensland/brisbane-south/ekibin/"
       ]
     },
     {
@@ -7123,7 +6811,7 @@
         "/areas/queensland/gold-coast/miami-keys/",
         "/areas/queensland/gold-coast/broadbeach/",
         "/areas/queensland/gold-coast/moana-park/",
-        "/areas/queensland/gold-coast/pacific-fair/"
+        "/areas/queensland/gold-coast/surfers-paradise/"
       ]
     },
     {
@@ -7210,10 +6898,10 @@
       "neighbourHrefs": [
         "/areas/queensland/brisbane-south/doolandella/",
         "/areas/queensland/logan/ellen-grove/",
-        "/areas/queensland/brisbane-south/heathwood-df/",
         "/areas/queensland/brisbane-south/heathwood/",
         "/areas/queensland/brisbane-south/serviceton/",
-        "/areas/queensland/brisbane-south/inala-west/"
+        "/areas/queensland/brisbane-south/inala-west/",
+        "/areas/queensland/brisbane-south/inala-heights/"
       ]
     },
     {
@@ -7239,7 +6927,7 @@
         "/areas/queensland/ipswich/greenbank/",
         "/areas/queensland/brisbane-south/larapinta/",
         "/areas/queensland/brisbane-south/heathwood/",
-        "/areas/queensland/brisbane-south/heathwood-df/"
+        "/areas/queensland/brisbane-south/parkinson/"
       ]
     },
     {
@@ -7260,12 +6948,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/brisbane-inner/brisbane-exhibition/",
         "/areas/queensland/brisbane-inner/spring-hill/",
         "/areas/queensland/brisbane-inner/kangaroo-point/",
         "/areas/queensland/brisbane-inner/mayne/",
-        "/areas/queensland/brisbane-inner/brisbane-adelaide-street/",
-        "/areas/queensland/brisbane-inner/brisbane-gpo/"
+        "/areas/queensland/brisbane-inner/teneriffe/",
+        "/areas/queensland/brisbane-inner/newstead/",
+        "/areas/queensland/brisbane-inner/brisbane/"
       ]
     },
     {
@@ -7367,9 +7055,9 @@
         "/areas/queensland/ipswich/goodna/",
         "/areas/queensland/ipswich/goodna-east/",
         "/areas/queensland/ipswich/carole-park/",
-        "/areas/queensland/brisbane-south/wacol-east-immigration-centre/",
         "/areas/queensland/brisbane-south/wacol/",
-        "/areas/queensland/ipswich/camira/"
+        "/areas/queensland/ipswich/camira/",
+        "/areas/queensland/logan/ellen-grove/"
       ]
     },
     {
@@ -7395,7 +7083,7 @@
         "/areas/queensland/gold-coast/arundel/",
         "/areas/queensland/gold-coast/molendinar/",
         "/areas/queensland/gold-coast/helensvale/",
-        "/areas/queensland/gold-coast/helensvale-town-centre/"
+        "/areas/queensland/gold-coast/studio-village/"
       ]
     },
     {
@@ -7416,12 +7104,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/moreton-bay/brookside-centre/",
         "/areas/queensland/brisbane-west/enoggera/",
         "/areas/queensland/moreton-bay/mitchelton/",
         "/areas/queensland/moreton-bay/oxford-park/",
         "/areas/queensland/brisbane-north/alderley/",
-        "/areas/queensland/moreton-bay/everton-park/"
+        "/areas/queensland/moreton-bay/everton-park/",
+        "/areas/queensland/brisbane-inner/dorrington/"
       ]
     },
     {
@@ -7444,10 +7132,10 @@
       "neighbourHrefs": [
         "/areas/queensland/brisbane-north/zillmere/",
         "/areas/queensland/brisbane-north/virginia/",
-        "/areas/queensland/brisbane-north/chermside-centre/",
         "/areas/queensland/brisbane-north/wavell-heights-north/",
         "/areas/queensland/brisbane-north/boondall/",
-        "/areas/queensland/brisbane-north/taigum/"
+        "/areas/queensland/brisbane-north/taigum/",
+        "/areas/queensland/brisbane-north/wavell-heights/"
       ]
     },
     {
@@ -7778,8 +7466,8 @@
         "/areas/queensland/brisbane-north/alderley/",
         "/areas/queensland/brisbane-inner/eildon-hill/",
         "/areas/queensland/moreton-bay/stafford/",
-        "/areas/queensland/moreton-bay/stafford-city/",
-        "/areas/queensland/brisbane-north/gordon-park/"
+        "/areas/queensland/brisbane-north/gordon-park/",
+        "/areas/queensland/brisbane-inner/newmarket/"
       ]
     },
     {
@@ -7804,8 +7492,8 @@
         "/areas/queensland/ipswich/boronia-heights/",
         "/areas/queensland/logan/hillcrest/",
         "/areas/queensland/brisbane-south/heathwood/",
-        "/areas/queensland/brisbane-south/heathwood-df/",
-        "/areas/queensland/brisbane-south/larapinta/"
+        "/areas/queensland/brisbane-south/larapinta/",
+        "/areas/queensland/logan/regents-park/"
       ]
     },
     {
@@ -7911,7 +7599,7 @@
         "/areas/queensland/moreton-bay/mango-hill/",
         "/areas/queensland/brisbane-north/brighton/",
         "/areas/queensland/moreton-bay/kallangur/",
-        "/areas/queensland/brisbane-north/brighton-eventide/"
+        "/areas/queensland/moreton-bay/clontarf-beach/"
       ]
     },
     {
@@ -7937,7 +7625,7 @@
         "/areas/queensland/brisbane-west/keperra/",
         "/areas/queensland/moreton-bay/everton-hills/",
         "/areas/queensland/moreton-bay/mitchelton/",
-        "/areas/queensland/moreton-bay/brookside-centre/"
+        "/areas/queensland/moreton-bay/everton-park/"
       ]
     },
     {
@@ -8160,38 +7848,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/brisbane-south/heathwood-df/",
         "/areas/queensland/brisbane-south/larapinta/",
         "/areas/queensland/brisbane-south/doolandella/",
         "/areas/queensland/logan/forest-lake/",
         "/areas/queensland/logan/ellen-grove/",
-        "/areas/queensland/brisbane-south/pallara/"
-      ]
-    },
-    {
-      "slug": "heathwood-df",
-      "name": "HEATHWOOD DF",
-      "state": "QLD",
-      "postcodes": [
-        "4110"
-      ],
-      "coords": {
-        "lat": -27.6333,
-        "lng": 152.983
-      },
-      "council": "Brisbane",
-      "anchorKey": "brisbane",
-      "distanceKm": 18.65,
-      "regionSlug": "brisbane-south",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/brisbane-south/heathwood/",
-        "/areas/queensland/brisbane-south/larapinta/",
-        "/areas/queensland/brisbane-south/doolandella/",
-        "/areas/queensland/logan/forest-lake/",
-        "/areas/queensland/logan/ellen-grove/",
-        "/areas/queensland/brisbane-south/pallara/"
+        "/areas/queensland/brisbane-south/pallara/",
+        "/areas/queensland/logan/forestdale/"
       ]
     },
     {
@@ -8212,38 +7874,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/gold-coast/helensvale-town-centre/",
         "/areas/queensland/gold-coast/studio-village/",
         "/areas/queensland/gold-coast/oxenford/",
         "/areas/queensland/gold-coast/monterey-keys/",
         "/areas/queensland/gold-coast/arundel/",
-        "/areas/queensland/gold-coast/pacific-pines/"
-      ]
-    },
-    {
-      "slug": "helensvale-town-centre",
-      "name": "HELENSVALE TOWN CENTRE",
-      "state": "QLD",
-      "postcodes": [
-        "4212"
-      ],
-      "coords": {
-        "lat": -27.9159865,
-        "lng": 153.3345536
-      },
-      "council": "Gold Coast",
-      "anchorKey": "southport",
-      "distanceKm": 8.65,
-      "regionSlug": "gold-coast",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/gold-coast/helensvale/",
-        "/areas/queensland/gold-coast/studio-village/",
-        "/areas/queensland/gold-coast/oxenford/",
-        "/areas/queensland/gold-coast/monterey-keys/",
-        "/areas/queensland/gold-coast/arundel/",
-        "/areas/queensland/gold-coast/pacific-pines/"
+        "/areas/queensland/gold-coast/pacific-pines/",
+        "/areas/queensland/gold-coast/gaven/"
       ]
     },
     {
@@ -8344,10 +7980,10 @@
       "neighbourHrefs": [
         "/areas/queensland/brisbane-inner/ballymore/",
         "/areas/queensland/brisbane-inner/wilston/",
-        "/areas/queensland/brisbane-inner/brisbane-exhibition/",
         "/areas/queensland/brisbane-inner/normanby/",
         "/areas/queensland/brisbane-inner/mayne/",
-        "/areas/queensland/brisbane-inner/newmarket/"
+        "/areas/queensland/brisbane-inner/newmarket/",
+        "/areas/queensland/brisbane-inner/kelvin-grove/"
       ]
     },
     {
@@ -8900,37 +8536,11 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/brisbane-west/indooroopilly-centre/",
         "/areas/queensland/brisbane-west/taringa/",
         "/areas/queensland/brisbane-south/chelmer/",
         "/areas/queensland/brisbane-inner/ironside/",
         "/areas/queensland/brisbane-inner/toowong/",
-        "/areas/queensland/brisbane-south/long-pocket/"
-      ]
-    },
-    {
-      "slug": "indooroopilly-centre",
-      "name": "INDOOROOPILLY CENTRE",
-      "state": "QLD",
-      "postcodes": [
-        "4068"
-      ],
-      "coords": {
-        "lat": -27.5001761,
-        "lng": 152.9721547
-      },
-      "council": "Brisbane",
-      "anchorKey": "brisbane",
-      "distanceKm": 6.22,
-      "regionSlug": "brisbane-west",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/brisbane-west/indooroopilly/",
-        "/areas/queensland/brisbane-west/taringa/",
-        "/areas/queensland/brisbane-south/chelmer/",
-        "/areas/queensland/brisbane-inner/toowong/",
-        "/areas/queensland/brisbane-inner/ironside/",
+        "/areas/queensland/brisbane-south/long-pocket/",
         "/areas/queensland/brisbane-south/graceville/"
       ]
     },
@@ -9354,12 +8964,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/brisbane-inner/brisbane-gpo/",
-        "/areas/queensland/brisbane-inner/brisbane-adelaide-street/",
         "/areas/queensland/brisbane-inner/brisbane-city/",
         "/areas/queensland/brisbane-inner/brisbane/",
         "/areas/queensland/brisbane-inner/spring-hill/",
-        "/areas/queensland/brisbane-inner/fortitude-valley/"
+        "/areas/queensland/brisbane-inner/fortitude-valley/",
+        "/areas/queensland/brisbane-inner/new-farm/",
+        "/areas/queensland/brisbane-inner/teneriffe/"
       ]
     },
     {
@@ -9562,10 +9172,10 @@
       "neighbourHrefs": [
         "/areas/queensland/gold-coast/southport-park/",
         "/areas/queensland/gold-coast/ashmore/",
-        "/areas/queensland/gold-coast/ashmore-city/",
         "/areas/queensland/gold-coast/southport/",
         "/areas/queensland/gold-coast/sundale/",
-        "/areas/queensland/gold-coast/surfers-paradise/"
+        "/areas/queensland/gold-coast/surfers-paradise/",
+        "/areas/queensland/gold-coast/paradise-waters/"
       ]
     },
     {
@@ -9695,7 +9305,7 @@
         "/areas/queensland/brisbane-west/kenmore-east/",
         "/areas/queensland/brisbane-west/mount-coot-tha/",
         "/areas/queensland/brisbane-west/brookfield/",
-        "/areas/queensland/brisbane-west/indooroopilly-centre/"
+        "/areas/queensland/brisbane-west/jindalee/"
       ]
     },
     {
@@ -9720,8 +9330,8 @@
         "/areas/queensland/moreton-bay/oxford-park/",
         "/areas/queensland/brisbane-north/arana-hills/",
         "/areas/queensland/moreton-bay/mitchelton/",
-        "/areas/queensland/moreton-bay/brookside-centre/",
-        "/areas/queensland/moreton-bay/everton-hills/"
+        "/areas/queensland/moreton-bay/everton-hills/",
+        "/areas/queensland/moreton-bay/ferny-grove/"
       ]
     },
     {
@@ -9772,8 +9382,8 @@
         "/areas/queensland/gold-coast/mudgeeraba/",
         "/areas/queensland/gold-coast/merrimac/",
         "/areas/queensland/gold-coast/varsity-lakes/",
-        "/areas/queensland/gold-coast/q-supercentre/",
-        "/areas/queensland/gold-coast/clear-island-waters/"
+        "/areas/queensland/gold-coast/clear-island-waters/",
+        "/areas/queensland/gold-coast/mermaid-keys/"
       ]
     },
     {
@@ -9992,8 +9602,8 @@
         "/areas/queensland/brisbane-south/slacks-creek/",
         "/areas/queensland/logan/woodridge/",
         "/areas/queensland/logan/woodridge-east/",
-        "/areas/queensland/logan/marsden-postal-depot/",
-        "/areas/queensland/logan/loganlea/"
+        "/areas/queensland/logan/loganlea/",
+        "/areas/queensland/brisbane-south/chatswood-hills/"
       ]
     },
     {
@@ -10251,9 +9861,9 @@
         "/areas/queensland/gold-coast/chirn-park/",
         "/areas/queensland/gold-coast/biggera-waters/",
         "/areas/queensland/gold-coast/southport/",
-        "/areas/queensland/gold-coast/australia-fair/",
         "/areas/queensland/gold-coast/main-beach/",
-        "/areas/queensland/gold-coast/parkwood/"
+        "/areas/queensland/gold-coast/parkwood/",
+        "/areas/queensland/gold-coast/anglers-paradise/"
       ]
     },
     {
@@ -10436,11 +10046,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/queensland/brisbane-south/heathwood/",
-        "/areas/queensland/brisbane-south/heathwood-df/",
         "/areas/queensland/brisbane-south/doolandella/",
         "/areas/queensland/brisbane-south/pallara/",
         "/areas/queensland/brisbane-south/parkinson/",
-        "/areas/queensland/logan/forestdale/"
+        "/areas/queensland/logan/forestdale/",
+        "/areas/queensland/brisbane-south/willawong/"
       ]
     },
     {
@@ -10487,12 +10097,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/moreton-bay/strathpine-city/",
         "/areas/queensland/moreton-bay/strathpine/",
         "/areas/queensland/moreton-bay/bray-park/",
         "/areas/queensland/moreton-bay/petrie/",
-        "/areas/queensland/moreton-bay/strathpine-centre/",
-        "/areas/queensland/moreton-bay/murrumba-downs/"
+        "/areas/queensland/moreton-bay/murrumba-downs/",
+        "/areas/queensland/moreton-bay/dohles-rocks/",
+        "/areas/queensland/moreton-bay/frenchs-forest/"
       ]
     },
     {
@@ -10657,10 +10267,10 @@
       "neighbourHrefs": [
         "/areas/queensland/logan/waterford-west/",
         "/areas/queensland/logan/crestmead/",
-        "/areas/queensland/logan/marsden-postal-depot/",
         "/areas/queensland/logan/marsden/",
         "/areas/queensland/logan/loganlea/",
-        "/areas/queensland/logan/waterford/"
+        "/areas/queensland/logan/waterford/",
+        "/areas/queensland/logan/park-ridge/"
       ]
     },
     {
@@ -10759,12 +10369,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/logan/marsden-postal-depot/",
         "/areas/queensland/logan/waterford-west/",
         "/areas/queensland/logan/meadowbrook/",
         "/areas/queensland/logan/marsden/",
         "/areas/queensland/logan/bethania/",
-        "/areas/queensland/logan/kingston/"
+        "/areas/queensland/logan/kingston/",
+        "/areas/queensland/logan/logan-reserve/"
       ]
     },
     {
@@ -11083,12 +10693,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/gold-coast/australia-fair/",
         "/areas/queensland/gold-coast/sundale/",
         "/areas/queensland/gold-coast/southport/",
         "/areas/queensland/gold-coast/paradise-waters/",
         "/areas/queensland/gold-coast/chirn-park/",
-        "/areas/queensland/gold-coast/southport-park/"
+        "/areas/queensland/gold-coast/southport-park/",
+        "/areas/queensland/gold-coast/the-spit/"
       ]
     },
     {
@@ -11447,37 +11057,11 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/logan/marsden-postal-depot/",
         "/areas/queensland/logan/crestmead/",
         "/areas/queensland/logan/loganlea/",
         "/areas/queensland/logan/waterford-west/",
         "/areas/queensland/logan/logan-reserve/",
-        "/areas/queensland/brisbane-south/berrinba/"
-      ]
-    },
-    {
-      "slug": "marsden-postal-depot",
-      "name": "MARSDEN POSTAL DEPOT",
-      "state": "QLD",
-      "postcodes": [
-        "4132"
-      ],
-      "coords": {
-        "lat": -27.6788,
-        "lng": 153.116
-      },
-      "council": "Logan",
-      "anchorKey": "brisbane",
-      "distanceKm": 24.91,
-      "regionSlug": "logan",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/logan/loganlea/",
-        "/areas/queensland/logan/marsden/",
-        "/areas/queensland/logan/waterford-west/",
-        "/areas/queensland/logan/logan-reserve/",
-        "/areas/queensland/logan/crestmead/",
+        "/areas/queensland/brisbane-south/berrinba/",
         "/areas/queensland/logan/kingston/"
       ]
     },
@@ -11502,9 +11086,9 @@
         "/areas/queensland/brisbane-inner/woolloongabba/",
         "/areas/queensland/brisbane-inner/highgate-hill/",
         "/areas/queensland/brisbane-inner/dutton-park/",
-        "/areas/queensland/brisbane-inner/parliament-house/",
         "/areas/queensland/brisbane-inner/south-brisbane/",
-        "/areas/queensland/brisbane-inner/buranda/"
+        "/areas/queensland/brisbane-inner/buranda/",
+        "/areas/queensland/brisbane-inner/west-end/"
       ]
     },
     {
@@ -11553,10 +11137,10 @@
       "neighbourHrefs": [
         "/areas/queensland/brisbane-inner/bowen-bridge/",
         "/areas/queensland/brisbane-inner/bowen-hills/",
-        "/areas/queensland/brisbane-inner/brisbane-exhibition/",
         "/areas/queensland/brisbane-inner/newstead/",
         "/areas/queensland/brisbane-inner/breakfast-creek/",
-        "/areas/queensland/brisbane-inner/fortitude-valley/"
+        "/areas/queensland/brisbane-inner/fortitude-valley/",
+        "/areas/queensland/brisbane-inner/windsor/"
       ]
     },
     {
@@ -11582,7 +11166,7 @@
         "/areas/queensland/brisbane-north/chermside-west/",
         "/areas/queensland/moreton-bay/stafford-heights/",
         "/areas/queensland/brisbane-north/craigslea/",
-        "/areas/queensland/moreton-bay/brookside-centre/"
+        "/areas/queensland/moreton-bay/oxford-park/"
       ]
     },
     {
@@ -11682,11 +11266,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/queensland/gold-coast/nobby-beach/",
-        "/areas/queensland/gold-coast/pacific-fair/",
         "/areas/queensland/gold-coast/broadbeach/",
         "/areas/queensland/gold-coast/mermaid-waters/",
         "/areas/queensland/gold-coast/rialto/",
-        "/areas/queensland/gold-coast/miami-keys/"
+        "/areas/queensland/gold-coast/miami-keys/",
+        "/areas/queensland/gold-coast/rio-vista/"
       ]
     },
     {
@@ -11707,12 +11291,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/gold-coast/q-supercentre/",
         "/areas/queensland/gold-coast/rio-vista/",
         "/areas/queensland/gold-coast/clear-island-waters/",
         "/areas/queensland/gold-coast/rialto/",
         "/areas/queensland/gold-coast/mermaid-waters/",
-        "/areas/queensland/gold-coast/cypress-gardens/"
+        "/areas/queensland/gold-coast/cypress-gardens/",
+        "/areas/queensland/gold-coast/broadbeach-waters/"
       ]
     },
     {
@@ -11735,10 +11319,10 @@
       "neighbourHrefs": [
         "/areas/queensland/gold-coast/rialto/",
         "/areas/queensland/gold-coast/rio-vista/",
-        "/areas/queensland/gold-coast/q-supercentre/",
         "/areas/queensland/gold-coast/mermaid-keys/",
-        "/areas/queensland/gold-coast/pacific-fair/",
-        "/areas/queensland/gold-coast/mermaid-beach/"
+        "/areas/queensland/gold-coast/mermaid-beach/",
+        "/areas/queensland/gold-coast/nobby-beach/",
+        "/areas/queensland/gold-coast/broadbeach/"
       ]
     },
     {
@@ -11762,9 +11346,9 @@
         "/areas/queensland/gold-coast/robina/",
         "/areas/queensland/gold-coast/clear-island-waters/",
         "/areas/queensland/gold-coast/kerrydale/",
-        "/areas/queensland/gold-coast/q-supercentre/",
         "/areas/queensland/gold-coast/mermaid-keys/",
-        "/areas/queensland/gold-coast/worongary/"
+        "/areas/queensland/gold-coast/worongary/",
+        "/areas/queensland/gold-coast/cypress-gardens/"
       ]
     },
     {
@@ -11812,11 +11396,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/queensland/gold-coast/broadbeach/",
-        "/areas/queensland/gold-coast/pacific-fair/",
         "/areas/queensland/gold-coast/moana-park/",
         "/areas/queensland/gold-coast/florida-gardens/",
         "/areas/queensland/gold-coast/rialto/",
-        "/areas/queensland/gold-coast/rio-vista/"
+        "/areas/queensland/gold-coast/rio-vista/",
+        "/areas/queensland/gold-coast/broadbeach-waters/"
       ]
     },
     {
@@ -11915,12 +11499,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/moreton-bay/brookside-centre/",
         "/areas/queensland/moreton-bay/oxford-park/",
         "/areas/queensland/brisbane-north/gaythorne/",
         "/areas/queensland/brisbane-north/grovely/",
         "/areas/queensland/brisbane-west/keperra/",
-        "/areas/queensland/brisbane-north/arana-hills/"
+        "/areas/queensland/brisbane-north/arana-hills/",
+        "/areas/queensland/moreton-bay/everton-park/"
       ]
     },
     {
@@ -12021,10 +11605,10 @@
       "neighbourHrefs": [
         "/areas/queensland/gold-coast/parkwood/",
         "/areas/queensland/gold-coast/ashmore/",
-        "/areas/queensland/gold-coast/ashmore-city/",
         "/areas/queensland/gold-coast/gaven/",
         "/areas/queensland/gold-coast/keebra-park/",
-        "/areas/queensland/gold-coast/arundel/"
+        "/areas/queensland/gold-coast/arundel/",
+        "/areas/queensland/gold-coast/nerang/"
       ]
     },
     {
@@ -12072,11 +11656,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/queensland/gold-coast/helensvale/",
-        "/areas/queensland/gold-coast/helensvale-town-centre/",
         "/areas/queensland/gold-coast/hope-island/",
         "/areas/queensland/gold-coast/oxenford/",
         "/areas/queensland/gold-coast/santa-barbara/",
-        "/areas/queensland/gold-coast/studio-village/"
+        "/areas/queensland/gold-coast/studio-village/",
+        "/areas/queensland/gold-coast/boykambil/"
       ]
     },
     {
@@ -12973,11 +12557,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/queensland/brisbane-east/bulwer-island/",
-        "/areas/queensland/brisbane-east/port-of-brisbane/",
         "/areas/queensland/brisbane-east/lytton/",
         "/areas/queensland/brisbane-east/pinkenba/",
         "/areas/queensland/brisbane-east/meeandah/",
-        "/areas/queensland/brisbane-east/wynnum-north/"
+        "/areas/queensland/brisbane-east/wynnum-north/",
+        "/areas/queensland/brisbane-east/lindum/"
       ]
     },
     {
@@ -13076,12 +12660,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/brisbane-north/brighton-nathan-street/",
         "/areas/queensland/brisbane-north/brighton/",
-        "/areas/queensland/brisbane-north/brighton-eventide/",
         "/areas/queensland/brisbane-north/deagon/",
         "/areas/queensland/brisbane-north/sandgate/",
-        "/areas/queensland/brisbane-north/bracken-ridge/"
+        "/areas/queensland/brisbane-north/bracken-ridge/",
+        "/areas/queensland/brisbane-north/shorncliffe/",
+        "/areas/queensland/brisbane-north/bald-hills/"
       ]
     },
     {
@@ -13456,9 +13040,9 @@
         "/areas/queensland/gold-coast/mermaid-beach/",
         "/areas/queensland/gold-coast/miami/",
         "/areas/queensland/gold-coast/mermaid-waters/",
-        "/areas/queensland/gold-coast/pacific-fair/",
         "/areas/queensland/gold-coast/rialto/",
-        "/areas/queensland/gold-coast/broadbeach/"
+        "/areas/queensland/gold-coast/broadbeach/",
+        "/areas/queensland/gold-coast/rio-vista/"
       ]
     },
     {
@@ -13636,11 +13220,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/queensland/ipswich/booval/",
-        "/areas/queensland/ipswich/booval-fair/",
         "/areas/queensland/ipswich/bundamba/",
         "/areas/queensland/ipswich/silkstone/",
         "/areas/queensland/ipswich/ebbw-vale/",
-        "/areas/queensland/ipswich/blackstone/"
+        "/areas/queensland/ipswich/blackstone/",
+        "/areas/queensland/ipswich/dinmore/"
       ]
     },
     {
@@ -14153,10 +13737,10 @@
       "neighbourHrefs": [
         "/areas/queensland/gold-coast/studio-village/",
         "/areas/queensland/gold-coast/helensvale/",
-        "/areas/queensland/gold-coast/helensvale-town-centre/",
         "/areas/queensland/gold-coast/upper-coomera/",
         "/areas/queensland/gold-coast/monterey-keys/",
-        "/areas/queensland/gold-coast/maudsland/"
+        "/areas/queensland/gold-coast/maudsland/",
+        "/areas/queensland/gold-coast/pacific-pines/"
       ]
     },
     {
@@ -14179,10 +13763,10 @@
       "neighbourHrefs": [
         "/areas/queensland/moreton-bay/mitchelton/",
         "/areas/queensland/brisbane-north/grovely/",
-        "/areas/queensland/moreton-bay/brookside-centre/",
         "/areas/queensland/brisbane-north/arana-hills/",
         "/areas/queensland/moreton-bay/everton-hills/",
-        "/areas/queensland/brisbane-west/keperra/"
+        "/areas/queensland/brisbane-west/keperra/",
+        "/areas/queensland/brisbane-north/gaythorne/"
       ]
     },
     {
@@ -14209,32 +13793,6 @@
         "/areas/queensland/brisbane-south/darra/",
         "/areas/queensland/brisbane-south/fig-tree-pocket/",
         "/areas/queensland/brisbane-south/sinnamon-park/"
-      ]
-    },
-    {
-      "slug": "pacific-fair",
-      "name": "PACIFIC FAIR",
-      "state": "QLD",
-      "postcodes": [
-        "4218"
-      ],
-      "coords": {
-        "lat": -28.036401,
-        "lng": 153.4280222
-      },
-      "council": "Gold Coast",
-      "anchorKey": "southport",
-      "distanceKm": 8.09,
-      "regionSlug": "gold-coast",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/gold-coast/broadbeach/",
-        "/areas/queensland/gold-coast/rialto/",
-        "/areas/queensland/gold-coast/miami-keys/",
-        "/areas/queensland/gold-coast/mermaid-beach/",
-        "/areas/queensland/gold-coast/rio-vista/",
-        "/areas/queensland/gold-coast/mermaid-waters/"
       ]
     },
     {
@@ -14284,9 +13842,9 @@
         "/areas/queensland/gold-coast/gaven/",
         "/areas/queensland/gold-coast/studio-village/",
         "/areas/queensland/gold-coast/helensvale/",
-        "/areas/queensland/gold-coast/helensvale-town-centre/",
         "/areas/queensland/gold-coast/arundel/",
-        "/areas/queensland/gold-coast/parkwood/"
+        "/areas/queensland/gold-coast/parkwood/",
+        "/areas/queensland/gold-coast/molendinar/"
       ]
     },
     {
@@ -14519,8 +14077,8 @@
         "/areas/queensland/gold-coast/southport-park/",
         "/areas/queensland/gold-coast/chevron-island/",
         "/areas/queensland/gold-coast/surfers-paradise/",
-        "/areas/queensland/gold-coast/australia-fair/",
-        "/areas/queensland/gold-coast/keebra-park/"
+        "/areas/queensland/gold-coast/keebra-park/",
+        "/areas/queensland/gold-coast/main-beach/"
       ]
     },
     {
@@ -14651,32 +14209,6 @@
         "/areas/queensland/gold-coast/labrador/",
         "/areas/queensland/gold-coast/chirn-park/",
         "/areas/queensland/gold-coast/ashmore/"
-      ]
-    },
-    {
-      "slug": "parliament-house",
-      "name": "PARLIAMENT HOUSE",
-      "state": "QLD",
-      "postcodes": [
-        "4000"
-      ],
-      "coords": {
-        "lat": -27.4754,
-        "lng": 153.027
-      },
-      "council": "Brisbane",
-      "anchorKey": "brisbane",
-      "distanceKm": 0.65,
-      "regionSlug": "brisbane-inner",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/brisbane-inner/brisbane-city/",
-        "/areas/queensland/brisbane-inner/brisbane-gpo/",
-        "/areas/queensland/brisbane-inner/brisbane-adelaide-street/",
-        "/areas/queensland/brisbane-inner/south-brisbane/",
-        "/areas/queensland/brisbane-inner/mater-hill/",
-        "/areas/queensland/brisbane-inner/brisbane/"
       ]
     },
     {
@@ -15179,32 +14711,6 @@
       ]
     },
     {
-      "slug": "port-of-brisbane",
-      "name": "PORT OF BRISBANE",
-      "state": "QLD",
-      "postcodes": [
-        "4178"
-      ],
-      "coords": {
-        "lat": -27.3807264,
-        "lng": 153.1640009
-      },
-      "council": "Brisbane",
-      "anchorKey": "brisbane",
-      "distanceKm": 16.91,
-      "regionSlug": "brisbane-east",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/brisbane-east/myrtletown/",
-        "/areas/queensland/brisbane-east/lytton/",
-        "/areas/queensland/brisbane-east/bulwer-island/",
-        "/areas/queensland/brisbane-east/wynnum-north/",
-        "/areas/queensland/brisbane-north/nudgee-beach/",
-        "/areas/queensland/brisbane-east/wynnum/"
-      ]
-    },
-    {
       "slug": "priestdale",
       "name": "PRIESTDALE",
       "state": "QLD",
@@ -15278,8 +14784,8 @@
         "/areas/queensland/brisbane-west/moggill/",
         "/areas/queensland/ipswich/redbank/",
         "/areas/queensland/brisbane-west/riverhills/",
-        "/areas/queensland/brisbane-south/wacol-east-immigration-centre/",
-        "/areas/queensland/brisbane-south/wacol/"
+        "/areas/queensland/brisbane-south/wacol/",
+        "/areas/queensland/ipswich/goodna/"
       ]
     },
     {
@@ -15326,32 +14832,6 @@
       "ruralFringe": true,
       "tier": 3,
       "neighbourHrefs": []
-    },
-    {
-      "slug": "q-supercentre",
-      "name": "Q SUPERCENTRE",
-      "state": "QLD",
-      "postcodes": [
-        "4218"
-      ],
-      "coords": {
-        "lat": -28.0455677,
-        "lng": 153.4078964
-      },
-      "council": "Gold Coast",
-      "anchorKey": "southport",
-      "distanceKm": 8.66,
-      "regionSlug": "gold-coast",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/gold-coast/mermaid-keys/",
-        "/areas/queensland/gold-coast/clear-island-waters/",
-        "/areas/queensland/gold-coast/rio-vista/",
-        "/areas/queensland/gold-coast/mermaid-waters/",
-        "/areas/queensland/gold-coast/rialto/",
-        "/areas/queensland/gold-coast/cypress-gardens/"
-      ]
     },
     {
       "slug": "raceview",
@@ -15723,11 +15203,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/queensland/gold-coast/rio-vista/",
-        "/areas/queensland/gold-coast/pacific-fair/",
         "/areas/queensland/gold-coast/mermaid-waters/",
         "/areas/queensland/gold-coast/miami-keys/",
         "/areas/queensland/gold-coast/mermaid-keys/",
-        "/areas/queensland/gold-coast/q-supercentre/"
+        "/areas/queensland/gold-coast/broadbeach/",
+        "/areas/queensland/gold-coast/broadbeach-waters/"
       ]
     },
     {
@@ -15821,10 +15301,10 @@
       "neighbourHrefs": [
         "/areas/queensland/gold-coast/rialto/",
         "/areas/queensland/gold-coast/mermaid-keys/",
-        "/areas/queensland/gold-coast/q-supercentre/",
         "/areas/queensland/gold-coast/broadbeach-waters/",
         "/areas/queensland/gold-coast/mermaid-waters/",
-        "/areas/queensland/gold-coast/pacific-fair/"
+        "/areas/queensland/gold-coast/moana-park/",
+        "/areas/queensland/gold-coast/cypress-gardens/"
       ]
     },
     {
@@ -15971,9 +15451,9 @@
         "/areas/queensland/gold-coast/kerrydale/",
         "/areas/queensland/gold-coast/merrimac/",
         "/areas/queensland/gold-coast/clear-island-waters/",
-        "/areas/queensland/gold-coast/q-supercentre/",
         "/areas/queensland/gold-coast/mermaid-keys/",
-        "/areas/queensland/gold-coast/mudgeeraba/"
+        "/areas/queensland/gold-coast/mudgeeraba/",
+        "/areas/queensland/gold-coast/varsity-lakes/"
       ]
     },
     {
@@ -16046,12 +15526,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/brisbane-south/brisbane-market/",
         "/areas/queensland/brisbane-south/corinda/",
         "/areas/queensland/brisbane-south/oxley/",
         "/areas/queensland/brisbane-south/yeerongpilly/",
         "/areas/queensland/brisbane-south/archerfield/",
-        "/areas/queensland/brisbane-south/tennyson/"
+        "/areas/queensland/brisbane-south/tennyson/",
+        "/areas/queensland/brisbane-south/sherwood/"
       ]
     },
     {
@@ -16451,9 +15931,9 @@
         "/areas/queensland/brisbane-north/shorncliffe/",
         "/areas/queensland/brisbane-north/deagon/",
         "/areas/queensland/brisbane-north/nashville/",
-        "/areas/queensland/brisbane-north/brighton-nathan-street/",
-        "/areas/queensland/brisbane-north/brighton-eventide/",
-        "/areas/queensland/brisbane-north/brighton/"
+        "/areas/queensland/brisbane-north/brighton/",
+        "/areas/queensland/brisbane-north/boondall/",
+        "/areas/queensland/brisbane-north/taigum/"
       ]
     },
     {
@@ -16758,8 +16238,8 @@
         "/areas/queensland/brisbane-north/deagon/",
         "/areas/queensland/brisbane-north/boondall/",
         "/areas/queensland/brisbane-north/nashville/",
-        "/areas/queensland/brisbane-north/brighton-nathan-street/",
-        "/areas/queensland/brisbane-north/brighton-eventide/"
+        "/areas/queensland/brisbane-north/nudgee-beach/",
+        "/areas/queensland/brisbane-north/brighton/"
       ]
     },
     {
@@ -16780,12 +16260,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/ipswich/booval-fair/",
         "/areas/queensland/ipswich/booval/",
         "/areas/queensland/ipswich/blackstone/",
         "/areas/queensland/ipswich/north-booval/",
         "/areas/queensland/ipswich/bundamba/",
-        "/areas/queensland/ipswich/ebbw-vale/"
+        "/areas/queensland/ipswich/ebbw-vale/",
+        "/areas/queensland/ipswich/new-chum/"
       ]
     },
     {
@@ -16966,8 +16446,8 @@
         "/areas/queensland/brisbane-inner/south-brisbane/",
         "/areas/queensland/brisbane-inner/highgate-hill/",
         "/areas/queensland/brisbane-inner/milton/",
-        "/areas/queensland/brisbane-inner/parliament-house/",
-        "/areas/queensland/brisbane-inner/mater-hill/"
+        "/areas/queensland/brisbane-inner/mater-hill/",
+        "/areas/queensland/brisbane-inner/torwood/"
       ]
     },
     {
@@ -16990,10 +16470,10 @@
       "neighbourHrefs": [
         "/areas/queensland/brisbane-inner/south-bank/",
         "/areas/queensland/brisbane-inner/west-end/",
-        "/areas/queensland/brisbane-inner/parliament-house/",
         "/areas/queensland/brisbane-inner/brisbane-city/",
         "/areas/queensland/brisbane-inner/highgate-hill/",
-        "/areas/queensland/brisbane-inner/brisbane/"
+        "/areas/queensland/brisbane-inner/brisbane/",
+        "/areas/queensland/brisbane-inner/milton/"
       ]
     },
     {
@@ -17086,11 +16566,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/queensland/gold-coast/chirn-park/",
-        "/areas/queensland/gold-coast/australia-fair/",
         "/areas/queensland/gold-coast/sundale/",
         "/areas/queensland/gold-coast/labrador/",
         "/areas/queensland/gold-coast/keebra-park/",
-        "/areas/queensland/gold-coast/main-beach/"
+        "/areas/queensland/gold-coast/main-beach/",
+        "/areas/queensland/gold-coast/southport-park/"
       ]
     },
     {
@@ -17116,7 +16596,7 @@
         "/areas/queensland/gold-coast/sundale/",
         "/areas/queensland/gold-coast/chevron-island/",
         "/areas/queensland/gold-coast/surfers-paradise/",
-        "/areas/queensland/gold-coast/australia-fair/"
+        "/areas/queensland/gold-coast/southport/"
       ]
     },
     {
@@ -17183,11 +16663,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/queensland/brisbane-inner/brisbane/",
-        "/areas/queensland/brisbane-inner/brisbane-adelaide-street/",
-        "/areas/queensland/brisbane-inner/brisbane-gpo/",
         "/areas/queensland/brisbane-inner/fortitude-valley/",
         "/areas/queensland/brisbane-inner/kangaroo-point/",
-        "/areas/queensland/brisbane-inner/brisbane-city/"
+        "/areas/queensland/brisbane-inner/brisbane-city/",
+        "/areas/queensland/brisbane-inner/normanby/",
+        "/areas/queensland/brisbane-inner/petrie-terrace/"
       ]
     },
     {
@@ -17443,38 +16923,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/moreton-bay/stafford-city/",
         "/areas/queensland/brisbane-north/grange/",
         "/areas/queensland/brisbane-north/the-grange/",
         "/areas/queensland/brisbane-north/alderley/",
         "/areas/queensland/brisbane-north/gordon-park/",
-        "/areas/queensland/moreton-bay/stafford-heights/"
-      ]
-    },
-    {
-      "slug": "stafford-city",
-      "name": "STAFFORD CITY",
-      "state": "QLD",
-      "postcodes": [
-        "4053"
-      ],
-      "coords": {
-        "lat": -27.4119,
-        "lng": 153.01
-      },
-      "council": "Moreton Bay",
-      "anchorKey": "brisbane",
-      "distanceKm": 6.61,
-      "regionSlug": "moreton-bay",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/moreton-bay/stafford/",
-        "/areas/queensland/brisbane-north/grange/",
-        "/areas/queensland/brisbane-north/the-grange/",
-        "/areas/queensland/brisbane-north/alderley/",
-        "/areas/queensland/brisbane-north/gordon-park/",
-        "/areas/queensland/moreton-bay/stafford-heights/"
+        "/areas/queensland/moreton-bay/stafford-heights/",
+        "/areas/queensland/moreton-bay/somerset-hills/"
       ]
     },
     {
@@ -17499,8 +16953,8 @@
         "/areas/queensland/brisbane-north/craigslea/",
         "/areas/queensland/brisbane-north/chermside-west/",
         "/areas/queensland/moreton-bay/stafford/",
-        "/areas/queensland/moreton-bay/stafford-city/",
-        "/areas/queensland/brisbane-north/kedron/"
+        "/areas/queensland/brisbane-north/kedron/",
+        "/areas/queensland/moreton-bay/kedron-upper/"
       ]
     },
     {
@@ -17651,64 +17105,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/moreton-bay/strathpine-city/",
-        "/areas/queensland/moreton-bay/strathpine-centre/",
         "/areas/queensland/moreton-bay/lawnton/",
         "/areas/queensland/brisbane-north/bald-hills/",
         "/areas/queensland/moreton-bay/bray-park/",
-        "/areas/queensland/moreton-bay/brendale/"
-      ]
-    },
-    {
-      "slug": "strathpine-centre",
-      "name": "STRATHPINE CENTRE",
-      "state": "QLD",
-      "postcodes": [
-        "4500"
-      ],
-      "coords": {
-        "lat": -27.3071578,
-        "lng": 152.9911067
-      },
-      "council": "Moreton Bay",
-      "anchorKey": "brisbane",
-      "distanceKm": 18.39,
-      "regionSlug": "moreton-bay",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/moreton-bay/strathpine/",
-        "/areas/queensland/moreton-bay/strathpine-city/",
-        "/areas/queensland/brisbane-north/bald-hills/",
-        "/areas/queensland/moreton-bay/lawnton/",
         "/areas/queensland/moreton-bay/brendale/",
-        "/areas/queensland/moreton-bay/bray-park/"
-      ]
-    },
-    {
-      "slug": "strathpine-city",
-      "name": "STRATHPINE CITY",
-      "state": "QLD",
-      "postcodes": [
-        "4500"
-      ],
-      "coords": {
-        "lat": -27.3014,
-        "lng": 152.988
-      },
-      "council": "Moreton Bay",
-      "anchorKey": "brisbane",
-      "distanceKm": 19.08,
-      "regionSlug": "moreton-bay",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/moreton-bay/strathpine/",
-        "/areas/queensland/moreton-bay/strathpine-centre/",
-        "/areas/queensland/moreton-bay/lawnton/",
-        "/areas/queensland/brisbane-north/bald-hills/",
-        "/areas/queensland/moreton-bay/bray-park/",
-        "/areas/queensland/moreton-bay/brendale/"
+        "/areas/queensland/moreton-bay/warner/",
+        "/areas/queensland/moreton-bay/dohles-rocks/"
       ]
     },
     {
@@ -17782,11 +17184,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/queensland/gold-coast/helensvale/",
-        "/areas/queensland/gold-coast/helensvale-town-centre/",
         "/areas/queensland/gold-coast/oxenford/",
         "/areas/queensland/gold-coast/pacific-pines/",
         "/areas/queensland/gold-coast/maudsland/",
-        "/areas/queensland/gold-coast/monterey-keys/"
+        "/areas/queensland/gold-coast/monterey-keys/",
+        "/areas/queensland/gold-coast/gaven/"
       ]
     },
     {
@@ -17833,12 +17235,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/gold-coast/australia-fair/",
         "/areas/queensland/gold-coast/paradise-waters/",
         "/areas/queensland/gold-coast/main-beach/",
         "/areas/queensland/gold-coast/southport-park/",
         "/areas/queensland/gold-coast/southport/",
-        "/areas/queensland/gold-coast/keebra-park/"
+        "/areas/queensland/gold-coast/keebra-park/",
+        "/areas/queensland/gold-coast/chevron-island/"
       ]
     },
     {
@@ -18334,10 +17736,10 @@
       "neighbourHrefs": [
         "/areas/queensland/brisbane-west/indooroopilly/",
         "/areas/queensland/brisbane-inner/toowong/",
-        "/areas/queensland/brisbane-west/indooroopilly-centre/",
         "/areas/queensland/brisbane-inner/ironside/",
         "/areas/queensland/brisbane-inner/st-lucia/",
-        "/areas/queensland/brisbane-inner/auchenflower/"
+        "/areas/queensland/brisbane-inner/auchenflower/",
+        "/areas/queensland/brisbane-south/long-pocket/"
       ]
     },
     {
@@ -18389,7 +17791,7 @@
         "/areas/queensland/brisbane-inner/new-farm/",
         "/areas/queensland/brisbane-inner/fortitude-valley/",
         "/areas/queensland/brisbane-inner/hawthorne/",
-        "/areas/queensland/brisbane-inner/brisbane-exhibition/"
+        "/areas/queensland/brisbane-inner/mayne/"
       ]
     },
     {
@@ -18410,12 +17812,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/brisbane-south/brisbane-market/",
         "/areas/queensland/brisbane-south/yeerongpilly/",
         "/areas/queensland/brisbane-south/yeronga-west/",
         "/areas/queensland/brisbane-south/long-pocket/",
         "/areas/queensland/brisbane-south/graceville/",
-        "/areas/queensland/brisbane-south/graceville-east/"
+        "/areas/queensland/brisbane-south/graceville-east/",
+        "/areas/queensland/brisbane-south/yeronga/"
       ]
     },
     {
@@ -18493,8 +17895,8 @@
         "/areas/queensland/brisbane-north/alderley/",
         "/areas/queensland/brisbane-inner/eildon-hill/",
         "/areas/queensland/moreton-bay/stafford/",
-        "/areas/queensland/moreton-bay/stafford-city/",
-        "/areas/queensland/brisbane-north/gordon-park/"
+        "/areas/queensland/brisbane-north/gordon-park/",
+        "/areas/queensland/brisbane-inner/newmarket/"
       ]
     },
     {
@@ -18519,8 +17921,8 @@
         "/areas/queensland/gold-coast/biggera-waters/",
         "/areas/queensland/gold-coast/labrador/",
         "/areas/queensland/gold-coast/chirn-park/",
-        "/areas/queensland/gold-coast/australia-fair/",
-        "/areas/queensland/gold-coast/anglers-paradise/"
+        "/areas/queensland/gold-coast/anglers-paradise/",
+        "/areas/queensland/gold-coast/runaway-bay/"
       ]
     },
     {
@@ -18720,8 +18122,8 @@
         "/areas/queensland/brisbane-inner/auchenflower/",
         "/areas/queensland/brisbane-west/stuartholme/",
         "/areas/queensland/brisbane-inner/ironside/",
-        "/areas/queensland/brisbane-west/indooroopilly-centre/",
-        "/areas/queensland/brisbane-west/indooroopilly/"
+        "/areas/queensland/brisbane-west/indooroopilly/",
+        "/areas/queensland/brisbane-inner/torwood/"
       ]
     },
     {
@@ -19210,38 +18612,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/queensland/brisbane-south/wacol-east-immigration-centre/",
         "/areas/queensland/brisbane-south/sumner/",
         "/areas/queensland/ipswich/gailes/",
         "/areas/queensland/brisbane-south/richlands/",
         "/areas/queensland/ipswich/carole-park/",
-        "/areas/queensland/brisbane-west/riverhills/"
-      ]
-    },
-    {
-      "slug": "wacol-east-immigration-centre",
-      "name": "WACOL EAST IMMIGRATION CENTRE",
-      "state": "QLD",
-      "postcodes": [
-        "4076"
-      ],
-      "coords": {
-        "lat": -27.5888,
-        "lng": 152.925
-      },
-      "council": "Brisbane",
-      "anchorKey": "brisbane",
-      "distanceKm": 16.51,
-      "regionSlug": "brisbane-south",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/queensland/brisbane-south/wacol/",
-        "/areas/queensland/brisbane-south/sumner/",
-        "/areas/queensland/ipswich/gailes/",
-        "/areas/queensland/brisbane-south/richlands/",
-        "/areas/queensland/ipswich/carole-park/",
-        "/areas/queensland/brisbane-west/riverhills/"
+        "/areas/queensland/brisbane-west/riverhills/",
+        "/areas/queensland/brisbane-south/jamboree-heights/"
       ]
     },
     {
@@ -19382,8 +18758,8 @@
         "/areas/queensland/moreton-bay/brendale/",
         "/areas/queensland/moreton-bay/eatons-hill/",
         "/areas/queensland/brisbane-north/cashs-crossing/",
-        "/areas/queensland/moreton-bay/strathpine-city/",
-        "/areas/queensland/moreton-bay/strathpine/"
+        "/areas/queensland/moreton-bay/strathpine/",
+        "/areas/queensland/moreton-bay/joyner/"
       ]
     },
     {
@@ -19431,11 +18807,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/queensland/logan/loganlea/",
-        "/areas/queensland/logan/marsden-postal-depot/",
         "/areas/queensland/logan/logan-reserve/",
         "/areas/queensland/logan/waterford/",
         "/areas/queensland/logan/bethania/",
-        "/areas/queensland/logan/marsden/"
+        "/areas/queensland/logan/marsden/",
+        "/areas/queensland/logan/meadowbrook/"
       ]
     },
     {
@@ -19461,7 +18837,7 @@
         "/areas/queensland/brisbane-north/nundah/",
         "/areas/queensland/moreton-bay/kedron-upper/",
         "/areas/queensland/brisbane-north/kedron/",
-        "/areas/queensland/brisbane-north/chermside-centre/"
+        "/areas/queensland/brisbane-north/kalinga/"
       ]
     },
     {
@@ -19484,10 +18860,10 @@
       "neighbourHrefs": [
         "/areas/queensland/brisbane-north/wavell-heights/",
         "/areas/queensland/brisbane-north/chermside-south/",
-        "/areas/queensland/brisbane-north/chermside-centre/",
         "/areas/queensland/brisbane-north/nundah/",
         "/areas/queensland/brisbane-north/chermside/",
-        "/areas/queensland/moreton-bay/kedron-upper/"
+        "/areas/queensland/moreton-bay/kedron-upper/",
+        "/areas/queensland/brisbane-north/geebung/"
       ]
     },
     {
@@ -19636,8 +19012,8 @@
         "/areas/queensland/brisbane-inner/south-brisbane/",
         "/areas/queensland/brisbane-inner/highgate-hill/",
         "/areas/queensland/brisbane-inner/milton/",
-        "/areas/queensland/brisbane-inner/parliament-house/",
-        "/areas/queensland/brisbane-inner/mater-hill/"
+        "/areas/queensland/brisbane-inner/mater-hill/",
+        "/areas/queensland/brisbane-inner/brisbane-city/"
       ]
     },
     {
@@ -20251,9 +19627,9 @@
         "/areas/queensland/brisbane-inner/mater-hill/",
         "/areas/queensland/brisbane-inner/dutton-park/",
         "/areas/queensland/brisbane-inner/highgate-hill/",
-        "/areas/queensland/brisbane-inner/parliament-house/",
         "/areas/queensland/brisbane-inner/buranda/",
-        "/areas/queensland/brisbane-inner/south-brisbane/"
+        "/areas/queensland/brisbane-inner/south-brisbane/",
+        "/areas/queensland/brisbane-inner/west-end/"
       ]
     },
     {
@@ -20703,11 +20079,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/queensland/brisbane-south/moorvale/",
-        "/areas/queensland/brisbane-south/brisbane-market/",
         "/areas/queensland/brisbane-south/tennyson/",
         "/areas/queensland/brisbane-south/yeronga-west/",
         "/areas/queensland/brisbane-south/moorooka/",
-        "/areas/queensland/brisbane-south/clifton-hill/"
+        "/areas/queensland/brisbane-south/clifton-hill/",
+        "/areas/queensland/brisbane-south/yeronga/"
       ]
     },
     {
@@ -20755,11 +20131,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/queensland/brisbane-south/yeronga-west/",
-        "/areas/queensland/brisbane-inner/fairfield-gardens/",
         "/areas/queensland/brisbane-inner/fairfield/",
         "/areas/queensland/brisbane-inner/annerley/",
         "/areas/queensland/brisbane-south/clifton-hill/",
-        "/areas/queensland/brisbane-inner/st-lucia-south/"
+        "/areas/queensland/brisbane-inner/st-lucia-south/",
+        "/areas/queensland/brisbane-south/yeerongpilly/"
       ]
     },
     {
@@ -20783,9 +20159,9 @@
         "/areas/queensland/brisbane-south/yeronga/",
         "/areas/queensland/brisbane-south/yeerongpilly/",
         "/areas/queensland/brisbane-south/clifton-hill/",
-        "/areas/queensland/brisbane-inner/fairfield-gardens/",
         "/areas/queensland/brisbane-south/tennyson/",
-        "/areas/queensland/brisbane-inner/fairfield/"
+        "/areas/queensland/brisbane-inner/fairfield/",
+        "/areas/queensland/brisbane-inner/annerley/"
       ]
     },
     {
@@ -20837,7 +20213,7 @@
         "/areas/queensland/brisbane-north/geebung/",
         "/areas/queensland/brisbane-north/fitzgibbon/",
         "/areas/queensland/brisbane-north/virginia/",
-        "/areas/queensland/brisbane-north/chermside-centre/"
+        "/areas/queensland/brisbane-north/aspley/"
       ]
     },
     {
@@ -20863,7 +20239,7 @@
         "/areas/victoria/inner-melbourne/richmond-north/",
         "/areas/victoria/northern/clifton-hill/",
         "/areas/victoria/inner-melbourne/fitzroy/",
-        "/areas/victoria/inner-melbourne/victoria-gardens/"
+        "/areas/victoria/inner-melbourne/burnley-north/"
       ]
     },
     {
@@ -20884,12 +20260,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/western/highpoint-city/",
         "/areas/victoria/north-west/essendon/",
         "/areas/victoria/north-west/essendon-west/",
         "/areas/victoria/north-west/moonee-ponds/",
         "/areas/victoria/western/ascot-vale/",
-        "/areas/victoria/western/maribyrnong/"
+        "/areas/victoria/western/maribyrnong/",
+        "/areas/victoria/north-west/essendon-north/"
       ]
     },
     {
@@ -20966,8 +20342,8 @@
         "/areas/victoria/inner-melbourne/south-melbourne/",
         "/areas/victoria/inner-melbourne/southbank/",
         "/areas/victoria/inner-melbourne/south-wharf/",
-        "/areas/victoria/inner-melbourne/st-kilda-road-central/",
-        "/areas/victoria/inner-melbourne/st-kilda-road-melbourne/"
+        "/areas/victoria/inner-melbourne/st-kilda-west/",
+        "/areas/victoria/inner-melbourne/port-melbourne/"
       ]
     },
     {
@@ -21045,7 +20421,7 @@
         "/areas/victoria/western/altona-east/",
         "/areas/victoria/western/altona-north/",
         "/areas/victoria/western/laverton/",
-        "/areas/victoria/western/laverton-raaf/"
+        "/areas/victoria/western/laverton-north/"
       ]
     },
     {
@@ -21119,11 +20495,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/victoria/western/laverton/",
-        "/areas/victoria/western/laverton-raaf/",
         "/areas/victoria/western/seabrook/",
         "/areas/victoria/western/williams-landing/",
         "/areas/victoria/western/altona/",
-        "/areas/victoria/western/laverton-north/"
+        "/areas/victoria/western/laverton-north/",
+        "/areas/victoria/western/seaholme/"
       ]
     },
     {
@@ -21270,9 +20646,9 @@
         "/areas/victoria/north-west/moonee-ponds/",
         "/areas/victoria/north-west/flemington/",
         "/areas/victoria/north-west/aberfeldie/",
-        "/areas/victoria/western/highpoint-city/",
         "/areas/victoria/western/travancore/",
-        "/areas/victoria/north-west/kensington/"
+        "/areas/victoria/north-west/kensington/",
+        "/areas/victoria/western/maribyrnong/"
       ]
     },
     {
@@ -21294,11 +20670,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/victoria/inner-east/ashwood/",
-        "/areas/victoria/south-east/chadstone-centre/",
         "/areas/victoria/south-east/chadstone/",
         "/areas/victoria/south-east/holmesglen/",
         "/areas/victoria/bayside-and-peninsula/darling/",
-        "/areas/victoria/bayside-and-peninsula/malvern-east/"
+        "/areas/victoria/bayside-and-peninsula/malvern-east/",
+        "/areas/victoria/bayside-and-peninsula/darling-south/"
       ]
     },
     {
@@ -21477,10 +20853,10 @@
       "neighbourHrefs": [
         "/areas/victoria/western/maribyrnong/",
         "/areas/victoria/north-west/essendon-west/",
-        "/areas/victoria/western/highpoint-city/",
         "/areas/victoria/western/maidstone/",
         "/areas/victoria/western/sunshine-north/",
-        "/areas/victoria/western/braybrook/"
+        "/areas/victoria/western/braybrook/",
+        "/areas/victoria/western/braybrook-north/"
       ]
     },
     {
@@ -21539,12 +20915,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/inner-melbourne/brighton-road/",
         "/areas/victoria/inner-melbourne/ripponlea/",
         "/areas/victoria/inner-melbourne/elwood/",
         "/areas/victoria/bayside-and-peninsula/st-kilda-east/",
         "/areas/victoria/inner-melbourne/st-kilda/",
-        "/areas/victoria/inner-melbourne/st-kilda-south/"
+        "/areas/victoria/inner-melbourne/st-kilda-south/",
+        "/areas/victoria/inner-melbourne/elsternwick/"
       ]
     },
     {
@@ -21725,8 +21101,8 @@
         "/areas/victoria/bayside-and-peninsula/langwarrin-south/",
         "/areas/victoria/south-east/somerville/",
         "/areas/victoria/bayside-and-peninsula/frankston-heights/",
-        "/areas/victoria/bayside-and-peninsula/karingal-centre/",
-        "/areas/victoria/bayside-and-peninsula/langwarrin/"
+        "/areas/victoria/bayside-and-peninsula/langwarrin/",
+        "/areas/victoria/bayside-and-peninsula/frankston/"
       ]
     },
     {
@@ -21796,8 +21172,8 @@
         "/areas/victoria/eastern/bayswater/",
         "/areas/victoria/eastern/ringwood-east/",
         "/areas/victoria/eastern/kilsyth-south/",
-        "/areas/victoria/eastern/bedford-road/",
-        "/areas/victoria/eastern/heathmont/"
+        "/areas/victoria/eastern/heathmont/",
+        "/areas/victoria/eastern/croydon/"
       ]
     },
     {
@@ -21876,32 +21252,6 @@
         "/areas/victoria/bayside-and-peninsula/black-rock/",
         "/areas/victoria/bayside-and-peninsula/cheltenham/",
         "/areas/victoria/bayside-and-peninsula/cheltenham-east/"
-      ]
-    },
-    {
-      "slug": "bedford-road",
-      "name": "BEDFORD ROAD",
-      "state": "VIC",
-      "postcodes": [
-        "3135"
-      ],
-      "coords": {
-        "lat": -37.8193028,
-        "lng": 145.2439204
-      },
-      "council": "Maroondah",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 3.68,
-      "regionSlug": "eastern",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/eastern/ringwood-east/",
-        "/areas/victoria/eastern/heathmont/",
-        "/areas/victoria/eastern/ringwood/",
-        "/areas/victoria/eastern/heathwood/",
-        "/areas/victoria/eastern/croydon-south/",
-        "/areas/victoria/eastern/ringwood-north/"
       ]
     },
     {
@@ -22008,10 +21358,10 @@
       "neighbourHrefs": [
         "/areas/victoria/northern/ivanhoe-north/",
         "/areas/victoria/northern/heidelberg-west/",
-        "/areas/victoria/northern/heidelberg-rgh/",
         "/areas/victoria/northern/heidelberg-heights/",
         "/areas/victoria/northern/ivanhoe/",
-        "/areas/victoria/northern/eaglemont/"
+        "/areas/victoria/northern/eaglemont/",
+        "/areas/victoria/northern/heidelberg/"
       ]
     },
     {
@@ -22231,7 +21581,7 @@
         "/areas/victoria/bayside-and-peninsula/beaumaris/",
         "/areas/victoria/bayside-and-peninsula/cromer/",
         "/areas/victoria/bayside-and-peninsula/highett/",
-        "/areas/victoria/bayside-and-peninsula/southland-centre/"
+        "/areas/victoria/bayside-and-peninsula/hampton-north/"
       ]
     },
     {
@@ -22308,8 +21658,8 @@
         "/areas/victoria/eastern/doncaster-heights/",
         "/areas/victoria/eastern/laburnum/",
         "/areas/victoria/eastern/nunawading/",
-        "/areas/victoria/eastern/tunstall-square-po/",
-        "/areas/victoria/eastern/doncaster-east/"
+        "/areas/victoria/eastern/doncaster-east/",
+        "/areas/victoria/eastern/kerrimuir/"
       ]
     },
     {
@@ -22384,32 +21734,6 @@
       ]
     },
     {
-      "slug": "booran-road-po",
-      "name": "BOORAN ROAD PO",
-      "state": "VIC",
-      "postcodes": [
-        "3163"
-      ],
-      "coords": {
-        "lat": -37.896,
-        "lng": 145.036
-      },
-      "council": "Glen Eira",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 21.32,
-      "regionSlug": "bayside-and-peninsula",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/bayside-and-peninsula/glen-huntly/",
-        "/areas/victoria/bayside-and-peninsula/ormond/",
-        "/areas/victoria/bayside-and-peninsula/caulfield-south/",
-        "/areas/victoria/bayside-and-peninsula/north-road/",
-        "/areas/victoria/bayside-and-peninsula/caulfield/",
-        "/areas/victoria/bayside-and-peninsula/mckinnon/"
-      ]
-    },
-    {
       "slug": "boronia",
       "name": "BORONIA",
       "state": "VIC",
@@ -22432,7 +21756,7 @@
         "/areas/victoria/eastern/the-basin/",
         "/areas/victoria/south-east/mountain-gate/",
         "/areas/victoria/eastern/bayswater-north/",
-        "/areas/victoria/eastern/knox-city-centre/"
+        "/areas/victoria/eastern/studfield/"
       ]
     },
     {
@@ -22479,38 +21803,12 @@
       "ruralFringe": false,
       "tier": 1,
       "neighbourHrefs": [
-        "/areas/victoria/eastern/box-hill-central/",
         "/areas/victoria/eastern/box-hill-north/",
         "/areas/victoria/inner-east/mont-albert/",
         "/areas/victoria/eastern/mont-albert-north/",
         "/areas/victoria/eastern/kerrimuir/",
-        "/areas/victoria/eastern/laburnum/"
-      ]
-    },
-    {
-      "slug": "box-hill-central",
-      "name": "BOX HILL CENTRAL",
-      "state": "VIC",
-      "postcodes": [
-        "3128"
-      ],
-      "coords": {
-        "lat": -37.8181073,
-        "lng": 145.1238563
-      },
-      "council": "Whitehorse",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 13.19,
-      "regionSlug": "eastern",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/eastern/box-hill/",
-        "/areas/victoria/eastern/box-hill-north/",
-        "/areas/victoria/inner-east/mont-albert/",
-        "/areas/victoria/eastern/mont-albert-north/",
-        "/areas/victoria/eastern/kerrimuir/",
-        "/areas/victoria/eastern/laburnum/"
+        "/areas/victoria/eastern/laburnum/",
+        "/areas/victoria/eastern/box-hill-south/"
       ]
     },
     {
@@ -22534,9 +21832,9 @@
         "/areas/victoria/eastern/kerrimuir/",
         "/areas/victoria/eastern/mont-albert-north/",
         "/areas/victoria/eastern/box-hill/",
-        "/areas/victoria/eastern/box-hill-central/",
         "/areas/victoria/inner-east/mont-albert/",
-        "/areas/victoria/eastern/laburnum/"
+        "/areas/victoria/eastern/laburnum/",
+        "/areas/victoria/eastern/doncaster/"
       ]
     },
     {
@@ -22562,7 +21860,7 @@
         "/areas/victoria/eastern/blackburn-south/",
         "/areas/victoria/south-east/burwood/",
         "/areas/victoria/eastern/box-hill/",
-        "/areas/victoria/eastern/box-hill-central/"
+        "/areas/victoria/south-east/bennettswood/"
       ]
     },
     {
@@ -22613,8 +21911,8 @@
         "/areas/victoria/south-east/wheelers-hill/",
         "/areas/victoria/south-east/sandown-village/",
         "/areas/victoria/south-east/notting-hill/",
-        "/areas/victoria/south-east/waverley-gardens/",
-        "/areas/victoria/south-east/clayton/"
+        "/areas/victoria/south-east/clayton/",
+        "/areas/victoria/south-east/pinewood/"
       ]
     },
     {
@@ -22670,32 +21968,6 @@
       ]
     },
     {
-      "slug": "brentford-square",
-      "name": "BRENTFORD SQUARE",
-      "state": "VIC",
-      "postcodes": [
-        "3131"
-      ],
-      "coords": {
-        "lat": -37.8370056,
-        "lng": 145.1840103
-      },
-      "council": "Manningham",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 7.62,
-      "regionSlug": "eastern",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/eastern/forest-hill/",
-        "/areas/victoria/eastern/vermont/",
-        "/areas/victoria/eastern/mitcham/",
-        "/areas/victoria/eastern/vermont-south/",
-        "/areas/victoria/eastern/nunawading/",
-        "/areas/victoria/eastern/blackburn/"
-      ]
-    },
-    {
       "slug": "briar-hill",
       "name": "BRIAR HILL",
       "state": "VIC",
@@ -22735,9 +22007,9 @@
         "/areas/victoria/bayside-and-peninsula/brighton-north/",
         "/areas/victoria/inner-melbourne/gardenvale/",
         "/areas/victoria/bayside-and-peninsula/dendy/",
-        "/areas/victoria/bayside-and-peninsula/north-road/",
-        "/areas/victoria/bayside-and-peninsula/hopetoun-gardens/",
-        "/areas/victoria/inner-melbourne/elsternwick/"
+        "/areas/victoria/inner-melbourne/elsternwick/",
+        "/areas/victoria/bayside-and-peninsula/brighton-east/",
+        "/areas/victoria/bayside-and-peninsula/caulfield-south/"
       ]
     },
     {
@@ -22758,12 +22030,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/bayside-and-peninsula/north-road/",
-        "/areas/victoria/bayside-and-peninsula/were-street-po/",
         "/areas/victoria/bayside-and-peninsula/patterson/",
         "/areas/victoria/bayside-and-peninsula/mckinnon/",
         "/areas/victoria/bayside-and-peninsula/bentleigh/",
-        "/areas/victoria/bayside-and-peninsula/brighton-north/"
+        "/areas/victoria/bayside-and-peninsula/brighton-north/",
+        "/areas/victoria/bayside-and-peninsula/dendy/",
+        "/areas/victoria/bayside-and-peninsula/brighton/"
       ]
     },
     {
@@ -22786,36 +22058,10 @@
       "neighbourHrefs": [
         "/areas/victoria/bayside-and-peninsula/brighton/",
         "/areas/victoria/inner-melbourne/gardenvale/",
-        "/areas/victoria/bayside-and-peninsula/north-road/",
         "/areas/victoria/bayside-and-peninsula/dendy/",
-        "/areas/victoria/bayside-and-peninsula/hopetoun-gardens/",
-        "/areas/victoria/bayside-and-peninsula/brighton-east/"
-      ]
-    },
-    {
-      "slug": "brighton-road",
-      "name": "BRIGHTON ROAD",
-      "state": "VIC",
-      "postcodes": [
-        "3184"
-      ],
-      "coords": {
-        "lat": -37.8765417,
-        "lng": 144.9923384
-      },
-      "council": "Port Phillip",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 24.64,
-      "regionSlug": "inner-melbourne",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/inner-melbourne/ripponlea/",
-        "/areas/victoria/bayside-and-peninsula/balaclava/",
-        "/areas/victoria/inner-melbourne/elwood/",
+        "/areas/victoria/bayside-and-peninsula/brighton-east/",
         "/areas/victoria/inner-melbourne/elsternwick/",
-        "/areas/victoria/inner-melbourne/st-kilda-south/",
-        "/areas/victoria/inner-melbourne/st-kilda/"
+        "/areas/victoria/bayside-and-peninsula/caulfield-south/"
       ]
     },
     {
@@ -22910,9 +22156,9 @@
         "/areas/victoria/northern/brunswick-lower/",
         "/areas/victoria/northern/brunswick-south/",
         "/areas/victoria/northern/brunswick-north/",
-        "/areas/victoria/northern/lygon-street-north/",
         "/areas/victoria/northern/brunswick-west/",
-        "/areas/victoria/northern/moonee-vale/"
+        "/areas/victoria/northern/moonee-vale/",
+        "/areas/victoria/northern/moreland-west/"
       ]
     },
     {
@@ -22934,11 +22180,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/victoria/northern/sumner/",
-        "/areas/victoria/northern/lygon-street-north/",
         "/areas/victoria/northern/fitzroy-north/",
         "/areas/victoria/northern/northcote/",
         "/areas/victoria/northern/northcote-south/",
-        "/areas/victoria/northern/brunswick-north/"
+        "/areas/victoria/northern/brunswick-north/",
+        "/areas/victoria/northern/brunswick/"
       ]
     },
     {
@@ -22962,9 +22208,9 @@
         "/areas/victoria/northern/brunswick/",
         "/areas/victoria/northern/brunswick-south/",
         "/areas/victoria/northern/brunswick-north/",
-        "/areas/victoria/northern/lygon-street-north/",
         "/areas/victoria/northern/brunswick-west/",
-        "/areas/victoria/northern/moonee-vale/"
+        "/areas/victoria/northern/moonee-vale/",
+        "/areas/victoria/northern/moreland-west/"
       ]
     },
     {
@@ -22987,10 +22233,10 @@
       "neighbourHrefs": [
         "/areas/victoria/northern/brunswick/",
         "/areas/victoria/northern/brunswick-lower/",
-        "/areas/victoria/northern/lygon-street-north/",
         "/areas/victoria/northern/moreland-west/",
         "/areas/victoria/northern/coburg/",
-        "/areas/victoria/northern/brunswick-east/"
+        "/areas/victoria/northern/brunswick-east/",
+        "/areas/victoria/northern/brunswick-west/"
       ]
     },
     {
@@ -23238,12 +22484,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/inner-melbourne/victoria-gardens/",
         "/areas/victoria/inner-east/hawthorn-west/",
         "/areas/victoria/inner-east/hawthorn-north/",
         "/areas/victoria/inner-melbourne/richmond/",
         "/areas/victoria/inner-melbourne/richmond-south/",
-        "/areas/victoria/inner-melbourne/richmond-east/"
+        "/areas/victoria/inner-melbourne/richmond-east/",
+        "/areas/victoria/inner-melbourne/burnley/"
       ]
     },
     {
@@ -23876,10 +23122,10 @@
       "neighbourHrefs": [
         "/areas/victoria/bayside-and-peninsula/caulfield-south/",
         "/areas/victoria/bayside-and-peninsula/caulfield-junction/",
-        "/areas/victoria/bayside-and-peninsula/hopetoun-gardens/",
         "/areas/victoria/bayside-and-peninsula/caulfield-north/",
-        "/areas/victoria/bayside-and-peninsula/booran-road-po/",
-        "/areas/victoria/bayside-and-peninsula/glen-huntly/"
+        "/areas/victoria/bayside-and-peninsula/glen-huntly/",
+        "/areas/victoria/bayside-and-peninsula/caulfield-east/",
+        "/areas/victoria/inner-melbourne/elsternwick/"
       ]
     },
     {
@@ -23928,10 +23174,10 @@
       "neighbourHrefs": [
         "/areas/victoria/bayside-and-peninsula/caulfield-north/",
         "/areas/victoria/bayside-and-peninsula/caulfield/",
-        "/areas/victoria/bayside-and-peninsula/hopetoun-gardens/",
         "/areas/victoria/bayside-and-peninsula/caulfield-east/",
         "/areas/victoria/bayside-and-peninsula/caulfield-south/",
-        "/areas/victoria/bayside-and-peninsula/central-park/"
+        "/areas/victoria/bayside-and-peninsula/central-park/",
+        "/areas/victoria/inner-east/armadale/"
       ]
     },
     {
@@ -23956,8 +23202,8 @@
         "/areas/victoria/inner-east/armadale/",
         "/areas/victoria/bayside-and-peninsula/caulfield/",
         "/areas/victoria/inner-east/armadale-north/",
-        "/areas/victoria/bayside-and-peninsula/hopetoun-gardens/",
-        "/areas/victoria/bayside-and-peninsula/st-kilda-east/"
+        "/areas/victoria/bayside-and-peninsula/st-kilda-east/",
+        "/areas/victoria/inner-melbourne/elsternwick/"
       ]
     },
     {
@@ -23979,11 +23225,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/victoria/bayside-and-peninsula/caulfield/",
-        "/areas/victoria/bayside-and-peninsula/booran-road-po/",
-        "/areas/victoria/bayside-and-peninsula/north-road/",
         "/areas/victoria/bayside-and-peninsula/glen-huntly/",
-        "/areas/victoria/bayside-and-peninsula/hopetoun-gardens/",
-        "/areas/victoria/bayside-and-peninsula/ormond/"
+        "/areas/victoria/bayside-and-peninsula/ormond/",
+        "/areas/victoria/bayside-and-peninsula/caulfield-junction/",
+        "/areas/victoria/inner-melbourne/elsternwick/",
+        "/areas/victoria/inner-melbourne/gardenvale/"
       ]
     },
     {
@@ -24004,12 +23250,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/bayside-and-peninsula/wattletree-road-po/",
         "/areas/victoria/bayside-and-peninsula/caulfield-east/",
         "/areas/victoria/inner-east/glen-iris/",
         "/areas/victoria/inner-east/tooronga/",
         "/areas/victoria/inner-east/malvern/",
-        "/areas/victoria/bayside-and-peninsula/darling/"
+        "/areas/victoria/bayside-and-peninsula/darling/",
+        "/areas/victoria/bayside-and-peninsula/darling-south/"
       ]
     },
     {
@@ -24031,63 +23277,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/victoria/south-east/holmesglen/",
-        "/areas/victoria/south-east/chadstone-centre/",
         "/areas/victoria/south-east/jordanville/",
         "/areas/victoria/inner-east/ashwood/",
         "/areas/victoria/south-east/oakleigh/",
-        "/areas/victoria/south-east/hughesdale/"
-      ]
-    },
-    {
-      "slug": "chadstone-centre",
-      "name": "CHADSTONE CENTRE",
-      "state": "VIC",
-      "postcodes": [
-        "3148"
-      ],
-      "coords": {
-        "lat": -37.8858532,
-        "lng": 145.0847703
-      },
-      "council": "Monash",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 16.89,
-      "regionSlug": "south-east",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/south-east/holmesglen/",
         "/areas/victoria/south-east/hughesdale/",
-        "/areas/victoria/south-east/chadstone/",
-        "/areas/victoria/south-east/oakleigh/",
-        "/areas/victoria/bayside-and-peninsula/murrumbeena/",
         "/areas/victoria/inner-east/ashburton/"
-      ]
-    },
-    {
-      "slug": "chapel-street-north",
-      "name": "CHAPEL STREET NORTH",
-      "state": "VIC",
-      "postcodes": [
-        "3141"
-      ],
-      "coords": {
-        "lat": -37.8417659,
-        "lng": 144.9951571
-      },
-      "council": "Melbourne",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 24.15,
-      "regionSlug": "inner-melbourne",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/inner-melbourne/south-yarra/",
-        "/areas/victoria/inner-east/hawksburn/",
-        "/areas/victoria/inner-melbourne/prahran/",
-        "/areas/victoria/inner-melbourne/prahran-east/",
-        "/areas/victoria/inner-melbourne/cremorne/",
-        "/areas/victoria/inner-melbourne/domain-road-po/"
       ]
     },
     {
@@ -24187,11 +23381,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/victoria/bayside-and-peninsula/cheltenham-east/",
-        "/areas/victoria/bayside-and-peninsula/southland-centre/",
         "/areas/victoria/bayside-and-peninsula/cheltenham-north/",
         "/areas/victoria/bayside-and-peninsula/mentone/",
         "/areas/victoria/bayside-and-peninsula/mentone-east/",
-        "/areas/victoria/bayside-and-peninsula/heatherton/"
+        "/areas/victoria/bayside-and-peninsula/heatherton/",
+        "/areas/victoria/bayside-and-peninsula/moorabbin-east/"
       ]
     },
     {
@@ -24213,11 +23407,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/victoria/bayside-and-peninsula/cheltenham/",
-        "/areas/victoria/bayside-and-peninsula/southland-centre/",
         "/areas/victoria/bayside-and-peninsula/cheltenham-north/",
         "/areas/victoria/bayside-and-peninsula/mentone/",
         "/areas/victoria/bayside-and-peninsula/mentone-east/",
-        "/areas/victoria/bayside-and-peninsula/heatherton/"
+        "/areas/victoria/bayside-and-peninsula/heatherton/",
+        "/areas/victoria/bayside-and-peninsula/moorabbin-east/"
       ]
     },
     {
@@ -24238,12 +23432,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/bayside-and-peninsula/southland-centre/",
         "/areas/victoria/bayside-and-peninsula/cheltenham/",
         "/areas/victoria/bayside-and-peninsula/cheltenham-east/",
         "/areas/victoria/bayside-and-peninsula/moorabbin-east/",
         "/areas/victoria/bayside-and-peninsula/moorabbin/",
-        "/areas/victoria/bayside-and-peninsula/highett/"
+        "/areas/victoria/bayside-and-peninsula/highett/",
+        "/areas/victoria/bayside-and-peninsula/heatherton/"
       ]
     },
     {
@@ -24914,8 +24108,8 @@
         "/areas/victoria/inner-melbourne/richmond/",
         "/areas/victoria/inner-melbourne/richmond-south/",
         "/areas/victoria/inner-melbourne/south-yarra/",
-        "/areas/victoria/inner-melbourne/domain-road-po/",
-        "/areas/victoria/inner-melbourne/chapel-street-north/"
+        "/areas/victoria/inner-melbourne/burnley/",
+        "/areas/victoria/inner-east/hawksburn/"
       ]
     },
     {
@@ -25069,9 +24263,9 @@
         "/areas/victoria/eastern/bayswater-north/",
         "/areas/victoria/eastern/ringwood-east/",
         "/areas/victoria/eastern/croydon/",
-        "/areas/victoria/eastern/bedford-road/",
         "/areas/victoria/eastern/heathmont/",
-        "/areas/victoria/eastern/bayswater/"
+        "/areas/victoria/eastern/bayswater/",
+        "/areas/victoria/eastern/ringwood/"
       ]
     },
     {
@@ -25191,10 +24385,10 @@
       "neighbourHrefs": [
         "/areas/victoria/south-east/dunearn/",
         "/areas/victoria/south-east/noble-park-north/",
-        "/areas/victoria/south-east/waverley-gardens/",
         "/areas/victoria/south-east/dandenong/",
         "/areas/victoria/south-east/dandenong-east/",
-        "/areas/victoria/south-east/noble-park/"
+        "/areas/victoria/south-east/noble-park/",
+        "/areas/victoria/south-east/noble-park-east/"
       ]
     },
     {
@@ -25272,7 +24466,7 @@
         "/areas/victoria/bayside-and-peninsula/caulfield-east/",
         "/areas/victoria/bayside-and-peninsula/carnegie/",
         "/areas/victoria/bayside-and-peninsula/central-park/",
-        "/areas/victoria/bayside-and-peninsula/wattletree-road-po/"
+        "/areas/victoria/inner-east/glen-iris/"
       ]
     },
     {
@@ -25423,12 +24617,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/bayside-and-peninsula/were-street-po/",
         "/areas/victoria/bayside-and-peninsula/brighton/",
         "/areas/victoria/bayside-and-peninsula/brighton-north/",
         "/areas/victoria/bayside-and-peninsula/brighton-east/",
         "/areas/victoria/bayside-and-peninsula/hampton/",
-        "/areas/victoria/inner-melbourne/gardenvale/"
+        "/areas/victoria/inner-melbourne/gardenvale/",
+        "/areas/victoria/bayside-and-peninsula/hampton-north/"
       ]
     },
     {
@@ -25593,32 +24787,6 @@
       ]
     },
     {
-      "slug": "domain-road-po",
-      "name": "DOMAIN ROAD PO",
-      "state": "VIC",
-      "postcodes": [
-        "3141"
-      ],
-      "coords": {
-        "lat": -37.8344,
-        "lng": 144.983
-      },
-      "council": "Melbourne",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 25.24,
-      "regionSlug": "inner-melbourne",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/inner-melbourne/st-kilda-road-central/",
-        "/areas/victoria/inner-melbourne/st-kilda-road-melbourne/",
-        "/areas/victoria/inner-melbourne/south-yarra/",
-        "/areas/victoria/inner-melbourne/cremorne/",
-        "/areas/victoria/inner-melbourne/chapel-street-north/",
-        "/areas/victoria/inner-melbourne/richmond-east/"
-      ]
-    },
-    {
       "slug": "don-valley",
       "name": "DON VALLEY",
       "state": "VIC",
@@ -25682,11 +24850,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/victoria/eastern/doncaster-heights/",
-        "/areas/victoria/eastern/tunstall-square-po/",
         "/areas/victoria/eastern/blackburn-north/",
         "/areas/victoria/eastern/kerrimuir/",
         "/areas/victoria/eastern/doncaster/",
-        "/areas/victoria/eastern/donvale/"
+        "/areas/victoria/eastern/donvale/",
+        "/areas/victoria/eastern/the-pines/"
       ]
     },
     {
@@ -25708,11 +24876,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/victoria/eastern/doncaster-east/",
-        "/areas/victoria/eastern/tunstall-square-po/",
         "/areas/victoria/eastern/blackburn-north/",
         "/areas/victoria/eastern/donvale/",
         "/areas/victoria/eastern/kerrimuir/",
-        "/areas/victoria/eastern/the-pines/"
+        "/areas/victoria/eastern/the-pines/",
+        "/areas/victoria/eastern/mitcham-north/"
       ]
     },
     {
@@ -25759,12 +24927,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/eastern/tunstall-square-po/",
         "/areas/victoria/eastern/mitcham-north/",
         "/areas/victoria/eastern/rangeview/",
         "/areas/victoria/eastern/doncaster-heights/",
         "/areas/victoria/eastern/park-orchards/",
-        "/areas/victoria/eastern/doncaster-east/"
+        "/areas/victoria/eastern/doncaster-east/",
+        "/areas/victoria/eastern/blackburn-north/"
       ]
     },
     {
@@ -25972,12 +25140,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/bayside-and-peninsula/hopetoun-gardens/",
         "/areas/victoria/inner-melbourne/ripponlea/",
-        "/areas/victoria/inner-melbourne/brighton-road/",
         "/areas/victoria/inner-melbourne/gardenvale/",
         "/areas/victoria/bayside-and-peninsula/balaclava/",
-        "/areas/victoria/bayside-and-peninsula/caulfield/"
+        "/areas/victoria/bayside-and-peninsula/caulfield/",
+        "/areas/victoria/bayside-and-peninsula/caulfield-south/",
+        "/areas/victoria/inner-melbourne/elwood/"
       ]
     },
     {
@@ -26050,12 +25218,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/inner-melbourne/brighton-road/",
         "/areas/victoria/inner-melbourne/ripponlea/",
         "/areas/victoria/bayside-and-peninsula/balaclava/",
         "/areas/victoria/inner-melbourne/st-kilda-south/",
         "/areas/victoria/inner-melbourne/st-kilda/",
-        "/areas/victoria/inner-melbourne/elsternwick/"
+        "/areas/victoria/inner-melbourne/elsternwick/",
+        "/areas/victoria/bayside-and-peninsula/st-kilda-east/"
       ]
     },
     {
@@ -26237,7 +25405,7 @@
         "/areas/victoria/western/niddrie-north/",
         "/areas/victoria/western/niddrie/",
         "/areas/victoria/north-west/avondale-heights/",
-        "/areas/victoria/western/highpoint-city/"
+        "/areas/victoria/north-west/essendon-north/"
       ]
     },
     {
@@ -26411,8 +25579,8 @@
         "/areas/victoria/eastern/knoxfield/",
         "/areas/victoria/eastern/boronia/",
         "/areas/victoria/south-east/upper-ferntree-gully/",
-        "/areas/victoria/eastern/knox-city-centre/",
-        "/areas/victoria/eastern/wantirna-south/"
+        "/areas/victoria/eastern/wantirna-south/",
+        "/areas/victoria/eastern/studfield/"
       ]
     },
     {
@@ -26589,12 +25757,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/eastern/brentford-square/",
         "/areas/victoria/eastern/nunawading/",
         "/areas/victoria/eastern/vermont/",
         "/areas/victoria/eastern/blackburn/",
         "/areas/victoria/eastern/blackburn-south/",
-        "/areas/victoria/eastern/vermont-south/"
+        "/areas/victoria/eastern/vermont-south/",
+        "/areas/victoria/eastern/mitcham/"
       ]
     },
     {
@@ -26644,9 +25812,9 @@
         "/areas/victoria/bayside-and-peninsula/frankston-east/",
         "/areas/victoria/bayside-and-peninsula/frankston-heights/",
         "/areas/victoria/bayside-and-peninsula/karingal/",
-        "/areas/victoria/bayside-and-peninsula/karingal-centre/",
         "/areas/victoria/bayside-and-peninsula/pines-forest/",
-        "/areas/victoria/bayside-and-peninsula/frankston-north/"
+        "/areas/victoria/bayside-and-peninsula/frankston-north/",
+        "/areas/victoria/bayside-and-peninsula/belvedere-park/"
       ]
     },
     {
@@ -26670,9 +25838,9 @@
         "/areas/victoria/bayside-and-peninsula/frankston/",
         "/areas/victoria/bayside-and-peninsula/frankston-heights/",
         "/areas/victoria/bayside-and-peninsula/karingal/",
-        "/areas/victoria/bayside-and-peninsula/karingal-centre/",
         "/areas/victoria/bayside-and-peninsula/pines-forest/",
-        "/areas/victoria/bayside-and-peninsula/frankston-north/"
+        "/areas/victoria/bayside-and-peninsula/frankston-north/",
+        "/areas/victoria/bayside-and-peninsula/belvedere-park/"
       ]
     },
     {
@@ -26693,12 +25861,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/bayside-and-peninsula/karingal-centre/",
         "/areas/victoria/bayside-and-peninsula/frankston/",
         "/areas/victoria/bayside-and-peninsula/frankston-east/",
         "/areas/victoria/bayside-and-peninsula/karingal/",
         "/areas/victoria/bayside-and-peninsula/frankston-south/",
-        "/areas/victoria/bayside-and-peninsula/baxter/"
+        "/areas/victoria/bayside-and-peninsula/baxter/",
+        "/areas/victoria/bayside-and-peninsula/langwarrin/"
       ]
     },
     {
@@ -26724,7 +25892,7 @@
         "/areas/victoria/bayside-and-peninsula/belvedere-park/",
         "/areas/victoria/bayside-and-peninsula/seaford/",
         "/areas/victoria/bayside-and-peninsula/carrum-downs/",
-        "/areas/victoria/bayside-and-peninsula/karingal-centre/"
+        "/areas/victoria/bayside-and-peninsula/frankston/"
       ]
     },
     {
@@ -26748,35 +25916,9 @@
         "/areas/victoria/bayside-and-peninsula/baxter/",
         "/areas/victoria/bayside-and-peninsula/frankston-heights/",
         "/areas/victoria/bayside-and-peninsula/langwarrin-south/",
-        "/areas/victoria/bayside-and-peninsula/karingal-centre/",
         "/areas/victoria/bayside-and-peninsula/langwarrin/",
-        "/areas/victoria/south-east/somerville/"
-      ]
-    },
-    {
-      "slug": "garden-city",
-      "name": "GARDEN CITY",
-      "state": "VIC",
-      "postcodes": [
-        "3207"
-      ],
-      "coords": {
-        "lat": -37.8366289,
-        "lng": 144.919805
-      },
-      "council": "Melbourne",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 30.78,
-      "regionSlug": "inner-melbourne",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/inner-melbourne/port-melbourne/",
-        "/areas/victoria/inner-melbourne/west-melbourne/",
-        "/areas/victoria/inner-melbourne/albert-park/",
-        "/areas/victoria/inner-melbourne/docklands/",
-        "/areas/victoria/inner-melbourne/south-wharf/",
-        "/areas/victoria/western/newport/"
+        "/areas/victoria/south-east/somerville/",
+        "/areas/victoria/bayside-and-peninsula/frankston/"
       ]
     },
     {
@@ -26799,10 +25941,10 @@
       "neighbourHrefs": [
         "/areas/victoria/bayside-and-peninsula/brighton-north/",
         "/areas/victoria/bayside-and-peninsula/brighton/",
-        "/areas/victoria/bayside-and-peninsula/north-road/",
-        "/areas/victoria/bayside-and-peninsula/hopetoun-gardens/",
         "/areas/victoria/inner-melbourne/elsternwick/",
-        "/areas/victoria/bayside-and-peninsula/caulfield-south/"
+        "/areas/victoria/bayside-and-peninsula/caulfield-south/",
+        "/areas/victoria/bayside-and-peninsula/brighton-east/",
+        "/areas/victoria/bayside-and-peninsula/caulfield/"
       ]
     },
     {
@@ -26970,12 +26112,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/bayside-and-peninsula/booran-road-po/",
         "/areas/victoria/bayside-and-peninsula/ormond/",
         "/areas/victoria/bayside-and-peninsula/caulfield-south/",
         "/areas/victoria/bayside-and-peninsula/carnegie/",
         "/areas/victoria/bayside-and-peninsula/caulfield-east/",
-        "/areas/victoria/bayside-and-peninsula/caulfield/"
+        "/areas/victoria/bayside-and-peninsula/caulfield/",
+        "/areas/victoria/bayside-and-peninsula/mckinnon/"
       ]
     },
     {
@@ -26997,11 +26139,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/victoria/inner-east/tooronga/",
-        "/areas/victoria/bayside-and-peninsula/wattletree-road-po/",
         "/areas/victoria/bayside-and-peninsula/central-park/",
         "/areas/victoria/inner-east/middle-camberwell/",
         "/areas/victoria/inner-east/camberwell-west/",
-        "/areas/victoria/inner-east/malvern/"
+        "/areas/victoria/inner-east/malvern/",
+        "/areas/victoria/bayside-and-peninsula/darling/"
       ]
     },
     {
@@ -27347,11 +26489,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/victoria/bayside-and-peninsula/hampton-north/",
-        "/areas/victoria/bayside-and-peninsula/were-street-po/",
         "/areas/victoria/bayside-and-peninsula/sandringham/",
         "/areas/victoria/bayside-and-peninsula/hampton-east/",
         "/areas/victoria/bayside-and-peninsula/dendy/",
-        "/areas/victoria/bayside-and-peninsula/brighton-east/"
+        "/areas/victoria/bayside-and-peninsula/brighton-east/",
+        "/areas/victoria/bayside-and-peninsula/patterson/"
       ]
     },
     {
@@ -27401,9 +26543,9 @@
         "/areas/victoria/bayside-and-peninsula/hampton/",
         "/areas/victoria/bayside-and-peninsula/hampton-east/",
         "/areas/victoria/bayside-and-peninsula/sandringham/",
-        "/areas/victoria/bayside-and-peninsula/were-street-po/",
         "/areas/victoria/bayside-and-peninsula/brighton-east/",
-        "/areas/victoria/bayside-and-peninsula/patterson/"
+        "/areas/victoria/bayside-and-peninsula/patterson/",
+        "/areas/victoria/bayside-and-peninsula/highett/"
       ]
     },
     {
@@ -27502,12 +26644,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/inner-melbourne/chapel-street-north/",
         "/areas/victoria/inner-melbourne/prahran/",
         "/areas/victoria/inner-melbourne/prahran-east/",
         "/areas/victoria/inner-melbourne/south-yarra/",
         "/areas/victoria/inner-east/toorak/",
-        "/areas/victoria/inner-melbourne/windsor/"
+        "/areas/victoria/inner-melbourne/windsor/",
+        "/areas/victoria/inner-melbourne/cremorne/"
       ]
     },
     {
@@ -27581,11 +26723,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/victoria/inner-east/hawthorn-west/",
-        "/areas/victoria/inner-melbourne/victoria-gardens/",
         "/areas/victoria/inner-melbourne/burnley-north/",
         "/areas/victoria/inner-east/hawthorn/",
         "/areas/victoria/inner-east/kew/",
-        "/areas/victoria/inner-melbourne/burnley/"
+        "/areas/victoria/inner-melbourne/burnley/",
+        "/areas/victoria/inner-east/glenferrie-south/"
       ]
     },
     {
@@ -27608,10 +26750,10 @@
       "neighbourHrefs": [
         "/areas/victoria/inner-east/hawthorn-north/",
         "/areas/victoria/inner-melbourne/burnley-north/",
-        "/areas/victoria/inner-melbourne/victoria-gardens/",
         "/areas/victoria/inner-melbourne/burnley/",
         "/areas/victoria/inner-east/hawthorn/",
-        "/areas/victoria/inner-melbourne/richmond/"
+        "/areas/victoria/inner-melbourne/richmond/",
+        "/areas/victoria/inner-melbourne/richmond-south/"
       ]
     },
     {
@@ -27639,44 +26781,6 @@
         "/areas/victoria/eastern/mount-evelyn/",
         "/areas/victoria/eastern/lilydale/"
       ]
-    },
-    {
-      "slug": "healesville-main-street",
-      "name": "HEALESVILLE MAIN STREET",
-      "state": "VIC",
-      "postcodes": [
-        "3777"
-      ],
-      "coords": {
-        "lat": -37.6565,
-        "lng": 145.515
-      },
-      "council": "Murrindindi",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 30.06,
-      "regionSlug": "yarra-valley-and-hinterland",
-      "ruralFringe": true,
-      "tier": 3,
-      "neighbourHrefs": []
-    },
-    {
-      "slug": "healesville-post-shop",
-      "name": "HEALESVILLE POST SHOP",
-      "state": "VIC",
-      "postcodes": [
-        "3777"
-      ],
-      "coords": {
-        "lat": -37.6541,
-        "lng": 145.515
-      },
-      "council": "Murrindindi",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 30.24,
-      "regionSlug": "yarra-valley-and-hinterland",
-      "ruralFringe": true,
-      "tier": 3,
-      "neighbourHrefs": []
     },
     {
       "slug": "heatherton",
@@ -27722,12 +26826,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/eastern/bedford-road/",
         "/areas/victoria/eastern/heathwood/",
         "/areas/victoria/eastern/ringwood-east/",
         "/areas/victoria/eastern/wantirna/",
         "/areas/victoria/eastern/ringwood/",
-        "/areas/victoria/eastern/bayswater/"
+        "/areas/victoria/eastern/bayswater/",
+        "/areas/victoria/eastern/croydon-south/"
       ]
     },
     {
@@ -27749,11 +26853,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/victoria/eastern/heathmont/",
-        "/areas/victoria/eastern/bedford-road/",
         "/areas/victoria/eastern/ringwood/",
         "/areas/victoria/eastern/wantirna/",
         "/areas/victoria/eastern/ringwood-east/",
-        "/areas/victoria/eastern/mitcham/"
+        "/areas/victoria/eastern/mitcham/",
+        "/areas/victoria/eastern/vermont/"
       ]
     },
     {
@@ -27801,37 +26905,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/victoria/northern/heidelberg-west/",
-        "/areas/victoria/northern/heidelberg-rgh/",
         "/areas/victoria/northern/rosanna/",
         "/areas/victoria/northern/bellfield/",
         "/areas/victoria/northern/heidelberg/",
-        "/areas/victoria/northern/northland-centre/"
-      ]
-    },
-    {
-      "slug": "heidelberg-rgh",
-      "name": "HEIDELBERG RGH",
-      "state": "VIC",
-      "postcodes": [
-        "3081"
-      ],
-      "coords": {
-        "lat": -37.7418,
-        "lng": 145.044
-      },
-      "council": "Banyule",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 22.95,
-      "regionSlug": "northern",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/northern/heidelberg-west/",
-        "/areas/victoria/northern/heidelberg-heights/",
-        "/areas/victoria/northern/northland-centre/",
-        "/areas/victoria/northern/bellfield/",
         "/areas/victoria/northern/ivanhoe-north/",
-        "/areas/victoria/northern/rosanna/"
+        "/areas/victoria/northern/banyule/"
       ]
     },
     {
@@ -27852,12 +26930,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/northern/heidelberg-rgh/",
         "/areas/victoria/northern/heidelberg-heights/",
         "/areas/victoria/northern/bellfield/",
-        "/areas/victoria/northern/northland-centre/",
         "/areas/victoria/northern/ivanhoe-north/",
-        "/areas/victoria/northern/rosanna/"
+        "/areas/victoria/northern/rosanna/",
+        "/areas/victoria/northern/heidelberg/",
+        "/areas/victoria/northern/banyule/"
       ]
     },
     {
@@ -27879,37 +26957,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/victoria/bayside-and-peninsula/hampton-east/",
-        "/areas/victoria/bayside-and-peninsula/southland-centre/",
         "/areas/victoria/bayside-and-peninsula/wishart/",
         "/areas/victoria/bayside-and-peninsula/moorabbin/",
         "/areas/victoria/bayside-and-peninsula/moorabbin-east/",
-        "/areas/victoria/bayside-and-peninsula/cheltenham-north/"
-      ]
-    },
-    {
-      "slug": "highpoint-city",
-      "name": "HIGHPOINT CITY",
-      "state": "VIC",
-      "postcodes": [
-        "3032"
-      ],
-      "coords": {
-        "lat": -37.7732279,
-        "lng": 144.8893046
-      },
-      "council": "Maribyrnong",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 34.4,
-      "regionSlug": "western",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/western/maribyrnong/",
-        "/areas/victoria/western/maidstone/",
-        "/areas/victoria/north-west/aberfeldie/",
-        "/areas/victoria/western/ascot-vale/",
-        "/areas/victoria/north-west/essendon-west/",
-        "/areas/victoria/north-west/avondale-heights/"
+        "/areas/victoria/bayside-and-peninsula/cheltenham-north/",
+        "/areas/victoria/bayside-and-peninsula/sandringham/"
       ]
     },
     {
@@ -27976,38 +27028,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/south-east/chadstone-centre/",
         "/areas/victoria/south-east/chadstone/",
         "/areas/victoria/south-east/hughesdale/",
         "/areas/victoria/south-east/oakleigh/",
         "/areas/victoria/inner-east/ashburton/",
-        "/areas/victoria/south-east/jordanville/"
-      ]
-    },
-    {
-      "slug": "hopetoun-gardens",
-      "name": "HOPETOUN GARDENS",
-      "state": "VIC",
-      "postcodes": [
-        "3162"
-      ],
-      "coords": {
-        "lat": -37.8862817,
-        "lng": 145.010627
-      },
-      "council": "Glen Eira",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 23.24,
-      "regionSlug": "bayside-and-peninsula",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/inner-melbourne/elsternwick/",
-        "/areas/victoria/bayside-and-peninsula/caulfield/",
-        "/areas/victoria/bayside-and-peninsula/caulfield-south/",
-        "/areas/victoria/inner-melbourne/gardenvale/",
-        "/areas/victoria/inner-melbourne/ripponlea/",
-        "/areas/victoria/bayside-and-peninsula/caulfield-junction/"
+        "/areas/victoria/south-east/jordanville/",
+        "/areas/victoria/bayside-and-peninsula/murrumbeena/"
       ]
     },
     {
@@ -28082,10 +27108,10 @@
       "neighbourHrefs": [
         "/areas/victoria/south-east/oakleigh/",
         "/areas/victoria/bayside-and-peninsula/murrumbeena/",
-        "/areas/victoria/south-east/chadstone-centre/",
         "/areas/victoria/south-east/holmesglen/",
         "/areas/victoria/south-east/chadstone/",
-        "/areas/victoria/bayside-and-peninsula/carnegie/"
+        "/areas/victoria/bayside-and-peninsula/carnegie/",
+        "/areas/victoria/south-east/huntingdale/"
       ]
     },
     {
@@ -28245,8 +27271,8 @@
         "/areas/victoria/northern/ivanhoe/",
         "/areas/victoria/northern/eaglemont/",
         "/areas/victoria/northern/heidelberg-west/",
-        "/areas/victoria/northern/heidelberg-rgh/",
-        "/areas/victoria/northern/heidelberg-heights/"
+        "/areas/victoria/northern/heidelberg-heights/",
+        "/areas/victoria/northern/ivanhoe-east/"
       ]
     },
     {
@@ -28428,38 +27454,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/bayside-and-peninsula/karingal-centre/",
         "/areas/victoria/bayside-and-peninsula/frankston-north/",
         "/areas/victoria/bayside-and-peninsula/frankston/",
         "/areas/victoria/bayside-and-peninsula/frankston-east/",
         "/areas/victoria/bayside-and-peninsula/pines-forest/",
-        "/areas/victoria/bayside-and-peninsula/frankston-heights/"
-      ]
-    },
-    {
-      "slug": "karingal-centre",
-      "name": "KARINGAL CENTRE",
-      "state": "VIC",
-      "postcodes": [
-        "3199"
-      ],
-      "coords": {
-        "lat": -38.1531656,
-        "lng": 145.1655844
-      },
-      "council": "Frankston",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 35.46,
-      "regionSlug": "bayside-and-peninsula",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/bayside-and-peninsula/karingal/",
         "/areas/victoria/bayside-and-peninsula/frankston-heights/",
-        "/areas/victoria/bayside-and-peninsula/langwarrin/",
-        "/areas/victoria/bayside-and-peninsula/frankston/",
-        "/areas/victoria/bayside-and-peninsula/frankston-east/",
-        "/areas/victoria/bayside-and-peninsula/frankston-north/"
+        "/areas/victoria/bayside-and-peninsula/langwarrin/"
       ]
     },
     {
@@ -28717,9 +27717,9 @@
         "/areas/victoria/eastern/box-hill-north/",
         "/areas/victoria/eastern/mont-albert-north/",
         "/areas/victoria/eastern/box-hill/",
-        "/areas/victoria/eastern/box-hill-central/",
         "/areas/victoria/eastern/doncaster/",
-        "/areas/victoria/eastern/blackburn-north/"
+        "/areas/victoria/eastern/blackburn-north/",
+        "/areas/victoria/eastern/laburnum/"
       ]
     },
     {
@@ -28743,9 +27743,9 @@
         "/areas/victoria/inner-east/cotham/",
         "/areas/victoria/inner-east/hawthorn-north/",
         "/areas/victoria/inner-east/hawthorn/",
-        "/areas/victoria/inner-melbourne/victoria-gardens/",
         "/areas/victoria/inner-east/hawthorn-west/",
-        "/areas/victoria/inner-east/kew-east/"
+        "/areas/victoria/inner-east/kew-east/",
+        "/areas/victoria/inner-melbourne/burnley-north/"
       ]
     },
     {
@@ -28958,7 +27958,7 @@
         "/areas/victoria/northern/reservoir-north/",
         "/areas/victoria/northern/reservoir-south/",
         "/areas/victoria/northern/bundoora/",
-        "/areas/victoria/northern/northland-centre/"
+        "/areas/victoria/northern/macleod/"
       ]
     },
     {
@@ -29014,32 +28014,6 @@
       ]
     },
     {
-      "slug": "knox-city-centre",
-      "name": "KNOX CITY CENTRE",
-      "state": "VIC",
-      "postcodes": [
-        "3152"
-      ],
-      "coords": {
-        "lat": -37.8688889,
-        "lng": 145.2411111
-      },
-      "council": "Knox",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 3.67,
-      "regionSlug": "eastern",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/eastern/studfield/",
-        "/areas/victoria/eastern/wantirna-south/",
-        "/areas/victoria/eastern/knoxfield/",
-        "/areas/victoria/eastern/wantirna/",
-        "/areas/victoria/south-east/ferntree-gully/",
-        "/areas/victoria/south-east/mountain-gate/"
-      ]
-    },
-    {
       "slug": "knoxfield",
       "name": "KNOXFIELD",
       "state": "VIC",
@@ -29059,10 +28033,10 @@
       "neighbourHrefs": [
         "/areas/victoria/south-east/mountain-gate/",
         "/areas/victoria/eastern/wantirna-south/",
-        "/areas/victoria/eastern/knox-city-centre/",
         "/areas/victoria/south-east/ferntree-gully/",
         "/areas/victoria/eastern/scoresby/",
-        "/areas/victoria/eastern/studfield/"
+        "/areas/victoria/eastern/studfield/",
+        "/areas/victoria/eastern/rowville/"
       ]
     },
     {
@@ -29183,9 +28157,9 @@
         "/areas/victoria/eastern/blackburn/",
         "/areas/victoria/eastern/blackburn-south/",
         "/areas/victoria/eastern/box-hill/",
-        "/areas/victoria/eastern/box-hill-central/",
         "/areas/victoria/eastern/blackburn-north/",
-        "/areas/victoria/eastern/box-hill-north/"
+        "/areas/victoria/eastern/box-hill-north/",
+        "/areas/victoria/eastern/kerrimuir/"
       ]
     },
     {
@@ -29232,12 +28206,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/bayside-and-peninsula/karingal-centre/",
         "/areas/victoria/bayside-and-peninsula/langwarrin-south/",
         "/areas/victoria/bayside-and-peninsula/karingal/",
         "/areas/victoria/bayside-and-peninsula/frankston-heights/",
         "/areas/victoria/bayside-and-peninsula/frankston-south/",
-        "/areas/victoria/bayside-and-peninsula/skye/"
+        "/areas/victoria/bayside-and-peninsula/skye/",
+        "/areas/victoria/bayside-and-peninsula/frankston-north/"
       ]
     },
     {
@@ -29263,7 +28237,7 @@
         "/areas/victoria/bayside-and-peninsula/frankston-south/",
         "/areas/victoria/south-east/pearcedale/",
         "/areas/victoria/south-east/somerville/",
-        "/areas/victoria/bayside-and-peninsula/karingal-centre/"
+        "/areas/victoria/bayside-and-peninsula/frankston-heights/"
       ]
     },
     {
@@ -29303,12 +28277,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/western/laverton-raaf/",
         "/areas/victoria/western/altona-meadows/",
         "/areas/victoria/western/seabrook/",
         "/areas/victoria/western/williams-landing/",
         "/areas/victoria/western/altona/",
-        "/areas/victoria/western/laverton-north/"
+        "/areas/victoria/western/laverton-north/",
+        "/areas/victoria/western/altona-east/"
       ]
     },
     {
@@ -29335,32 +28309,6 @@
         "/areas/victoria/western/altona-east/",
         "/areas/victoria/western/altona-north/",
         "/areas/victoria/western/altona/"
-      ]
-    },
-    {
-      "slug": "laverton-raaf",
-      "name": "LAVERTON RAAF",
-      "state": "VIC",
-      "postcodes": [
-        "3027"
-      ],
-      "coords": {
-        "lat": -37.8655231,
-        "lng": 144.7613154
-      },
-      "council": "Wyndham",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 44.73,
-      "regionSlug": "western",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/western/laverton/",
-        "/areas/victoria/western/seabrook/",
-        "/areas/victoria/western/altona-meadows/",
-        "/areas/victoria/western/williams-landing/",
-        "/areas/victoria/western/altona/",
-        "/areas/victoria/western/laverton-north/"
       ]
     },
     {
@@ -29413,32 +28361,6 @@
         "/areas/victoria/eastern/templestowe-lower/",
         "/areas/victoria/northern/banyule/",
         "/areas/victoria/eastern/templestowe/"
-      ]
-    },
-    {
-      "slug": "lygon-street-north",
-      "name": "LYGON STREET NORTH",
-      "state": "VIC",
-      "postcodes": [
-        "3057"
-      ],
-      "coords": {
-        "lat": -37.7714,
-        "lng": 144.972
-      },
-      "council": "Moreland",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 27.44,
-      "regionSlug": "northern",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/northern/sumner/",
-        "/areas/victoria/northern/brunswick-east/",
-        "/areas/victoria/northern/brunswick/",
-        "/areas/victoria/northern/brunswick-lower/",
-        "/areas/victoria/northern/princes-hill/",
-        "/areas/victoria/northern/brunswick-north/"
       ]
     },
     {
@@ -29634,12 +28556,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/western/highpoint-city/",
         "/areas/victoria/western/maribyrnong/",
         "/areas/victoria/western/robinson/",
         "/areas/victoria/western/west-footscray/",
         "/areas/victoria/western/braybrook/",
-        "/areas/victoria/western/braybrook-north/"
+        "/areas/victoria/western/braybrook-north/",
+        "/areas/victoria/western/footscray/"
       ]
     },
     {
@@ -29661,11 +28583,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/victoria/inner-east/malvern-north/",
-        "/areas/victoria/bayside-and-peninsula/wattletree-road-po/",
         "/areas/victoria/inner-east/armadale-north/",
         "/areas/victoria/inner-east/armadale/",
         "/areas/victoria/bayside-and-peninsula/central-park/",
-        "/areas/victoria/inner-east/kooyong/"
+        "/areas/victoria/inner-east/kooyong/",
+        "/areas/victoria/inner-east/glen-iris/"
       ]
     },
     {
@@ -29691,7 +28613,7 @@
         "/areas/victoria/bayside-and-peninsula/caulfield-east/",
         "/areas/victoria/bayside-and-peninsula/carnegie/",
         "/areas/victoria/bayside-and-peninsula/central-park/",
-        "/areas/victoria/bayside-and-peninsula/wattletree-road-po/"
+        "/areas/victoria/inner-east/glen-iris/"
       ]
     },
     {
@@ -29717,7 +28639,7 @@
         "/areas/victoria/inner-east/armadale/",
         "/areas/victoria/inner-east/kooyong/",
         "/areas/victoria/inner-east/toorak/",
-        "/areas/victoria/bayside-and-peninsula/wattletree-road-po/"
+        "/areas/victoria/bayside-and-peninsula/central-park/"
       ]
     },
     {
@@ -29738,12 +28660,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/western/highpoint-city/",
         "/areas/victoria/western/maidstone/",
         "/areas/victoria/north-west/essendon-west/",
         "/areas/victoria/north-west/avondale-heights/",
         "/areas/victoria/north-west/aberfeldie/",
-        "/areas/victoria/western/ascot-vale/"
+        "/areas/victoria/western/ascot-vale/",
+        "/areas/victoria/western/braybrook/"
       ]
     },
     {
@@ -29785,10 +28707,10 @@
       "neighbourHrefs": [
         "/areas/victoria/bayside-and-peninsula/ormond/",
         "/areas/victoria/bayside-and-peninsula/bentleigh/",
-        "/areas/victoria/bayside-and-peninsula/booran-road-po/",
         "/areas/victoria/bayside-and-peninsula/patterson/",
         "/areas/victoria/bayside-and-peninsula/glen-huntly/",
-        "/areas/victoria/bayside-and-peninsula/north-road/"
+        "/areas/victoria/bayside-and-peninsula/brighton-east/",
+        "/areas/victoria/bayside-and-peninsula/caulfield-south/"
       ]
     },
     {
@@ -30033,9 +28955,9 @@
         "/areas/victoria/inner-melbourne/st-kilda-west/",
         "/areas/victoria/inner-melbourne/albert-park/",
         "/areas/victoria/inner-melbourne/south-melbourne/",
-        "/areas/victoria/inner-melbourne/st-kilda-road-central/",
-        "/areas/victoria/inner-melbourne/st-kilda-road-melbourne/",
-        "/areas/victoria/inner-melbourne/st-kilda/"
+        "/areas/victoria/inner-melbourne/st-kilda/",
+        "/areas/victoria/inner-melbourne/windsor/",
+        "/areas/victoria/inner-melbourne/st-kilda-south/"
       ]
     },
     {
@@ -30104,9 +29026,9 @@
         "/areas/victoria/eastern/vermont/",
         "/areas/victoria/eastern/rangeview/",
         "/areas/victoria/eastern/nunawading/",
-        "/areas/victoria/eastern/brentford-square/",
         "/areas/victoria/eastern/mitcham-north/",
-        "/areas/victoria/eastern/forest-hill/"
+        "/areas/victoria/eastern/forest-hill/",
+        "/areas/victoria/eastern/heathwood/"
       ]
     },
     {
@@ -30131,8 +29053,8 @@
         "/areas/victoria/eastern/donvale/",
         "/areas/victoria/eastern/nunawading/",
         "/areas/victoria/eastern/mitcham/",
-        "/areas/victoria/eastern/tunstall-square-po/",
-        "/areas/victoria/eastern/blackburn-north/"
+        "/areas/victoria/eastern/blackburn-north/",
+        "/areas/victoria/eastern/doncaster-heights/"
       ]
     },
     {
@@ -30174,10 +29096,10 @@
       "neighbourHrefs": [
         "/areas/victoria/eastern/mont-albert-north/",
         "/areas/victoria/eastern/box-hill/",
-        "/areas/victoria/eastern/box-hill-central/",
         "/areas/victoria/south-east/surrey-hills-south/",
         "/areas/victoria/inner-east/surrey-hills/",
-        "/areas/victoria/inner-east/surrey-hills-north/"
+        "/areas/victoria/inner-east/surrey-hills-north/",
+        "/areas/victoria/eastern/box-hill-north/"
       ]
     },
     {
@@ -30201,9 +29123,9 @@
         "/areas/victoria/inner-east/mont-albert/",
         "/areas/victoria/eastern/box-hill-north/",
         "/areas/victoria/eastern/box-hill/",
-        "/areas/victoria/eastern/box-hill-central/",
         "/areas/victoria/eastern/kerrimuir/",
-        "/areas/victoria/eastern/greythorn/"
+        "/areas/victoria/eastern/greythorn/",
+        "/areas/victoria/south-east/surrey-hills-south/"
       ]
     },
     {
@@ -30332,8 +29254,8 @@
         "/areas/victoria/bayside-and-peninsula/wishart/",
         "/areas/victoria/bayside-and-peninsula/cheltenham-north/",
         "/areas/victoria/bayside-and-peninsula/highett/",
-        "/areas/victoria/bayside-and-peninsula/southland-centre/",
-        "/areas/victoria/bayside-and-peninsula/hampton-east/"
+        "/areas/victoria/bayside-and-peninsula/hampton-east/",
+        "/areas/victoria/bayside-and-peninsula/patterson/"
       ]
     },
     {
@@ -30358,8 +29280,8 @@
         "/areas/victoria/bayside-and-peninsula/wishart/",
         "/areas/victoria/bayside-and-peninsula/cheltenham-north/",
         "/areas/victoria/bayside-and-peninsula/highett/",
-        "/areas/victoria/bayside-and-peninsula/southland-centre/",
-        "/areas/victoria/bayside-and-peninsula/patterson/"
+        "/areas/victoria/bayside-and-peninsula/patterson/",
+        "/areas/victoria/bayside-and-peninsula/hampton-east/"
       ]
     },
     {
@@ -30746,8 +29668,8 @@
         "/areas/victoria/eastern/knoxfield/",
         "/areas/victoria/south-east/upper-ferntree-gully/",
         "/areas/victoria/eastern/boronia/",
-        "/areas/victoria/eastern/knox-city-centre/",
-        "/areas/victoria/eastern/wantirna-south/"
+        "/areas/victoria/eastern/wantirna-south/",
+        "/areas/victoria/eastern/rowville/"
       ]
     },
     {
@@ -30770,10 +29692,10 @@
       "neighbourHrefs": [
         "/areas/victoria/south-east/sandown-village/",
         "/areas/victoria/south-east/brandon-park/",
-        "/areas/victoria/south-east/waverley-gardens/",
         "/areas/victoria/south-east/wheelers-hill/",
         "/areas/victoria/south-east/springvale/",
-        "/areas/victoria/south-east/notting-hill/"
+        "/areas/victoria/south-east/notting-hill/",
+        "/areas/victoria/south-east/clayton/"
       ]
     },
     {
@@ -30796,10 +29718,10 @@
       "neighbourHrefs": [
         "/areas/victoria/south-east/hughesdale/",
         "/areas/victoria/bayside-and-peninsula/carnegie/",
-        "/areas/victoria/south-east/chadstone-centre/",
         "/areas/victoria/south-east/oakleigh/",
         "/areas/victoria/bayside-and-peninsula/bentleigh-east/",
-        "/areas/victoria/south-east/holmesglen/"
+        "/areas/victoria/south-east/holmesglen/",
+        "/areas/victoria/bayside-and-peninsula/coatesville/"
       ]
     },
     {
@@ -31132,32 +30054,6 @@
       ]
     },
     {
-      "slug": "north-road",
-      "name": "NORTH ROAD",
-      "state": "VIC",
-      "postcodes": [
-        "3187"
-      ],
-      "coords": {
-        "lat": -37.9013216,
-        "lng": 145.019596
-      },
-      "council": "Glen Eira",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 22.86,
-      "regionSlug": "bayside-and-peninsula",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/inner-melbourne/gardenvale/",
-        "/areas/victoria/bayside-and-peninsula/caulfield-south/",
-        "/areas/victoria/bayside-and-peninsula/brighton-north/",
-        "/areas/victoria/bayside-and-peninsula/booran-road-po/",
-        "/areas/victoria/bayside-and-peninsula/brighton/",
-        "/areas/victoria/bayside-and-peninsula/hopetoun-gardens/"
-      ]
-    },
-    {
       "slug": "north-warrandyte",
       "name": "NORTH WARRANDYTE",
       "state": "VIC",
@@ -31229,32 +30125,6 @@
       ]
     },
     {
-      "slug": "northland-centre",
-      "name": "NORTHLAND CENTRE",
-      "state": "VIC",
-      "postcodes": [
-        "3072"
-      ],
-      "coords": {
-        "lat": -37.7385104,
-        "lng": 145.0300628
-      },
-      "council": "Darebin",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 24.2,
-      "regionSlug": "northern",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/northern/sylvester/",
-        "/areas/victoria/northern/heidelberg-rgh/",
-        "/areas/victoria/northern/reservoir-south/",
-        "/areas/victoria/northern/heidelberg-west/",
-        "/areas/victoria/northern/preston/",
-        "/areas/victoria/northern/heidelberg-heights/"
-      ]
-    },
-    {
       "slug": "notting-hill",
       "name": "NOTTING HILL",
       "state": "VIC",
@@ -31303,7 +30173,7 @@
         "/areas/victoria/eastern/mitcham/",
         "/areas/victoria/eastern/blackburn/",
         "/areas/victoria/eastern/blackburn-north/",
-        "/areas/victoria/eastern/brentford-square/"
+        "/areas/victoria/eastern/rangeview/"
       ]
     },
     {
@@ -31397,10 +30267,10 @@
       "neighbourHrefs": [
         "/areas/victoria/south-east/hughesdale/",
         "/areas/victoria/south-east/holmesglen/",
-        "/areas/victoria/south-east/chadstone-centre/",
         "/areas/victoria/south-east/huntingdale/",
         "/areas/victoria/bayside-and-peninsula/murrumbeena/",
-        "/areas/victoria/south-east/chadstone/"
+        "/areas/victoria/south-east/chadstone/",
+        "/areas/victoria/bayside-and-peninsula/oakleigh-south/"
       ]
     },
     {
@@ -31551,12 +30421,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/bayside-and-peninsula/booran-road-po/",
         "/areas/victoria/bayside-and-peninsula/mckinnon/",
         "/areas/victoria/bayside-and-peninsula/glen-huntly/",
         "/areas/victoria/bayside-and-peninsula/caulfield-south/",
-        "/areas/victoria/bayside-and-peninsula/north-road/",
-        "/areas/victoria/bayside-and-peninsula/carnegie/"
+        "/areas/victoria/bayside-and-peninsula/carnegie/",
+        "/areas/victoria/bayside-and-peninsula/bentleigh/",
+        "/areas/victoria/bayside-and-peninsula/caulfield/"
       ]
     },
     {
@@ -31993,12 +30863,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/western/williams-raaf/",
         "/areas/victoria/western/seabrook/",
         "/areas/victoria/western/altona-meadows/",
-        "/areas/victoria/western/laverton-raaf/",
         "/areas/victoria/western/williams-landing/",
-        "/areas/victoria/western/laverton/"
+        "/areas/victoria/western/laverton/",
+        "/areas/victoria/western/altona/",
+        "/areas/victoria/western/seaholme/"
       ]
     },
     {
@@ -32019,12 +30889,12 @@
       "ruralFringe": false,
       "tier": 1,
       "neighbourHrefs": [
-        "/areas/victoria/inner-melbourne/garden-city/",
         "/areas/victoria/inner-melbourne/west-melbourne/",
         "/areas/victoria/inner-melbourne/docklands/",
         "/areas/victoria/inner-melbourne/south-wharf/",
         "/areas/victoria/inner-melbourne/albert-park/",
-        "/areas/victoria/inner-melbourne/southbank/"
+        "/areas/victoria/inner-melbourne/southbank/",
+        "/areas/victoria/western/newport/"
       ]
     },
     {
@@ -32067,9 +30937,9 @@
         "/areas/victoria/inner-melbourne/prahran-east/",
         "/areas/victoria/inner-east/hawksburn/",
         "/areas/victoria/inner-melbourne/windsor/",
-        "/areas/victoria/inner-melbourne/chapel-street-north/",
         "/areas/victoria/bayside-and-peninsula/st-kilda-east/",
-        "/areas/victoria/inner-melbourne/south-yarra/"
+        "/areas/victoria/inner-melbourne/south-yarra/",
+        "/areas/victoria/inner-east/armadale/"
       ]
     },
     {
@@ -32093,9 +30963,9 @@
         "/areas/victoria/inner-melbourne/prahran/",
         "/areas/victoria/inner-east/hawksburn/",
         "/areas/victoria/inner-melbourne/windsor/",
-        "/areas/victoria/inner-melbourne/chapel-street-north/",
         "/areas/victoria/bayside-and-peninsula/st-kilda-east/",
-        "/areas/victoria/inner-melbourne/south-yarra/"
+        "/areas/victoria/inner-melbourne/south-yarra/",
+        "/areas/victoria/inner-east/armadale/"
       ]
     },
     {
@@ -32121,7 +30991,7 @@
         "/areas/victoria/northern/preston-west/",
         "/areas/victoria/northern/preston-south/",
         "/areas/victoria/northern/regent-west/",
-        "/areas/victoria/northern/northland-centre/"
+        "/areas/victoria/northern/gilberton/"
       ]
     },
     {
@@ -32221,11 +31091,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/victoria/northern/carlton-north/",
-        "/areas/victoria/northern/lygon-street-north/",
         "/areas/victoria/northern/fitzroy-north/",
         "/areas/victoria/inner-melbourne/carlton/",
         "/areas/victoria/northern/parkville/",
-        "/areas/victoria/northern/sumner/"
+        "/areas/victoria/northern/sumner/",
+        "/areas/victoria/northern/brunswick-south/"
       ]
     },
     {
@@ -32381,7 +31251,7 @@
         "/areas/victoria/northern/reservoir-north/",
         "/areas/victoria/northern/reservoir-south/",
         "/areas/victoria/northern/sylvester/",
-        "/areas/victoria/northern/northland-centre/"
+        "/areas/victoria/northern/regent-west/"
       ]
     },
     {
@@ -32432,8 +31302,8 @@
         "/areas/victoria/northern/preston/",
         "/areas/victoria/northern/reservoir-east/",
         "/areas/victoria/northern/regent-west/",
-        "/areas/victoria/northern/northland-centre/",
-        "/areas/victoria/northern/preston-west/"
+        "/areas/victoria/northern/preston-west/",
+        "/areas/victoria/northern/reservoir/"
       ]
     },
     {
@@ -32559,11 +31429,11 @@
       "tier": 1,
       "neighbourHrefs": [
         "/areas/victoria/eastern/ringwood-north/",
-        "/areas/victoria/eastern/bedford-road/",
         "/areas/victoria/eastern/ringwood-east/",
         "/areas/victoria/eastern/heathwood/",
         "/areas/victoria/eastern/heathmont/",
-        "/areas/victoria/eastern/rangeview/"
+        "/areas/victoria/eastern/rangeview/",
+        "/areas/victoria/eastern/mitcham/"
       ]
     },
     {
@@ -32584,12 +31454,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/eastern/bedford-road/",
         "/areas/victoria/eastern/heathmont/",
         "/areas/victoria/eastern/croydon-south/",
         "/areas/victoria/eastern/ringwood/",
         "/areas/victoria/eastern/heathwood/",
-        "/areas/victoria/eastern/bayswater-north/"
+        "/areas/victoria/eastern/bayswater-north/",
+        "/areas/victoria/eastern/ringwood-north/"
       ]
     },
     {
@@ -32612,10 +31482,10 @@
       "neighbourHrefs": [
         "/areas/victoria/eastern/ringwood/",
         "/areas/victoria/eastern/rangeview/",
-        "/areas/victoria/eastern/bedford-road/",
         "/areas/victoria/eastern/park-orchards/",
         "/areas/victoria/eastern/ringwood-east/",
-        "/areas/victoria/eastern/warranwood/"
+        "/areas/victoria/eastern/warranwood/",
+        "/areas/victoria/eastern/heathwood/"
       ]
     },
     {
@@ -32636,12 +31506,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/inner-melbourne/brighton-road/",
         "/areas/victoria/bayside-and-peninsula/balaclava/",
         "/areas/victoria/inner-melbourne/elwood/",
         "/areas/victoria/inner-melbourne/elsternwick/",
-        "/areas/victoria/bayside-and-peninsula/hopetoun-gardens/",
-        "/areas/victoria/bayside-and-peninsula/st-kilda-east/"
+        "/areas/victoria/bayside-and-peninsula/st-kilda-east/",
+        "/areas/victoria/inner-melbourne/st-kilda-south/",
+        "/areas/victoria/inner-melbourne/st-kilda/"
       ]
     },
     {
@@ -32693,7 +31563,7 @@
         "/areas/victoria/northern/heidelberg-heights/",
         "/areas/victoria/northern/macleod-west/",
         "/areas/victoria/northern/heidelberg-west/",
-        "/areas/victoria/northern/heidelberg-rgh/"
+        "/areas/victoria/northern/bellfield/"
       ]
     },
     {
@@ -32718,8 +31588,8 @@
         "/areas/victoria/south-east/lysterfield-south/",
         "/areas/victoria/eastern/knoxfield/",
         "/areas/victoria/south-east/mountain-gate/",
-        "/areas/victoria/south-east/waverley-gardens/",
-        "/areas/victoria/south-east/wheelers-hill/"
+        "/areas/victoria/south-east/wheelers-hill/",
+        "/areas/victoria/eastern/wantirna-south/"
       ]
     },
     {
@@ -32832,10 +31702,10 @@
       "neighbourHrefs": [
         "/areas/victoria/south-east/mulgrave/",
         "/areas/victoria/south-east/springvale/",
-        "/areas/victoria/south-east/waverley-gardens/",
         "/areas/victoria/south-east/brandon-park/",
         "/areas/victoria/south-east/noble-park-north/",
-        "/areas/victoria/south-east/noble-park/"
+        "/areas/victoria/south-east/noble-park/",
+        "/areas/victoria/south-east/noble-park-east/"
       ]
     },
     {
@@ -32938,8 +31808,8 @@
         "/areas/victoria/south-east/wheelers-hill/",
         "/areas/victoria/eastern/knoxfield/",
         "/areas/victoria/eastern/wantirna-south/",
-        "/areas/victoria/eastern/knox-city-centre/",
-        "/areas/victoria/south-east/waverley-gardens/"
+        "/areas/victoria/south-east/mulgrave/",
+        "/areas/victoria/south-east/brandon-park/"
       ]
     },
     {
@@ -32960,12 +31830,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/western/laverton-raaf/",
         "/areas/victoria/western/altona-meadows/",
         "/areas/victoria/western/williams-landing/",
         "/areas/victoria/western/laverton/",
         "/areas/victoria/western/point-cook/",
-        "/areas/victoria/western/altona/"
+        "/areas/victoria/western/altona/",
+        "/areas/victoria/western/laverton-north/"
       ]
     },
     {
@@ -33316,11 +32186,11 @@
       "tier": 1,
       "neighbourHrefs": [
         "/areas/victoria/inner-melbourne/southbank/",
-        "/areas/victoria/inner-melbourne/st-kilda-road-central/",
-        "/areas/victoria/inner-melbourne/st-kilda-road-melbourne/",
         "/areas/victoria/inner-melbourne/south-wharf/",
         "/areas/victoria/inner-melbourne/albert-park/",
-        "/areas/victoria/inner-melbourne/domain-road-po/"
+        "/areas/victoria/inner-melbourne/middle-park/",
+        "/areas/victoria/inner-melbourne/melbourne/",
+        "/areas/victoria/inner-melbourne/east-melbourne/"
       ]
     },
     {
@@ -33372,7 +32242,7 @@
         "/areas/victoria/inner-melbourne/south-melbourne/",
         "/areas/victoria/inner-melbourne/melbourne/",
         "/areas/victoria/inner-melbourne/albert-park/",
-        "/areas/victoria/inner-melbourne/st-kilda-road-central/"
+        "/areas/victoria/inner-melbourne/carlton-south/"
       ]
     },
     {
@@ -33393,12 +32263,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/inner-melbourne/chapel-street-north/",
-        "/areas/victoria/inner-melbourne/domain-road-po/",
         "/areas/victoria/inner-melbourne/cremorne/",
         "/areas/victoria/inner-east/hawksburn/",
-        "/areas/victoria/inner-melbourne/st-kilda-road-central/",
-        "/areas/victoria/inner-melbourne/st-kilda-road-melbourne/"
+        "/areas/victoria/inner-melbourne/richmond-east/",
+        "/areas/victoria/inner-melbourne/prahran/",
+        "/areas/victoria/inner-melbourne/prahran-east/",
+        "/areas/victoria/inner-melbourne/windsor/"
       ]
     },
     {
@@ -33424,33 +32294,7 @@
         "/areas/victoria/inner-melbourne/melbourne/",
         "/areas/victoria/inner-melbourne/albert-park/",
         "/areas/victoria/inner-melbourne/docklands/",
-        "/areas/victoria/inner-melbourne/st-kilda-road-central/"
-      ]
-    },
-    {
-      "slug": "southland-centre",
-      "name": "SOUTHLAND CENTRE",
-      "state": "VIC",
-      "postcodes": [
-        "3192"
-      ],
-      "coords": {
-        "lat": -37.9583789,
-        "lng": 145.0539188
-      },
-      "council": "Bayside (Vic.)",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 22.77,
-      "regionSlug": "bayside-and-peninsula",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/bayside-and-peninsula/cheltenham-north/",
-        "/areas/victoria/bayside-and-peninsula/cheltenham/",
-        "/areas/victoria/bayside-and-peninsula/cheltenham-east/",
-        "/areas/victoria/bayside-and-peninsula/highett/",
-        "/areas/victoria/bayside-and-peninsula/moorabbin/",
-        "/areas/victoria/bayside-and-peninsula/moorabbin-east/"
+        "/areas/victoria/inner-melbourne/east-melbourne/"
       ]
     },
     {
@@ -33599,7 +32443,7 @@
         "/areas/victoria/inner-melbourne/windsor/",
         "/areas/victoria/bayside-and-peninsula/balaclava/",
         "/areas/victoria/bayside-and-peninsula/st-kilda-east/",
-        "/areas/victoria/inner-melbourne/brighton-road/"
+        "/areas/victoria/inner-melbourne/elwood/"
       ]
     },
     {
@@ -33625,59 +32469,7 @@
         "/areas/victoria/bayside-and-peninsula/balaclava/",
         "/areas/victoria/inner-melbourne/windsor/",
         "/areas/victoria/inner-melbourne/st-kilda/",
-        "/areas/victoria/inner-melbourne/brighton-road/"
-      ]
-    },
-    {
-      "slug": "st-kilda-road-central",
-      "name": "ST KILDA ROAD CENTRAL",
-      "state": "VIC",
-      "postcodes": [
-        "3004"
-      ],
-      "coords": {
-        "lat": -37.8368,
-        "lng": 144.976
-      },
-      "council": "Melbourne",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 25.85,
-      "regionSlug": "inner-melbourne",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/inner-melbourne/st-kilda-road-melbourne/",
-        "/areas/victoria/inner-melbourne/domain-road-po/",
-        "/areas/victoria/inner-melbourne/south-melbourne/",
-        "/areas/victoria/inner-melbourne/south-yarra/",
-        "/areas/victoria/inner-melbourne/cremorne/",
-        "/areas/victoria/inner-melbourne/chapel-street-north/"
-      ]
-    },
-    {
-      "slug": "st-kilda-road-melbourne",
-      "name": "ST KILDA ROAD MELBOURNE",
-      "state": "VIC",
-      "postcodes": [
-        "3004"
-      ],
-      "coords": {
-        "lat": -37.8368,
-        "lng": 144.976
-      },
-      "council": "Melbourne",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 25.85,
-      "regionSlug": "inner-melbourne",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/inner-melbourne/st-kilda-road-central/",
-        "/areas/victoria/inner-melbourne/domain-road-po/",
-        "/areas/victoria/inner-melbourne/south-melbourne/",
-        "/areas/victoria/inner-melbourne/south-yarra/",
-        "/areas/victoria/inner-melbourne/cremorne/",
-        "/areas/victoria/inner-melbourne/chapel-street-north/"
+        "/areas/victoria/inner-east/armadale/"
       ]
     },
     {
@@ -33702,8 +32494,8 @@
         "/areas/victoria/inner-melbourne/st-kilda-west/",
         "/areas/victoria/inner-melbourne/elwood/",
         "/areas/victoria/bayside-and-peninsula/balaclava/",
-        "/areas/victoria/inner-melbourne/brighton-road/",
-        "/areas/victoria/inner-melbourne/windsor/"
+        "/areas/victoria/inner-melbourne/windsor/",
+        "/areas/victoria/inner-melbourne/ripponlea/"
       ]
     },
     {
@@ -33866,12 +32658,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/eastern/knox-city-centre/",
         "/areas/victoria/eastern/wantirna/",
         "/areas/victoria/eastern/wantirna-south/",
         "/areas/victoria/eastern/bayswater/",
         "/areas/victoria/eastern/knoxfield/",
-        "/areas/victoria/eastern/heathmont/"
+        "/areas/victoria/eastern/heathmont/",
+        "/areas/victoria/eastern/heathwood/"
       ]
     },
     {
@@ -33893,11 +32685,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/victoria/northern/brunswick-east/",
-        "/areas/victoria/northern/lygon-street-north/",
         "/areas/victoria/northern/fitzroy-north/",
         "/areas/victoria/northern/northcote-south/",
         "/areas/victoria/northern/northcote/",
-        "/areas/victoria/northern/princes-hill/"
+        "/areas/victoria/northern/princes-hill/",
+        "/areas/victoria/northern/carlton-north/"
       ]
     },
     {
@@ -34102,10 +32894,10 @@
       "neighbourHrefs": [
         "/areas/victoria/northern/preston/",
         "/areas/victoria/northern/reservoir-south/",
-        "/areas/victoria/northern/northland-centre/",
         "/areas/victoria/northern/regent-west/",
         "/areas/victoria/northern/preston-west/",
-        "/areas/victoria/northern/preston-south/"
+        "/areas/victoria/northern/preston-south/",
+        "/areas/victoria/northern/reservoir-east/"
       ]
     },
     {
@@ -34348,10 +33140,10 @@
       "neighbourHrefs": [
         "/areas/victoria/eastern/templestowe/",
         "/areas/victoria/eastern/doncaster-heights/",
-        "/areas/victoria/eastern/tunstall-square-po/",
         "/areas/victoria/eastern/doncaster-east/",
         "/areas/victoria/eastern/donvale/",
-        "/areas/victoria/eastern/park-orchards/"
+        "/areas/victoria/eastern/park-orchards/",
+        "/areas/victoria/eastern/doncaster/"
       ]
     },
     {
@@ -34527,11 +33319,11 @@
       "tier": 3,
       "neighbourHrefs": [
         "/areas/victoria/inner-east/glen-iris/",
-        "/areas/victoria/bayside-and-peninsula/wattletree-road-po/",
         "/areas/victoria/bayside-and-peninsula/central-park/",
         "/areas/victoria/inner-east/middle-camberwell/",
         "/areas/victoria/inner-east/camberwell-west/",
-        "/areas/victoria/inner-east/malvern/"
+        "/areas/victoria/inner-east/malvern/",
+        "/areas/victoria/bayside-and-peninsula/darling/"
       ]
     },
     {
@@ -34625,10 +33417,10 @@
       "neighbourHrefs": [
         "/areas/victoria/western/ravenhall/",
         "/areas/victoria/western/williams-landing/",
-        "/areas/victoria/western/laverton-raaf/",
         "/areas/victoria/western/chartwell/",
         "/areas/victoria/western/laverton/",
-        "/areas/victoria/western/laverton-north/"
+        "/areas/victoria/western/laverton-north/",
+        "/areas/victoria/western/derrimut/"
       ]
     },
     {
@@ -34655,32 +33447,6 @@
         "/areas/victoria/north-west/westmeadows/",
         "/areas/victoria/western/airport-west/",
         "/areas/victoria/north-west/jacana/"
-      ]
-    },
-    {
-      "slug": "tunstall-square-po",
-      "name": "TUNSTALL SQUARE PO",
-      "state": "VIC",
-      "postcodes": [
-        "3109"
-      ],
-      "coords": {
-        "lat": -37.7904,
-        "lng": 145.17
-      },
-      "council": "Manningham",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 10.7,
-      "regionSlug": "eastern",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/eastern/doncaster-heights/",
-        "/areas/victoria/eastern/doncaster-east/",
-        "/areas/victoria/eastern/donvale/",
-        "/areas/victoria/eastern/blackburn-north/",
-        "/areas/victoria/eastern/mitcham-north/",
-        "/areas/victoria/eastern/rangeview/"
       ]
     },
     {
@@ -34817,12 +33583,12 @@
       "ruralFringe": false,
       "tier": 1,
       "neighbourHrefs": [
-        "/areas/victoria/eastern/brentford-square/",
         "/areas/victoria/eastern/mitcham/",
         "/areas/victoria/eastern/forest-hill/",
         "/areas/victoria/eastern/vermont-south/",
         "/areas/victoria/eastern/heathwood/",
-        "/areas/victoria/eastern/nunawading/"
+        "/areas/victoria/eastern/nunawading/",
+        "/areas/victoria/eastern/wantirna/"
       ]
     },
     {
@@ -34843,12 +33609,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/eastern/brentford-square/",
         "/areas/victoria/eastern/vermont/",
         "/areas/victoria/south-east/glen-waverley/",
         "/areas/victoria/eastern/forest-hill/",
         "/areas/victoria/eastern/burwood-east/",
-        "/areas/victoria/eastern/burwood-heights/"
+        "/areas/victoria/eastern/burwood-heights/",
+        "/areas/victoria/south-east/syndal/"
       ]
     },
     {
@@ -34869,32 +33635,6 @@
       "ruralFringe": true,
       "tier": 3,
       "neighbourHrefs": []
-    },
-    {
-      "slug": "victoria-gardens",
-      "name": "VICTORIA GARDENS",
-      "state": "VIC",
-      "postcodes": [
-        "3121"
-      ],
-      "coords": {
-        "lat": -37.8132,
-        "lng": 145.012
-      },
-      "council": "Yarra",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 22.95,
-      "regionSlug": "inner-melbourne",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/inner-melbourne/burnley-north/",
-        "/areas/victoria/inner-east/hawthorn-north/",
-        "/areas/victoria/inner-east/hawthorn-west/",
-        "/areas/victoria/inner-melbourne/richmond/",
-        "/areas/victoria/inner-melbourne/richmond-south/",
-        "/areas/victoria/inner-melbourne/abbotsford/"
-      ]
     },
     {
       "slug": "viewbank",
@@ -34988,9 +33728,9 @@
         "/areas/victoria/eastern/studfield/",
         "/areas/victoria/eastern/heathwood/",
         "/areas/victoria/eastern/heathmont/",
-        "/areas/victoria/eastern/knox-city-centre/",
         "/areas/victoria/eastern/vermont/",
-        "/areas/victoria/eastern/wantirna-south/"
+        "/areas/victoria/eastern/wantirna-south/",
+        "/areas/victoria/eastern/bayswater/"
       ]
     },
     {
@@ -35011,12 +33751,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/eastern/knox-city-centre/",
         "/areas/victoria/eastern/studfield/",
         "/areas/victoria/eastern/knoxfield/",
         "/areas/victoria/eastern/scoresby/",
         "/areas/victoria/eastern/wantirna/",
-        "/areas/victoria/south-east/mountain-gate/"
+        "/areas/victoria/south-east/mountain-gate/",
+        "/areas/victoria/south-east/ferntree-gully/"
       ]
     },
     {
@@ -35297,84 +34037,6 @@
       ]
     },
     {
-      "slug": "wattletree-road-po",
-      "name": "WATTLETREE ROAD PO",
-      "state": "VIC",
-      "postcodes": [
-        "3145"
-      ],
-      "coords": {
-        "lat": -37.8638,
-        "lng": 145.041
-      },
-      "council": "Glen Eira",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 20.22,
-      "regionSlug": "bayside-and-peninsula",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/bayside-and-peninsula/central-park/",
-        "/areas/victoria/inner-east/malvern/",
-        "/areas/victoria/inner-east/glen-iris/",
-        "/areas/victoria/inner-east/tooronga/",
-        "/areas/victoria/inner-east/malvern-north/",
-        "/areas/victoria/bayside-and-peninsula/caulfield-east/"
-      ]
-    },
-    {
-      "slug": "waverley-gardens",
-      "name": "WAVERLEY GARDENS",
-      "state": "VIC",
-      "postcodes": [
-        "3170"
-      ],
-      "coords": {
-        "lat": -37.9367533,
-        "lng": 145.1915757
-      },
-      "council": "Monash",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 12.3,
-      "regionSlug": "south-east",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/south-east/mulgrave/",
-        "/areas/victoria/south-east/sandown-village/",
-        "/areas/victoria/south-east/dandenong-north/",
-        "/areas/victoria/south-east/brandon-park/",
-        "/areas/victoria/south-east/noble-park-north/",
-        "/areas/victoria/south-east/wheelers-hill/"
-      ]
-    },
-    {
-      "slug": "were-street-po",
-      "name": "WERE STREET PO",
-      "state": "VIC",
-      "postcodes": [
-        "3186"
-      ],
-      "coords": {
-        "lat": -37.9255,
-        "lng": 145
-      },
-      "council": "Bayside (Vic.)",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 25.34,
-      "regionSlug": "bayside-and-peninsula",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/bayside-and-peninsula/dendy/",
-        "/areas/victoria/bayside-and-peninsula/hampton/",
-        "/areas/victoria/bayside-and-peninsula/brighton-east/",
-        "/areas/victoria/bayside-and-peninsula/hampton-north/",
-        "/areas/victoria/bayside-and-peninsula/brighton/",
-        "/areas/victoria/bayside-and-peninsula/brighton-north/"
-      ]
-    },
-    {
       "slug": "wesburn",
       "name": "WESBURN",
       "state": "VIC",
@@ -35492,9 +34154,9 @@
         "/areas/victoria/south-east/brandon-park/",
         "/areas/victoria/south-east/mulgrave/",
         "/areas/victoria/eastern/scoresby/",
-        "/areas/victoria/south-east/waverley-gardens/",
         "/areas/victoria/south-east/sandown-village/",
-        "/areas/victoria/south-east/notting-hill/"
+        "/areas/victoria/south-east/notting-hill/",
+        "/areas/victoria/south-east/glen-waverley/"
       ]
     },
     {
@@ -35534,38 +34196,12 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/western/laverton-raaf/",
         "/areas/victoria/western/seabrook/",
         "/areas/victoria/western/laverton/",
         "/areas/victoria/western/altona-meadows/",
         "/areas/victoria/north-west/truganina/",
-        "/areas/victoria/western/laverton-north/"
-      ]
-    },
-    {
-      "slug": "williams-raaf",
-      "name": "WILLIAMS RAAF",
-      "state": "VIC",
-      "postcodes": [
-        "3027"
-      ],
-      "coords": {
-        "lat": -37.9232,
-        "lng": 144.749
-      },
-      "council": "Wyndham",
-      "anchorKey": "bayswater-north",
-      "distanceKm": 46.55,
-      "regionSlug": "western",
-      "ruralFringe": false,
-      "tier": 3,
-      "neighbourHrefs": [
-        "/areas/victoria/western/point-cook/",
-        "/areas/victoria/western/seabrook/",
-        "/areas/victoria/western/altona-meadows/",
-        "/areas/victoria/western/laverton-raaf/",
-        "/areas/victoria/western/williams-landing/",
-        "/areas/victoria/western/laverton/"
+        "/areas/victoria/western/laverton-north/",
+        "/areas/victoria/western/altona/"
       ]
     },
     {
@@ -35591,7 +34227,7 @@
         "/areas/victoria/western/spotswood/",
         "/areas/victoria/western/south-kingsville/",
         "/areas/victoria/western/seaholme/",
-        "/areas/victoria/inner-melbourne/garden-city/"
+        "/areas/victoria/western/yarraville/"
       ]
     },
     {
@@ -35643,7 +34279,7 @@
         "/areas/victoria/inner-melbourne/st-kilda/",
         "/areas/victoria/bayside-and-peninsula/st-kilda-east/",
         "/areas/victoria/inner-melbourne/st-kilda-west/",
-        "/areas/victoria/inner-melbourne/chapel-street-north/"
+        "/areas/victoria/inner-east/hawksburn/"
       ]
     },
     {

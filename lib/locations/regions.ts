@@ -117,6 +117,7 @@ export const REGIONS: readonly RegionDef[] = [
   {
     slug: 'inner-east',
     name: 'Inner East',
+    inSentence: 'the Inner East',
     state: 'VIC',
     ruralFringe: false,
     councils: ['Boroondara', 'Stonnington'],
@@ -138,6 +139,8 @@ export const REGIONS: readonly RegionDef[] = [
   {
     slug: 'bayside-and-peninsula',
     name: 'Bayside & Peninsula',
+    inSentence: 'Bayside & the Peninsula',
+    preposition: 'across',
     state: 'VIC',
     ruralFringe: false,
     councils: [
@@ -172,6 +175,7 @@ export const REGIONS: readonly RegionDef[] = [
   {
     slug: 'yarra-valley-and-hinterland',
     name: 'Yarra Valley & Hinterland',
+    inSentence: 'the Yarra Valley & Hinterland',
     state: 'VIC',
     ruralFringe: true,
     councils: ['Yarra Ranges', 'Nillumbik', 'Murrindindi', 'Baw Baw', 'Cardinia'],
@@ -215,7 +219,14 @@ export const REGIONS: readonly RegionDef[] = [
   },
   { slug: 'ipswich', name: 'Ipswich', state: 'QLD', ruralFringe: false, councils: ['Ipswich'] },
   { slug: 'logan', name: 'Logan', state: 'QLD', ruralFringe: false, councils: ['Logan'] },
-  { slug: 'redlands', name: 'Redlands', state: 'QLD', ruralFringe: false, councils: ['Redland'] },
+  {
+    slug: 'redlands',
+    name: 'Redlands',
+    inSentence: 'the Redlands',
+    state: 'QLD',
+    ruralFringe: false,
+    councils: ['Redland'],
+  },
   {
     slug: 'moreton-bay',
     name: 'Moreton Bay',
@@ -226,6 +237,8 @@ export const REGIONS: readonly RegionDef[] = [
   {
     slug: 'sunshine-coast',
     name: 'Sunshine Coast',
+    inSentence: 'the Sunshine Coast',
+    preposition: 'on',
     state: 'QLD',
     ruralFringe: false,
     councils: ['Sunshine Coast'],
@@ -234,6 +247,8 @@ export const REGIONS: readonly RegionDef[] = [
   {
     slug: 'gold-coast',
     name: 'Gold Coast',
+    inSentence: 'the Gold Coast',
+    preposition: 'on',
     state: 'QLD',
     ruralFringe: false,
     councils: ['Gold Coast'],
@@ -241,11 +256,30 @@ export const REGIONS: readonly RegionDef[] = [
   {
     slug: 'seq-hinterland',
     name: 'South East Queensland Hinterland',
+    inSentence: 'the South East Queensland Hinterland',
     state: 'QLD',
     ruralFringe: true,
     councils: ['Scenic Rim', 'Gympie', 'Somerset'],
   },
 ] as const;
+
+/**
+ * The region name as it reads inside a sentence — "the Gold Coast", "Ipswich".
+ *
+ * One helper rather than `region.inSentence ?? region.name` scattered over four
+ * call sites, because the fallback is the part that gets forgotten.
+ */
+export function regionInSentence(region: RegionDef): string {
+  return region.inSentence ?? region.name;
+}
+
+/**
+ * Preposition plus name — "on the Gold Coast", "in Ipswich", "across Bayside &
+ * the Peninsula". This is what goes after "Commercial painting".
+ */
+export function regionLocative(region: RegionDef): string {
+  return `${region.preposition ?? 'in'} ${regionInSentence(region)}`;
+}
 
 const bySlug = new Map(REGIONS.map((r) => [r.slug, r]));
 

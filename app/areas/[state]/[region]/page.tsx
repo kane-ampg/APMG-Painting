@@ -11,10 +11,13 @@ import {
   displayName,
   getRegion,
   localitiesInRegion,
+  regionInSentence,
+  regionLocative,
   REGIONS,
   stateFromSlug,
   stateSlug,
   type Locality,
+  type RegionDef,
 } from '@/lib/locations';
 
 /**
@@ -22,7 +25,7 @@ import {
  *
  * These are the pages that are meant to rank: a region is a real unit of
  * enquiry ("commercial painters eastern suburbs Melbourne") and there are few
- * enough of them that each can carry genuine writing. The 1,440 suburb pages
+ * enough of them that each can carry genuine writing. The 1,387 suburb pages
  * beneath sit at `noindex, follow` precisely so their links point equity here.
  */
 export function generateStaticParams() {
@@ -36,9 +39,16 @@ export const dynamicParams = false;
 
 type Props = { params: Promise<{ state: string; region: string }> };
 
-/** Regions are named for their place, so the heading must not repeat "Melbourne". */
-function heading(regionName: string, vic: boolean): string {
-  return `Commercial ${vic ? 'painters in' : 'painting in'} ${regionName}`;
+/**
+ * Regions are named for their place, so the heading must not repeat "Melbourne".
+ *
+ * The preposition and article come from the region definition, not from this
+ * function: "Commercial painting in Gold Coast" was the reading before, and
+ * hard-coding a fix for that one string would have left "in Redlands" and "in
+ * Sunshine Coast" behind it. See `RegionDef.inSentence`.
+ */
+function heading(region: RegionDef, vic: boolean): string {
+  return `Commercial ${vic ? 'painters' : 'painting'} ${regionLocative(region)}`;
 }
 
 function resolve(state: string, region: string) {
@@ -55,12 +65,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const vic = regionDef.state === 'VIC';
   const count = localitiesInRegion(regionDef.slug).length;
+  const inSentence = regionInSentence(regionDef);
 
   return buildMetadata({
     title: `Commercial ${vic ? 'Painters' : 'Painting'} ${regionDef.name} | APMG Painting`,
     description: vic
-      ? `Commercial painting across ${regionDef.name} — ${count} suburbs, serviced from APMG Painting's Bayswater North base. Schools, clinics, retail, strata and industrial.`
-      : `Commercial painting across ${regionDef.name} — ${count} suburbs APMG Painting services. Schools, clinics, retail, strata and industrial.`,
+      ? `Commercial painting across ${inSentence} — ${count} suburbs, serviced from APMG Painting's Bayswater North base. Schools, clinics, retail, strata and industrial.`
+      : `Commercial painting across ${inSentence} — ${count} suburbs APMG Painting services. Schools, clinics, retail, strata and industrial.`,
     path: `/areas/${state}/${region}/`,
     // Hubs are always indexable: 22 pages, each with real writing behind it.
     index: true,
@@ -105,7 +116,7 @@ export default async function RegionPage({ params }: Props) {
         <Container width="wide">
           <Eyebrow>{vic ? 'Victoria' : 'Queensland'}</Eyebrow>
           <h1 className="font-display text-4xl tracking-tight sm:text-5xl">
-            {heading(regionDef.name, vic)}
+            {heading(regionDef, vic)}
           </h1>
           <Lede className="mt-4">
             {vic
@@ -120,8 +131,8 @@ export default async function RegionPage({ params }: Props) {
           <Prose className="mb-10">
             <p>
               {vic
-                ? `APMG Painting works right across ${regionDef.name} — schools and childcare centres, medical suites, retail tenancies, strata buildings and industrial units. Not houses.`
-                : `APMG Painting services ${regionDef.name} for commercial work — schools and childcare centres, medical suites, retail tenancies, strata buildings and industrial units. Not houses.`}
+                ? `APMG Painting works right across ${regionInSentence(regionDef)} — schools and childcare centres, medical suites, retail tenancies, strata buildings and industrial units. Not houses.`
+                : `APMG Painting services ${regionInSentence(regionDef)} for commercial work — schools and childcare centres, medical suites, retail tenancies, strata buildings and industrial units. Not houses.`}
             </p>
             <p>
               Scope is set by the council the building sits under more than by the suburb name, so
@@ -170,7 +181,7 @@ export default async function RegionPage({ params }: Props) {
       </Section>
 
       <CtaBand
-        heading={`Painting in ${regionDef.name}?`}
+        heading={`Painting ${regionLocative(regionDef)}?`}
         body={
           vic
             ? 'Tell us what needs doing and we will come and look.'

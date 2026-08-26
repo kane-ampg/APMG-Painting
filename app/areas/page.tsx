@@ -9,7 +9,7 @@ import { allLocalities, localitiesInRegion, regionsInState, type StateKey } from
 /**
  * The national hub.
  *
- * Indexable, and now a genuine directory: 1,440 localities across two states,
+ * Indexable, and now a genuine directory: 1,387 localities across two states,
  * 22 regions, all reachable from here in at most two clicks. The editorial
  * placeholder this page used to carry — a caveat that the coverage was a
  * representative subset pending real data — is gone, because the coverage is

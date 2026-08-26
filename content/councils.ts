@@ -12,8 +12,8 @@ export type Council = {
 /**
  * Authored once per council, inherited by every suburb in it.
  *
- * This is what makes 1,440 differentiated pages affordable: 45 pieces of real
- * writing instead of 1,440 name-swapped templates. Names match the dataset's
+ * This is what makes 1,387 differentiated pages affordable: 45 pieces of real
+ * writing instead of 1,387 name-swapped templates. Names match the dataset's
  * `lgaregion` verbatim, parenthesised disambiguators included.
  *
  * Two editorial rules govern this file.

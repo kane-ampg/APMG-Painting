@@ -17,7 +17,7 @@ import { generateStaticParams as stateParams } from '@/app/areas/[state]/page';
 
 describe('suburb params', () => {
   it('generates one route per locality', () => {
-    expect(suburbParams()).toHaveLength(1440);
+    expect(suburbParams()).toHaveLength(1387);
   });
 
   it('carries all three segments in each entry', () => {
@@ -61,9 +61,9 @@ describe('region and state params', () => {
 });
 
 describe('the page count the spec commits to', () => {
-  it('is 1,465 pages of which 41 are indexable', () => {
+  it('is 1,412 pages of which 41 are indexable', () => {
     const pages = suburbParams().length + regionParams().length + stateParams().length + 1;
-    expect(pages).toBe(1465);
+    expect(pages).toBe(1412);
     expect(indexableLocalities().length + 22 + 2 + 1).toBe(41);
   });
 });
@@ -71,11 +71,11 @@ describe('the page count the spec commits to', () => {
 /**
  * Robots directives.
  *
- * `noindex, follow` is the whole basis for generating 1,440 pages instead of
+ * `noindex, follow` is the whole basis for generating 1,387 pages instead of
  * 41: the Tier 3 pages are kept out of the index but stay crawlable, so the
  * links out of them carry equity up to the 22 region hubs. `buildMetadata`
  * originally derived `follow` from `index`, which quietly shipped
- * `noindex, nofollow` on all 1,424 of them and made every one a dead end.
+ * `noindex, nofollow` on all 1,371 of them and made every one a dead end.
  */
 type Robots = { index: boolean; follow: boolean };
 
@@ -119,13 +119,13 @@ describe('suburb page robots directives', () => {
 /**
  * The nearby-suburbs slot.
  *
- * All 209 rural-fringe localities carry an empty `neighbourHrefs` — they are
+ * All 207 rural-fringe localities carry an empty `neighbourHrefs` — they are
  * held out of neighbour lists on purpose — so the block used to return null
  * and leave a hole where one of the six facts spec §8 requires should be.
  */
 describe('the nearby-suburbs slot', () => {
   it('has fringe localities with no neighbours at all, so the branch is real', () => {
-    expect(allLocalities().filter((l) => l.neighbourHrefs.length === 0)).toHaveLength(209);
+    expect(allLocalities().filter((l) => l.neighbourHrefs.length === 0)).toHaveLength(207);
   });
 
   it('renders something with a link on every suburb page', () => {
@@ -134,5 +134,33 @@ describe('the nearby-suburbs slot', () => {
       expect(html, locality.href).toContain('<a ');
       expect(html.length, locality.href).toBeGreaterThan(100);
     }
+  });
+
+  /*
+   * The fringe branch may not turn the data rule into a claim about the map.
+   *
+   * It used to: "{name} has no adjoining suburb — what surrounds it is farmland
+   * and township", rendered on all 207 fringe pages. Powelltown adjoins Yarra
+   * Junction and Three Bridges and both have pages here, so the sentence was
+   * false on the page that most obviously disproves it. An empty
+   * `neighbourHrefs` says which localities are worth linking, nothing about
+   * what borders the place.
+   */
+  it('never claims a fringe locality has nothing adjoining it', () => {
+    const fringe = allLocalities().filter((l) => l.neighbourHrefs.length === 0);
+    expect(fringe.length).toBeGreaterThan(0);
+    for (const locality of fringe) {
+      const html = renderToStaticMarkup(createElement(NearbySuburbs, { locality }));
+      expect(html, locality.name).not.toMatch(
+        /no adjoining|nothing adjoin|does not adjoin|no neighbouring|no bordering|no surrounding suburb/i,
+      );
+    }
+  });
+
+  it('points a fringe page at its region hub instead', () => {
+    const powelltown = allLocalities().find((l) => l.state === 'VIC' && l.slug === 'powelltown');
+    expect(powelltown?.neighbourHrefs).toEqual([]);
+    const html = renderToStaticMarkup(createElement(NearbySuburbs, { locality: powelltown! }));
+    expect(html).toContain('/areas/victoria/yarra-valley-and-hinterland');
   });
 });

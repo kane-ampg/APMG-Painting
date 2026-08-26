@@ -16,6 +16,23 @@ export type RegionDef = {
   slug: string;
   name: string;
   state: StateKey;
+  /**
+   * The name as it reads inside a sentence, definite article included.
+   *
+   * Region headings used to be built as `Commercial painting in ${name}`, which
+   * produced "Commercial painting in Gold Coast" — nobody writes that. The
+   * article is a property of the place, not a string to special-case at one
+   * call site, so it lives here beside the name and every surface that puts the
+   * region into a sentence reads it. Omitted where `name` already reads
+   * correctly, which is 15 of the 22.
+   */
+  inSentence?: string;
+  /**
+   * The preposition that goes with `inSentence`. "on the Gold Coast", not "in
+   * the Gold Coast"; "across Bayside & the Peninsula", because it is two
+   * places. Defaults to "in".
+   */
+  preposition?: 'in' | 'on' | 'across';
   /** Matched verbatim against the dataset's `lgaregion`. */
   councils: readonly string[];
   ruralFringe: boolean;

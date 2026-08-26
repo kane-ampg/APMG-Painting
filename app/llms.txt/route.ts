@@ -6,6 +6,7 @@ import { projects } from '@/content/projects';
 import { homeFaqs } from '@/content/faqs';
 import { differentiators } from '@/content/approach';
 import {
+  allLocalities,
   displayName,
   getRegion,
   indexableLocalities,
@@ -31,6 +32,19 @@ export const dynamic = 'force-static';
 export function GET(): Response {
   const verified = accreditations.filter((a) => a.verified);
 
+  /*
+   * Region and locality counts are derived, never written down.
+   *
+   * The header used to say work is carried out "across Melbourne, Victoria,
+   * within roughly 60 km of the Bayswater North base" and then listed thirteen
+   * Queensland regions underneath, and the regions section said APMG "services
+   * three regions" in Queensland when the file itself listed thirteen. Both
+   * numbers now come from REGIONS, so the file cannot contradict its own lists.
+   */
+  const vicRegions = REGIONS.filter((r) => r.state === 'VIC').length;
+  const qldRegions = REGIONS.filter((r) => r.state === 'QLD').length;
+  const localityCount = allLocalities().length.toLocaleString('en-AU');
+
   const regionLines = (state: 'VIC' | 'QLD'): string =>
     REGIONS.filter((r) => r.state === state)
       .map((r) => `- ${r.name}: ${localitiesInRegion(r.slug).length} suburbs`)
@@ -42,7 +56,7 @@ export function GET(): Response {
 
   const body = `# ${site.name}
 
-> ${site.tagline}. ${site.legalName}, founded ${site.founded}, based at ${formattedAddress}. Work is carried out across ${site.serviceArea.primary}, within roughly ${site.serviceArea.radiusKm} km of the Bayswater North base.
+> ${site.tagline}. ${site.legalName}, founded ${site.founded}, based at ${formattedAddress}. Victorian work is carried out across ${site.serviceArea.primary}, within roughly ${site.serviceArea.radiusKm} km of the Bayswater North base. APMG also lists ${qldRegions} South East Queensland regions as areas served — there is no Queensland office, address, phone number or completed project, and no Queensland page on this site is indexed.
 
 APMG Painting is a commercial painting and property maintenance contractor. The work is painting programmes in buildings that stay open while they are painted — schools, clinics, aged care, strata, retail, hospitality and industrial sites.
 
@@ -68,7 +82,7 @@ ${projects.map((p) => `- [${p.title}](${siteUrl}/projects/${p.slug}/): ${p.locat
 
 ## Regions served
 
-APMG Painting works across 22 regions in two states: Victoria, worked from ${site.address.suburb}, and Queensland, where APMG has no office but services three regions. "Do you work in X?" is the most common question an answer engine gets asked about a trade business, so the region model is stated directly rather than as 1,440 individual suburb names, which would be too many to usefully list here.
+APMG Painting covers ${vicRegions + qldRegions} regions across two states: ${vicRegions} in Victoria, worked from ${site.address.suburb}, and ${qldRegions} in South East Queensland, which are areas served rather than places APMG operates from. "Do you work in X?" is the most common question an answer engine gets asked about a trade business, so the region model is stated directly rather than as ${localityCount} individual suburb names, which would be too many to usefully list here.
 
 ### Victoria
 

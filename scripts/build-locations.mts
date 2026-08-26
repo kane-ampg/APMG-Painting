@@ -38,7 +38,19 @@ const OUT = resolve('content/locations.generated.json');
  * Not a target: if the pipeline stops matching this, the build fails so a
  * human looks at the diff. Changing this number is a decision, not a fix.
  */
-const EXPECTED_TOTAL = 1440;
+/**
+ * 2026-08-26: 1,440 -> 1,387. Deliberate, not drift.
+ *
+ * The whole-branch review found that the BC/DC/MC sweep had missed 53 more
+ * Australia Post artifacts of the same class — post offices, street-address
+ * delivery rows, shopping centres, RAAF bases, the wholesale markets, an
+ * immigration detention centre — and that they were rendering as suburbs on
+ * indexable region hubs and in the Tier 1 nearby-suburb lists. See
+ * NON_SUBURB_PATTERNS below for the rules and
+ * .superpowers/sdd/2026-08-25-areas-vic-qld/final-fix-report.md for the full
+ * list of names removed. 1,440 - 53 = 1,387.
+ */
+const EXPECTED_TOTAL = 1387;
 const NEIGHBOUR_COUNT = 6;
 
 /**
@@ -72,6 +84,38 @@ const NON_SUBURB_LOCALITIES = new Set([
   'MELBOURNE AIRPORT',
   'MELBOURNE UNIVERSITY',
   'MOORABBIN AIRPORT',
+  // 2026-08-26 sweep. Same class again: retail, wholesale, port, aged-care and
+  // civic delivery names that no pattern can catch without also catching a real
+  // suburb. Each was checked individually against the dataset and against the
+  // real locality it sits inside, which survives in every case.
+  //
+  // The five "... CITY" names are Australia Post names for shopping centres
+  // (Ashmore City, Westfield Garden City, Highpoint, Stafford City, Westfield
+  // Strathpine). There is deliberately NO / CITY$/ pattern: BRISBANE CITY is
+  // the CBD locality, a real suburb, and would be destroyed by one.
+  'ASHMORE CITY',
+  'GARDEN CITY',
+  'HIGHPOINT CITY',
+  'STAFFORD CITY',
+  'STRATHPINE CITY',
+  // Retail centres and postal outlets whose names end in a word that is
+  // legitimate elsewhere. / CENTRAL$/ would take Hamilton Central, Logan
+  // Central, Springfield Central, Wynnum Central and Kinglake Central, all
+  // real; / GARDENS$/ would take Aspendale Gardens, Cypress Gardens and
+  // Florida Gardens, all real. So these five are named, not patterned.
+  'BOX HILL CENTRAL',
+  'FAIRFIELD GARDENS',
+  'VICTORIA GARDENS',
+  'WAVERLEY GARDENS',
+  'HOPETOUN GARDENS',
+  // Wholesale markets, the showgrounds, the port, an aged-care home, a
+  // repatriation hospital and Parliament House. None is a locality.
+  'BRISBANE MARKET',
+  'BRISBANE EXHIBITION',
+  'PORT OF BRISBANE',
+  'BRIGHTON EVENTIDE',
+  'HEIDELBERG RGH',
+  'PARLIAMENT HOUSE',
 ]);
 
 /**
@@ -86,6 +130,61 @@ const NON_SUBURB_LOCALITIES = new Set([
  * `AIRPORT WEST` is a real Melbourne suburb and does not match this pattern.
  */
 const NON_SUBURB_SUFFIX = /\b(BC|DC|MC)$/;
+
+/**
+ * The rest of the artifact class, as patterns rather than a hand list.
+ *
+ * The BC/DC/MC sweep above caught the bulk-delivery rows and stopped. It left
+ * behind the same class of thing under Australia Post's other naming
+ * conventions, and those rows were reaching *indexable* pages:
+ * /areas/victoria/eastern/ listed "Bedford Road", "Brentford Square", "Knox
+ * City Centre" and "Tunstall Square Po" as suburbs, and the Tier 1 page for
+ * Vermont linked "Brentford Square" as a nearby suburb. A rater sampling those
+ * hubs sees postal outlets and a detention centre presented as localities,
+ * which is the doorway signal the whole tiering scheme exists to avoid.
+ *
+ * Patterns, not names, wherever the pattern is unambiguous: a new artifact
+ * appearing upstream is then filtered on arrival instead of waiting for
+ * someone to notice it. Every rule below was run against the full VIC/QLD
+ * delivery-area set and the complete list of names it removes was reviewed by
+ * hand; that list is recorded in
+ * .superpowers/sdd/2026-08-25-areas-vic-qld/final-fix-report.md.
+ *
+ * Rules CONSIDERED AND REJECTED, because the dataset proved them unsafe:
+ *   / CITY$/     takes BRISBANE CITY, the CBD locality.
+ *   / CENTRAL$/  takes HAMILTON CENTRAL, LOGAN CENTRAL, SPRINGFIELD CENTRAL,
+ *                WYNNUM CENTRAL, KINGLAKE CENTRAL.
+ *   / GARDENS$/  takes ASPENDALE GARDENS, CYPRESS GARDENS, FLORIDA GARDENS.
+ *   / TERRACE$/  takes PETRIE TERRACE.
+ * Those cases are handled by name in NON_SUBURB_LOCALITIES instead.
+ *
+ * AIRPORT WEST matches none of these and survives, as do BROADMEADOWS and
+ * BROADBEACH — the street-type rule is word-anchored, so the "ROAD" inside
+ * "bROADmeadows" is not a match.
+ */
+const NON_SUBURB_PATTERNS: readonly RegExp[] = [
+  // Post office / delivery facility suffixes: BOORAN ROAD PO, HEATHWOOD DF,
+  // BRISBANE GPO. No VIC/QLD locality ends in a bare PO, GPO, LPO or DF.
+  / (PO|GPO|LPO|DF)$/,
+  // Spelled-out postal outlets: HEALESVILLE POST SHOP, MARSDEN POSTAL DEPOT.
+  /\b(POST SHOP|POSTAL DEPOT|POST OFFICE)\b/,
+  // Shopping centres and one immigration detention centre: CHADSTONE CENTRE,
+  // KNOX CITY CENTRE, HELENSVALE TOWN CENTRE, WACOL EAST IMMIGRATION CENTRE,
+  // Q SUPERCENTRE. No locality in either state ends in CENTRE.
+  / (SUPER)?CENTRE$/,
+  // Shopping centres named "... Fair": AUSTRALIA FAIR, PACIFIC FAIR, BOOVAL
+  // FAIR. A suburb that merely contains "fair" (FAIRFIELD, FAIRNEY VIEW) does
+  // not match, because the rule needs FAIR as the final word.
+  / FAIR$/,
+  // Street-address delivery rows: BEDFORD ROAD, NORTH ROAD, BRENTFORD SQUARE,
+  // ST KILDA ROAD CENTRAL, CHAPEL STREET NORTH, WYNNUM PLAZA. A street type
+  // anywhere in the name, not only at the end, so a trailing compass direction
+  // on the postal variants does not let them through.
+  /\b(ROAD|STREET|SQUARE|PLAZA)\b/,
+  // RAAF bases: LAVERTON RAAF, WILLIAMS RAAF. Same class as the university and
+  // hospital delivery areas already excluded by name.
+  / RAAF$/,
+];
 
 /**
  * Councils the dataset gets wrong or omits, keyed by postcode.
@@ -278,6 +377,7 @@ for (const r of rows) {
   const name = r.locality.toUpperCase();
   if (NON_SUBURB_LOCALITIES.has(name)) continue;
   if (NON_SUBURB_SUFFIX.test(name)) continue;
+  if (NON_SUBURB_PATTERNS.some((pattern) => pattern.test(name))) continue;
 
   const council =
     COUNCIL_OVERRIDES_BY_LOCALITY[name] ??

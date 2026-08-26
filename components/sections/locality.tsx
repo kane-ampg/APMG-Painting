@@ -118,31 +118,67 @@ const factLink =
   'rounded underline decoration-paper-edge underline-offset-4 hover:decoration-brand-600 ' +
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600';
 
-/** Region, council, postcode and the distance band — the page's quick facts. */
+/**
+ * Region, council, postcode and — in Victoria only — the drive band.
+ *
+ * The fourth fact used to be a distance-and-drive-band on every page in both
+ * states. In Victoria that is a real fact: APMG works from Bayswater North,
+ * every VIC locality's `distanceKm` is measured from it, and "a drive of 20 to
+ * 40 minutes" is the thing a facilities manager is actually asking about.
+ *
+ * In Queensland it was neither true nor even coherent. The QLD anchor labels
+ * are region names, so `/areas/queensland/brisbane-inner/brisbane-city/` read
+ * "0.0km from Brisbane — a drive of under 20 minutes" and Southport read
+ * "0.5km from Gold Coast": a tautology on 542 pages and a bare proximity claim
+ * on the other 370. Worse, no base was named, so "a drive of under 20 minutes"
+ * read as APMG's mobilisation time to that suburb — the strongest presence
+ * implication anywhere on the site, and false. APMG has no Queensland address,
+ * crew or phone number.
+ *
+ * So Queensland gets a different fourth fact, one that is true: how APMG
+ * services the suburb, and the absence a reader needs in order to read the rest
+ * of the page correctly. No distance, no drive time, no anchor.
+ * tests/unit/qld-copy.test.ts renders this card for every Queensland locality
+ * and fails if any distance or drive-time phrasing reappears.
+ */
 export function LocalityFacts({ locality }: { locality: Locality }) {
   const label = anchorLabel(locality);
   const band = driveBand(locality.distanceKm);
   const state = locality.state === 'VIC' ? 'victoria' : 'queensland';
+  const name = displayName(locality.name);
+  const region = getRegion(locality.regionSlug)?.name ?? locality.regionSlug;
 
   return (
     <Card>
       <dl className="grid gap-5 sm:grid-cols-2">
         <Fact label="Region">
           <Link href={`/areas/${state}/${locality.regionSlug}/`} className={factLink}>
-            {getRegion(locality.regionSlug)?.name ?? locality.regionSlug}
+            {region}
           </Link>
         </Fact>
         <Fact label={locality.postcodes.length > 1 ? 'Postcodes' : 'Postcode'}>
           {locality.postcodes.join(', ')}
         </Fact>
         <Fact label="Local government area">{locality.council.name}</Fact>
-        <Fact label="Distance">
-          {/* "a drive of under 20 minutes", not "roughly a under 20 minutes
-              drive" — the band is a phrase, not an adjective. */}
-          {locality.state === 'VIC'
-            ? `${km(locality.distanceKm)} from our ${label} base — a drive of ${band}.`
-            : `${km(locality.distanceKm)} from ${label} — a drive of ${band}.`}
-        </Fact>
+        {locality.state === 'VIC' ? (
+          <Fact label="Distance">
+            {/* "a drive of under 20 minutes", not "roughly a under 20 minutes
+                drive" — the band is a phrase, not an adjective.
+
+                `slug === anchorKey` is the locality that IS the anchor:
+                Bayswater North, which is both APMG's own suburb and a Tier 1
+                indexed page. Its dataset centroid sits 2.2km from the anchor
+                centroid, so the general branch printed "2.2km from our
+                Bayswater North base" on the Bayswater North page. */}
+            {locality.slug === locality.anchorKey
+              ? `Our ${label} base is in ${name} itself.`
+              : `${km(locality.distanceKm)} from our ${label} base — a drive of ${band}.`}
+          </Fact>
+        ) : (
+          <Fact label="How it is serviced">
+            {`Quoted and programmed as part of ${region}. APMG works from Victoria and holds no Queensland address or crew, so access and travel are priced per site.`}
+          </Fact>
+        )}
       </dl>
     </Card>
   );
@@ -205,12 +241,20 @@ export function NearestProjectBlock({ locality }: { locality: Locality }) {
 /**
  * The six nearest localities, as links. Traversable from noindex pages too.
  *
- * The 209 rural-fringe localities carry no neighbours at all — they are held
+ * The 207 rural-fringe localities carry no neighbours at all — they are held
  * out of every neighbour list on purpose, because a farm township is not a
  * neighbouring suburb in any sense a facilities manager would use the word.
  * Returning null there left a hole in one of the six facts spec §8 requires on
  * every suburb page, so the slot now says what is true of those places instead
  * and points at the region hub, which is the genuinely useful nearby link.
+ *
+ * What it must not do is turn that data rule into a claim about the map. This
+ * block used to read "{name} has no adjoining suburb — what surrounds it is
+ * farmland and township", asserted on all 207 fringe pages, and it is simply
+ * false: Powelltown adjoins Yarra Junction and Three Bridges, both of which
+ * have pages on this site. An empty `neighbourHrefs` is a decision about which
+ * localities are worth linking, not a fact about what physically borders the
+ * place. The copy now says which of the two it is.
  */
 export function NearbySuburbs({ locality }: { locality: Locality }) {
   const neighbours = locality.neighbourHrefs
@@ -227,15 +271,18 @@ export function NearbySuburbs({ locality }: { locality: Locality }) {
         <SectionHeading className="mb-4">Nearby</SectionHeading>
         <div className="max-w-prose space-y-4 text-ink-soft">
           <p>
-            {name} has no adjoining suburb — what surrounds it is farmland and township, which is
-            what makes travel and mobilisation a real share of the cost of a job out here, and why a
-            rural site cannot be assumed to have hardstand for a lift or three-phase power.
-          </p>
-          <p>
+            The suburb-to-suburb links elsewhere on this site are built from the commercial
+            localities only, and {name} is farmland and township — so the localities around it are
+            listed on the region hub rather than linked from here.{' '}
             <Link href={regionHref} className={factLink}>
               {region?.name ?? locality.regionSlug}
             </Link>{' '}
             is the wider area {name} sits in, and lists every locality covered.
+          </p>
+          <p>
+            Worth saying what that rural setting means for a job rather than for a link list: travel
+            and mobilisation are a real share of the cost out here, and a rural site cannot be
+            assumed to have hardstand for a lift or three-phase power.
           </p>
         </div>
       </div>

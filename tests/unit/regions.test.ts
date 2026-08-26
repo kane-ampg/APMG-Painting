@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { REGIONS, isRuralFringe, resolveRegion } from '@/lib/locations/regions';
+import {
+  REGIONS,
+  isRuralFringe,
+  regionInSentence,
+  regionLocative,
+  resolveRegion,
+} from '@/lib/locations/regions';
 
 /**
  * The region model, spec §4.2.
@@ -116,5 +122,54 @@ describe('rural fringe', () => {
   it('does not treat an ordinary metropolitan council as fringe', () => {
     expect(isRuralFringe('Maroondah', 'BAYSWATER NORTH')).toBe(false);
     expect(isRuralFringe('Brisbane', 'ACACIA RIDGE')).toBe(false);
+  });
+});
+
+/**
+ * How a region name reads inside a sentence.
+ *
+ * The region H1 was `Commercial painting in ${name}`, which produced
+ * "Commercial painting in Gold Coast". The fix is per-region data rather than a
+ * special case for that one string, so this asserts the reading of all 22 —
+ * including the 15 that need no article, because those are the ones a
+ * well-meaning edit would break by giving every region a "the".
+ */
+describe('region names inside a sentence', () => {
+  it('gives every region a locative phrase that reads correctly', () => {
+    const expected: Record<string, string> = {
+      'inner-melbourne': 'in Inner Melbourne',
+      'inner-east': 'in the Inner East',
+      eastern: 'in Eastern Melbourne',
+      'south-east': 'in South East Melbourne',
+      'bayside-and-peninsula': 'across Bayside & the Peninsula',
+      northern: 'in Northern Melbourne',
+      'north-west': 'in North West Melbourne',
+      western: 'in Western Melbourne',
+      'yarra-valley-and-hinterland': 'in the Yarra Valley & Hinterland',
+      'brisbane-inner': 'in Inner Brisbane',
+      'brisbane-north': 'in Brisbane North',
+      'brisbane-east': 'in Brisbane East',
+      'brisbane-south': 'in Brisbane South',
+      'brisbane-west': 'in Brisbane West',
+      ipswich: 'in Ipswich',
+      logan: 'in Logan',
+      redlands: 'in the Redlands',
+      'moreton-bay': 'in Moreton Bay',
+      'sunshine-coast': 'on the Sunshine Coast',
+      noosa: 'in Noosa',
+      'gold-coast': 'on the Gold Coast',
+      'seq-hinterland': 'in the South East Queensland Hinterland',
+    };
+    expect(Object.keys(expected)).toHaveLength(22);
+    for (const region of REGIONS) {
+      expect(regionLocative(region), region.slug).toBe(expected[region.slug]);
+    }
+  });
+
+  it('reads correctly after "across", which is the other frame the hub uses', () => {
+    const goldCoast = REGIONS.find((r) => r.slug === 'gold-coast');
+    const ipswich = REGIONS.find((r) => r.slug === 'ipswich');
+    expect(`across ${regionInSentence(goldCoast!)}`).toBe('across the Gold Coast');
+    expect(`across ${regionInSentence(ipswich!)}`).toBe('across Ipswich');
   });
 });

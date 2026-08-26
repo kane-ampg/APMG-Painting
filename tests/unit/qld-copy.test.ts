@@ -1,6 +1,9 @@
 import { readFileSync } from 'node:fs';
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { allLocalities } from '@/lib/locations';
+import { driveBand, LocalityFacts } from '@/components/sections/locality';
 import { COUNCILS } from '@/content/councils';
 
 /**
@@ -108,5 +111,61 @@ describe('one LocalBusiness, no Queensland entity', () => {
     const source = readFileSync('lib/site.ts', 'utf8');
     expect(source).not.toMatch(/QLD'/);
     expect(source).toMatch(/suburb: 'Bayswater North'/);
+  });
+});
+
+/**
+ * The class of defect a phrase list cannot catch.
+ *
+ * FORBIDDEN above is a grep over source and content. It never fired on the
+ * worst Queensland claim on the site, because that claim contained none of its
+ * phrases: the facts card printed "0.0km from Brisbane — a drive of under 20
+ * minutes" on every Queensland suburb page. No base was named, so the drive
+ * band read as APMG's mobilisation time to that suburb — the strongest presence
+ * implication anywhere on the site — and on 542 pages the distance was a
+ * tautology besides ("0.5km from Gold Coast", on Southport).
+ *
+ * A phrase list could not see it because the sentence is assembled from data at
+ * render time. So this renders the component instead, over every Queensland
+ * locality, and asserts the absence of the *shape*: no distance, no drive band,
+ * no travel-time unit. Any future edit that puts a QLD page's distance back —
+ * however it is worded — fails here.
+ */
+describe('no Queensland page states a distance or a drive time', () => {
+  const qld = allLocalities().filter((l) => l.state === 'QLD');
+  // Every band the function can emit, sampled at one distance per bucket.
+  const bands = [0, 20, 35, 60].map(driveBand);
+
+  it('has Queensland localities to check', () => {
+    expect(qld.length).toBeGreaterThan(700);
+  });
+
+  it('renders no distance, drive band or travel-time unit on any QLD facts card', () => {
+    for (const locality of qld) {
+      const html = renderToStaticMarkup(createElement(LocalityFacts, { locality }));
+      expect(html, `${locality.name}: prints a distance`).not.toMatch(/\d+(\.\d+)?km/);
+      expect(html, `${locality.name}: prints a drive`).not.toMatch(/\bdrive\b/i);
+      expect(html, `${locality.name}: prints a travel time`).not.toMatch(
+        /\bminutes\b|\ban hour\b/i,
+      );
+      for (const band of bands) {
+        expect(html, `${locality.name}: "${band}"`).not.toContain(band);
+      }
+    }
+  });
+
+  it('keeps the drive band in Victoria, so the branch is a decision and not an omission', () => {
+    const vic = allLocalities().find((l) => l.state === 'VIC' && l.slug !== l.anchorKey);
+    expect(vic).toBeDefined();
+    const html = renderToStaticMarkup(createElement(LocalityFacts, { locality: vic! }));
+    expect(html).toMatch(/km from our Bayswater North base/);
+    expect(html).toContain('a drive of');
+  });
+
+  it('prints no zero-distance tautology on any page in either state', () => {
+    for (const locality of allLocalities()) {
+      const html = renderToStaticMarkup(createElement(LocalityFacts, { locality }));
+      expect(html, locality.name).not.toMatch(/\b0\.0km\b/);
+    }
   });
 });

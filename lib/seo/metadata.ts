@@ -12,7 +12,7 @@ type BuildMetadataArgs = {
    * Crawl-the-links directive, deliberately independent of `index`.
    *
    * These were one flag until it was noticed that it shipped `nofollow` on
-   * every noindex page. The 1,424 Tier 3 suburb pages are noindex *so that*
+   * every noindex page. The 1,371 Tier 3 suburb pages are noindex *so that*
    * they can still be crawled and pass equity up to the 22 region hubs — that
    * is the entire argument for generating them. `nofollow` turns them into
    * dead ends and deletes the internal-link architecture the plan rests on.

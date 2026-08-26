@@ -296,11 +296,27 @@ test.describe('quote chat under reduced motion', () => {
 });
 
 test.describe('technical endpoints', () => {
-  test('robots.txt renders and blocks crawling of the preview', async ({ request }) => {
+  /*
+   * This used to assert `toContain('Disallow: /')`, from when the sandbox was
+   * locked out of the index. The lockdown is gone, and the assertion survived
+   * it by matching the `Disallow: /api/` substring — it would have passed on
+   * any robots.txt with any Disallow line in it, including one that blocked the
+   * whole site. It now asserts what the live file has to say.
+   */
+  test('robots.txt opens the site, keeps /api/ out and names the sitemap', async ({ request }) => {
     const response = await request.get('/robots.txt');
     expect(response.status()).toBe(200);
     const body = await response.text();
-    expect(body).toContain('Disallow: /');
+    expect(body).toMatch(/^User-Agent: \*$/im);
+    expect(body).toMatch(/^Allow: \/$/im);
+    expect(body).toMatch(/^Disallow: \/api\/$/im);
+    expect(body).toMatch(/^Sitemap: https?:\/\/\S+\/sitemap\.xml$/im);
+    // Nothing may blanket-disallow the site: a bare `Disallow: /` would.
+    expect(body).not.toMatch(/^Disallow: \/$/im);
+    // The answer engines are named explicitly so a later blanket rule cannot
+    // quietly lock them out (app/robots.ts).
+    expect(body).toContain('GPTBot');
+    expect(body).toContain('ClaudeBot');
   });
 
   test('sitemap.xml renders as valid XML', async ({ request }) => {
@@ -318,8 +334,18 @@ test.describe('technical endpoints', () => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText(/not here/i);
   });
 
-  test('corrected suburb slugs redirect permanently', async ({ page }) => {
-    await page.goto('/areas/painters-park-dale/');
-    await expect(page).toHaveURL(/\/areas\/painters-parkdale\//);
+  /*
+   * The destination is the nested /areas/{state}/{region}/{suburb}/ page, not
+   * the flat /areas/painters-parkdale/ this used to assert — that URL has not
+   * existed since the areas tree was nested, so the assertion was failing.
+   * The region segment is matched as a pattern rather than spelled out, so
+   * moving Parkdale between regions does not break the test; what matters is
+   * that a legacy typo slug still lands on the real Parkdale page.
+   */
+  test('corrected suburb slugs redirect permanently to the nested page', async ({ page }) => {
+    const response = await page.goto('/areas/painters-park-dale/');
+    expect(response?.status()).toBe(200);
+    await expect(page).toHaveURL(/\/areas\/victoria\/[a-z0-9-]+\/parkdale\/$/);
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(/Parkdale/i);
   });
 });

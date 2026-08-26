@@ -106,7 +106,7 @@ describe('areaServed after the VIC + QLD expansion', () => {
   const business = localBusinessSchema() as Record<string, unknown>;
   const areas = business.areaServed as Record<string, unknown>[];
 
-  it('does not enumerate 1,440 suburbs into sitewide JSON-LD', () => {
+  it('does not enumerate 1,387 suburbs into sitewide JSON-LD', () => {
     expect(areas.length).toBeLessThan(20);
   });
 

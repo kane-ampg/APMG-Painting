@@ -13,9 +13,9 @@ import {
 import { qldPresence } from '@/content/locations.overrides';
 
 /**
- * Tiers and indexability — the mechanism that makes 1,440 pages safe.
+ * Tiers and indexability — the mechanism that makes 1,387 pages safe.
  *
- * 16 indexable pages, not 1,440. If this count moves, someone has changed the
+ * 16 indexable pages, not 1,387. If this count moves, someone has changed the
  * risk profile of the whole site and should have to say so in a diff.
  */
 
@@ -39,7 +39,7 @@ describe('indexability', () => {
   });
 
   it('marks every other locality noindex', () => {
-    expect(allLocalities().filter((l) => !l.indexable)).toHaveLength(1424);
+    expect(allLocalities().filter((l) => !l.indexable)).toHaveLength(1371);
   });
 
   it('never marks a Tier 3 locality indexable', () => {
@@ -60,9 +60,9 @@ describe('hrefs', () => {
     expect(allLocalities().filter((l) => l.href.startsWith('/locations/'))).toEqual([]);
   });
 
-  it('gives 1,440 unique hrefs', () => {
+  it('gives 1,387 unique hrefs', () => {
     const hrefs = allLocalities().map((l) => l.href);
-    expect(new Set(hrefs).size).toBe(1440);
+    expect(new Set(hrefs).size).toBe(1387);
   });
 
   it('round-trips through getLocalityByHref', () => {
@@ -122,12 +122,12 @@ describe('state and region helpers', () => {
     expect(regionsInState('QLD')).toHaveLength(13);
   });
 
-  it('accounts for all 1,440 localities across the 22 regions', () => {
+  it('accounts for all 1,387 localities across the 22 regions', () => {
     const total = [...regionsInState('VIC'), ...regionsInState('QLD')].reduce(
       (sum, r) => sum + localitiesInRegion(r.slug).length,
       0,
     );
-    expect(total).toBe(1440);
+    expect(total).toBe(1387);
   });
 });
 

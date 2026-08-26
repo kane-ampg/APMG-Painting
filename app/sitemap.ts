@@ -23,7 +23,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/trade-services/', priority: 0.6 },
     { path: '/about-us/', priority: 0.5 },
     { path: '/contact-us/', priority: 0.7 },
-    { path: '/areas/', priority: 0.5 },
+    /*
+     * /areas/ sits above the two state hubs and the 22 region hubs, so it
+     * cannot be priced below them. It was 0.5 — under its own children at 0.7
+     * — which told Google the least important page in the /areas/ tree was its
+     * root. It is the entry point to the largest section of the site.
+     */
+    { path: '/areas/', priority: 0.8 },
     { path: '/areas/victoria/', priority: 0.7 },
     { path: '/areas/queensland/', priority: 0.7 },
   ];

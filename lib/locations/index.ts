@@ -1,7 +1,7 @@
 import generated from '@/content/locations.generated.json';
 import { getCouncil, type Council } from '@/content/councils';
 import { localityOverrides, qldPresence, TIER_1_OVERRIDES } from '@/content/locations.overrides';
-import { REGIONS } from './regions';
+import { REGIONS, regionInSentence, regionLocative } from './regions';
 import type { GeneratedLocality, RegionDef, StateKey, Tier } from './types';
 
 export type Locality = Omit<GeneratedLocality, 'council'> & {
@@ -127,5 +127,5 @@ export function hrefForVicSlug(slug: string): string | undefined {
   return ALL.find((l) => l.state === 'VIC' && l.slug === slug)?.href;
 }
 
-export { REGIONS };
+export { REGIONS, regionInSentence, regionLocative };
 export type { RegionDef, StateKey };
