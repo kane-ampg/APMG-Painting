@@ -94,7 +94,7 @@ export default async function RegionPage({ params }: Props) {
       <Container width="wide">
         <Breadcrumbs
           crumbs={[
-            { name: 'Areas we service', path: '/areas/' },
+            { name: 'Service areas', path: '/areas/' },
             { name: vic ? 'Victoria' : 'Queensland', path: `/areas/${state}/` },
             { name: regionDef.name, path: `/areas/${state}/${region}/` },
           ]}

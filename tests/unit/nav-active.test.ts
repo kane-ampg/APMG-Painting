@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { isCurrentPage, isSamePath, navActiveState } from '@/lib/nav/active';
-import { mainNav } from '@/components/navigation/nav-data';
+import { footerNav, mainNav } from '@/components/navigation/nav-data';
 
 /** The Commercial item, which is the only one with a non-URL child hierarchy. */
 const commercial = mainNav.find((item) => item.label === 'Commercial');
@@ -95,5 +95,50 @@ describe('navActiveState', () => {
       const marked = mainNav.filter((other) => navActiveState(item.href, other) === 'page');
       expect(marked.map((m) => m.label)).toEqual([item.label]);
     }
+  });
+});
+
+describe('Service Areas in the navigation', () => {
+  const areas = mainNav.find((item) => item.label === 'Service Areas');
+
+  it('appears in the main nav', () => {
+    expect(areas).toBeDefined();
+    expect(areas?.href).toBe('/areas/');
+  });
+
+  it('sits between Commercial and Projects', () => {
+    const labels = mainNav.map((i) => i.label);
+    expect(labels.indexOf('Service Areas')).toBeGreaterThan(labels.indexOf('Commercial'));
+    expect(labels.indexOf('Service Areas')).toBeLessThan(labels.indexOf('Projects'));
+  });
+
+  it('offers an overview and both states', () => {
+    expect(areas?.children?.map((c) => c.href)).toEqual([
+      '/areas/',
+      '/areas/victoria/',
+      '/areas/queensland/',
+    ]);
+  });
+
+  it('marks Areas as the section for a deep suburb page', () => {
+    expect(areas).toBeDefined();
+    if (!areas) return;
+    expect(navActiveState('/areas/victoria/eastern/vermont/', areas)).toBe('section');
+    expect(navActiveState('/areas/queensland/gold-coast/molendinar/', areas)).toBe('section');
+  });
+
+  it('marks Areas as the current page only on /areas/ itself', () => {
+    expect(areas).toBeDefined();
+    if (!areas) return;
+    expect(navActiveState('/areas/', areas)).toBe('page');
+    expect(navActiveState('/commercial/', areas)).toBe(false);
+  });
+
+  it('lists the areas column in the footer', () => {
+    expect(footerNav.areas.map((l) => l.href)).toEqual([
+      '/areas/',
+      '/areas/victoria/',
+      '/areas/queensland/',
+    ]);
   });
 });

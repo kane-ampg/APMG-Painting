@@ -50,7 +50,7 @@ export default function AreasPage() {
   return (
     <>
       <Container width="wide">
-        <Breadcrumbs crumbs={[{ name: 'Areas we service', path: '/areas/' }]} />
+        <Breadcrumbs crumbs={[{ name: 'Service areas', path: '/areas/' }]} />
       </Container>
 
       <Section tone="sunken" className="py-10" reveal={false}>

@@ -24,6 +24,15 @@ export const mainNav: readonly NavItem[] = [
         .map((s) => ({ label: s.shortTitle, href: s.legacyPath })),
     ],
   },
+  {
+    label: 'Service Areas',
+    href: '/areas/',
+    children: [
+      { label: 'Service areas', href: '/areas/', description: 'Overview' },
+      { label: 'Victoria', href: '/areas/victoria/' },
+      { label: 'Queensland', href: '/areas/queensland/' },
+    ],
+  },
   { label: 'Projects', href: '/projects/' },
   { label: 'Trade services', href: '/trade-services/' },
   { label: 'About', href: '/about-us/' },
@@ -39,7 +48,11 @@ export const footerNav = {
   company: [
     { label: 'About us', href: '/about-us/' },
     { label: 'Projects', href: '/projects/' },
-    { label: 'Areas we service', href: '/areas/' },
     { label: 'Contact us', href: '/contact-us/' },
+  ],
+  areas: [
+    { label: 'Service areas', href: '/areas/' },
+    { label: 'Victoria', href: '/areas/victoria/' },
+    { label: 'Queensland', href: '/areas/queensland/' },
   ],
 } as const;

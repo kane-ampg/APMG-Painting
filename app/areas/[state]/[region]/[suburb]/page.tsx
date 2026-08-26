@@ -74,7 +74,7 @@ export default async function SuburbPage({ params }: Props) {
       <Container width="wide">
         <Breadcrumbs
           crumbs={[
-            { name: 'Areas we service', path: '/areas/' },
+            { name: 'Service areas', path: '/areas/' },
             { name: vic ? 'Victoria' : 'Queensland', path: `/areas/${state}/` },
             { name: regionName, path: `/areas/${state}/${region}/` },
             { name, path: locality.href },

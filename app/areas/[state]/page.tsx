@@ -67,7 +67,7 @@ export default async function StatePage({ params }: Props) {
       <Container width="wide">
         <Breadcrumbs
           crumbs={[
-            { name: 'Areas we service', path: '/areas/' },
+            { name: 'Service areas', path: '/areas/' },
             { name: NAMES[key], path: `/areas/${state}/` },
           ]}
         />
