@@ -4,7 +4,6 @@ import { buildMetadata } from '@/lib/seo/metadata';
 import {
   CtaBand,
   ContentBlock,
-  FactStrip,
   FaqList,
   FeatureGrid,
   HomeHero,
@@ -14,19 +13,17 @@ import {
   SectorGrid,
   ServiceAreas,
   ServiceGrid,
-  TestimonialBlock,
-  TrustBar,
 } from '@/components/sections';
 import { JsonLd } from '@/components/seo/json-ld';
 import { ButtonLink, Container, Prose, Section, SectionHeading } from '@/components/ui';
 import { faqSchema } from '@/lib/schema';
+import { differentiators } from '@/content/approach';
 import { homeFaqs } from '@/content/faqs';
-import { locations } from '@/content/locations';
-import { featuredProjects, getProject } from '@/content/projects';
+import { indexableLocalities } from '@/lib/locations';
+import { featuredProjects } from '@/content/projects';
 import { googleAggregate } from '@/content/reviews';
 import { sectors } from '@/content/sectors';
 import { services } from '@/content/services';
-import { isPlaceholder } from '@/lib/content/types';
 import { site } from '@/lib/site';
 
 /**
@@ -58,71 +55,37 @@ export const metadata: Metadata = buildMetadata({
 const PROCESS = [
   {
     step: 'Enquiry',
+    icon: 'enquiry',
     body: 'Tell us the building, the areas involved and when we are allowed on site. Those three answers are what decide whether a site assessment can be scheduled.',
   },
   {
     step: 'Site visit',
+    icon: 'site-visit',
     body: 'We attend before quoting. Scope, substrate condition, access and the hours we are allowed to work get established rather than assumed.',
   },
   {
     step: 'Written scope and quote',
+    icon: 'quote',
     body: 'An itemised breakdown covering labour, materials and scheduling — per location where the work spans several sites — so you can see where the cost actually sits.',
   },
   {
     step: 'Staged delivery',
+    icon: 'delivery',
     body: 'Work sequenced zone by zone or after hours so the building keeps operating. Access planned per area: ladders, scaffolding, scissor lift or EWP as each space requires.',
   },
   {
     step: 'Handover',
+    icon: 'handover',
     body: 'Areas cleaned down and handed back progressively rather than all at the end, so the site regains the use of each space as it is finished.',
-  },
-] as const;
-
-/**
- * How the work is actually run. Each item summarises something stated at length
- * in content/services.ts or content/faqs.ts — this grid is a table of contents
- * for that detail, not a set of claims of its own.
- */
-const APPROACH = [
-  {
-    heading: 'We attend before we quote',
-    body: 'Preparation is the largest variable in any painting job, and it cannot be judged from a photograph or a floor area. Attending first is what stops a quote turning into a variation.',
-  },
-  {
-    heading: 'The building keeps running',
-    body: 'Schools mid-term, clinics between patients, warehouses mid-shift. Zones are isolated, work is staged or run after hours, and each area is handed back as it finishes.',
-  },
-  {
-    heading: 'Preparation matched to the substrate',
-    body: 'Existing coatings identified and the surface assessed before anything is specified — hot or cold power washing, steam cleaning, abrasion or chemical treatment, depending on what we find.',
-  },
-  {
-    heading: 'Access planned per elevation',
-    body: 'Not site-wide. Multi-level and hard-to-reach areas are reached with the appropriate equipment rather than the most convenient one, and exterior work is scheduled around suitable weather.',
-  },
-  {
-    heading: 'An itemised number, not one figure',
-    body: 'Labour, materials and scheduling are broken out, and multi-site programmes are broken down per location, so a budget holder can see what they are approving.',
-  },
-  {
-    heading: 'One programme for the adjacent trades',
-    body: 'Plastering, patching, rendering, tiling, flooring and making good coordinated under the same programme, because the gap between trades is what usually stalls a job.',
   },
 ] as const;
 
 export default function HomePage() {
   const yearsTrading = new Date().getFullYear() - site.founded;
 
-  // The one attributable testimonial APMG has published. The other four
-  // projects carry an editorial placeholder instead, and that holds here too:
-  // one real quote rather than three invented ones.
-  const quoted = getProject('case-study-factory-exterior-painting-in-noble-park-victoria');
-  const testimonial =
-    quoted?.testimonial && !isPlaceholder(quoted.testimonial) ? quoted.testimonial : null;
-
   return (
     <>
-      <JsonLd data={faqSchema(homeFaqs)} />
+      <JsonLd data={faqSchema([...differentiators, ...homeFaqs])} />
 
       <HomeHero
         eyebrow="Melbourne painting contractor"
@@ -144,35 +107,6 @@ export default function HomePage() {
           alt: 'Melbourne from the air over Docklands, looking across the Yarra to the CBD skyline',
         }}
         scrollTo={{ label: 'What we paint', href: '#services' }}
-      />
-
-      <TrustBar />
-
-      <FactStrip
-        facts={[
-          {
-            label: 'In business',
-            figure: `${yearsTrading} years`,
-            detail: `${site.legalName} was founded in ${site.founded} and has grown into a painting and property maintenance contractor.`,
-          },
-          {
-            label: 'Client rating',
-            figure: `${googleAggregate.rating.toFixed(1)} on Google`,
-            detail: `Averaged across ${googleAggregate.count} reviews from schools, healthcare, strata, retail and industrial clients.`,
-          },
-          {
-            label: 'Commercial sectors',
-            figure: String(sectors.length),
-            detail:
-              'Each with its own access, compliance and scheduling constraints, set out sector by sector.',
-          },
-          {
-            label: 'Workmanship warranty',
-            figure: '5 years',
-            detail:
-              'Backed by the Dulux Accredited Painter programme, covering peeling, flaking and blistering.',
-          },
-        ]}
       />
 
       <ContentBlock eyebrow="Services" heading="What we paint" id="services" width="wide">
@@ -211,15 +145,18 @@ export default function HomePage() {
       <ContentBlock
         tone="sunken"
         eyebrow="How we work"
-        heading="What actually makes the difference"
+        heading="How to choose a commercial painter in Melbourne"
       >
         <Prose className="mb-8">
           <p>
-            Almost nobody chooses a painter on the paint. The things below are what separate a job
-            that lands on time from one that does not.
+            Almost nobody chooses a painter on the paint. Six questions decide whether a commercial
+            job lands on time, and most quotes never answer them. Ask every contractor you are
+            considering — these are how APMG answers.
           </p>
         </Prose>
-        <FeatureGrid items={APPROACH} />
+        <FeatureGrid
+          items={differentiators.map((d) => ({ heading: d.question, body: d.answer }))}
+        />
       </ContentBlock>
 
       <Section tone="paper">
@@ -239,22 +176,10 @@ export default function HomePage() {
         </Container>
       </Section>
 
-      {testimonial && (
-        <ContentBlock eyebrow="In their words" heading="From a completed job">
-          <div className="max-w-2xl">
-            <TestimonialBlock
-              quote={testimonial.quote}
-              attribution={testimonial.attribution}
-              organisation={testimonial.organisation}
-            />
-          </div>
-        </ContentBlock>
-      )}
-
       <GoogleReviewWall />
 
       <ContentBlock eyebrow="Areas" heading="Where we work across Melbourne">
-        <ServiceAreas locations={locations} />
+        <ServiceAreas locations={indexableLocalities()} />
       </ContentBlock>
 
       <ContentBlock tone="sunken" heading="About APMG Painting">
@@ -262,8 +187,8 @@ export default function HomePage() {
           <p>
             APMG Painting was founded in {site.founded} and has grown into a painting and property
             maintenance contractor working across schools, healthcare, aged care, strata, retail and
-            industrial sites. Those clients rate the work {googleAggregate.rating.toFixed(1)} out of 5
-            across {googleAggregate.count} Google reviews.
+            industrial sites. Those clients rate the work {googleAggregate.rating.toFixed(1)} out of
+            5 across {googleAggregate.count} Google reviews.
           </p>
           <p>
             The approach has not changed much: do the work properly, keep the standard consistent,

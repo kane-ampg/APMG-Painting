@@ -7,7 +7,7 @@ import {
   serviceSchema,
 } from '@/lib/schema';
 import { getProject } from '@/content/projects';
-import { locations } from '@/content/locations';
+import { qldPresence } from '@/content/locations.overrides';
 import { site } from '@/lib/site';
 
 describe('structured data', () => {
@@ -38,17 +38,6 @@ describe('structured data', () => {
     // "HomeAndConstructionBusiness" also covers plumbers and roofers. The
     // painting-specific type is what makes the entity unambiguous.
     expect(localBusinessSchema()['@type']).toContain('HousePainter');
-  });
-
-  it('names every suburb it publishes a page for in areaServed', () => {
-    const served = JSON.stringify(localBusinessSchema().areaServed);
-    // "painters <suburb>" is the query a local trade can actually win, so
-    // each suburb has to appear as its own served area rather than being
-    // flattened into a single "Melbourne" node.
-    for (const location of locations) {
-      expect(served).toContain(location.suburb);
-    }
-    expect(served).toContain('Victoria');
   });
 
   it('omits geo and hours until they are confirmed', () => {
@@ -110,5 +99,44 @@ describe('structured data', () => {
     const schema = projectSchema(project);
     expect(schema.headline).toBe(project.title);
     expect(JSON.stringify(schema.contentLocation)).toContain('Vermont');
+  });
+});
+
+describe('areaServed after the VIC + QLD expansion', () => {
+  const business = localBusinessSchema() as Record<string, unknown>;
+  const areas = business.areaServed as Record<string, unknown>[];
+
+  it('does not enumerate 1,440 suburbs into sitewide JSON-LD', () => {
+    expect(areas.length).toBeLessThan(20);
+  });
+
+  it('names Victoria and the three Queensland service regions', () => {
+    const names = areas.map((a) => a.name).filter(Boolean);
+    expect(names).toContain('Victoria');
+    expect(names).toContain('Brisbane');
+    expect(names).toContain('Gold Coast');
+    expect(names).toContain('Sunshine Coast');
+  });
+
+  it('never labels a Queensland area as Victorian', () => {
+    const json = JSON.stringify(areas);
+    expect(json).not.toMatch(/"addressRegion":"VIC"[^}]*(Brisbane|Gold Coast|Sunshine)/);
+  });
+
+  it('emits exactly one LocalBusiness while qldPresence is false', () => {
+    // The brief's literal snippet checks `business['@type']).toBe('LocalBusiness')`,
+    // but `@type` here is `['HomeAndConstructionBusiness', 'HousePainter']` —
+    // that assignment sits outside the areaServedFragment lines this task
+    // scopes for lib/schema/index.ts, and changing it would drop the
+    // painting-specific type the "declares the specific trade" test above
+    // guards. Both types resolve to LocalBusiness in schema.org's hierarchy;
+    // asserted here as "still a LocalBusiness-family type" instead.
+    expect(qldPresence).toBe(false);
+    expect(business['@type']).toContain('HousePainter');
+  });
+
+  it('omits GeoCircle until APMG confirms the base coordinates', () => {
+    expect(site.coords).toBeNull();
+    expect(areas.some((a) => a['@type'] === 'GeoCircle')).toBe(false);
   });
 });

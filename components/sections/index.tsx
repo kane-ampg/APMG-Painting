@@ -1,8 +1,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
+import { ProcessIcon, type ProcessIconName } from '@/components/icons/process-icons';
 import { SectorIcon } from '@/components/icons/sector-icons';
 import { HeroReel } from '@/components/media/hero-reel';
+import { InView } from '@/components/motion/in-view';
+import { GoogleReviewCarousel } from '@/components/sections/google-review-carousel';
+import { GoogleMark, Stars } from '@/components/sections/review-parts';
 import {
   ButtonLink,
   Card,
@@ -10,19 +14,19 @@ import {
   Eyebrow,
   mediaZoom,
   microLabel,
-  Placeholder,
   SectionHeading,
   Section,
 } from '@/components/ui';
 import { cn } from '@/lib/utils';
-import { accreditationLogos, accreditations, site } from '@/lib/site';
+import { site } from '@/lib/site';
 import {
   averageRating,
   firstPartyReviews,
   googleAggregate,
   googleReviews,
 } from '@/content/reviews';
-import type { Faq, Location, Project, Sector, Service } from '@/lib/content/types';
+import { displayName, getRegion, type Locality } from '@/lib/locations';
+import type { Faq, Project, Sector, Service } from '@/lib/content/types';
 
 /* ------------------------------------------------------------------ */
 /* Hero                                                                 */
@@ -289,74 +293,6 @@ export function HomeHero({
 }
 
 /* ------------------------------------------------------------------ */
-/* Trust indicators                                                     */
-/* ------------------------------------------------------------------ */
-
-/**
- * Accreditations, as a logo wall.
- *
- * Only entries flagged `verified` in lib/site.ts are presented as credentials,
- * and only the four that carry a mark get a logo — the screening checks are
- * held per person, so badging them would imply a company-level certification
- * that does not exist. They are stated in words on the about page instead.
- *
- * Each mark sits on its own white chip. The four supplied files do not agree
- * on a background — MPA is transparent, the Dulux badge has white baked in and
- * Haymes a solid blue box — so dropping them straight onto the sunken band
- * showed the boxes. A chip normalises that, and heights are capped rather than
- * widths so the portrait MPA mark and the landscape Dulux one read at the same
- * optical weight.
- *
- * In colour, not greyscale: a faded accreditation badge reads as decoration,
- * and these are the strongest trust signal on the page.
- *
- * If nothing is verified the bar renders the gap rather than disappearing:
- * a silently empty trust bar looks identical to a business with no credentials.
- */
-export function TrustBar() {
-  if (accreditationLogos.length === 0) {
-    return (
-      <Section tone="sunken" reveal={false} className="py-8">
-        <Container>
-          <Placeholder
-            note={`accreditation logos and wording appear here once APMG supplies certificates for ${accreditations
-              .map((a) => a.label)
-              .join(', ')}. Nothing is displayed as verified until then.`}
-          />
-        </Container>
-      </Section>
-    );
-  }
-
-  return (
-    <Section tone="sunken" reveal={false} className="py-8 sm:py-10">
-      <Container>
-        <h2 className={cn(microLabel, 'mb-6 text-center text-ink-muted')}>
-          Accredited, prequalified and insured
-        </h2>
-        <ul className="flex flex-wrap items-center justify-center gap-4 sm:gap-5">
-          {accreditationLogos.map((item) => (
-            <li
-              key={item.id}
-              className="flex h-20 w-36 items-center justify-center rounded-lg border border-paper-edge bg-white px-4 py-3 sm:w-40"
-            >
-              <Image
-                src={item.logo!.src}
-                alt={item.logo!.alt}
-                width={item.logo!.width}
-                height={item.logo!.height}
-                className="max-h-full w-auto object-contain"
-              />
-              <span className="sr-only">{item.detail}</span>
-            </li>
-          ))}
-        </ul>
-      </Container>
-    </Section>
-  );
-}
-
-/* ------------------------------------------------------------------ */
 /* Cards: services, sectors, projects                                   */
 /* ------------------------------------------------------------------ */
 
@@ -370,46 +306,104 @@ export function TrustBar() {
  * reads competence off the set-up, the sheeting and the access equipment, not
  * off a finished wall that any painter can photograph.
  *
+ * It is no longer an even three-column grid, for two reasons. Five services
+ * into three columns left an orphan row of two, and the identical
+ * `sm:grid-cols-2 lg:grid-cols-3` shape runs three times down the homepage —
+ * here, then the sectors, then the projects. So the first service leads at the
+ * full width of the row with its photograph taking half the card, and the
+ * remaining four run beneath it, four across.
+ *
+ * Nothing is hidden behind an interaction. A carousel would have put three of
+ * the five services behind a click on the one section that answers what the
+ * company actually does, and the page already carries one at the review wall.
+ *
+ * The lead is `services[0]` rather than a slug named here, so reordering
+ * content/services.ts is what changes which service gets the large card.
+ *
  * Cards are not links. Services do not each have a page, so the frame carries
  * the house photo zoom and nothing else that would imply somewhere to click;
  * `image` stays optional so a service without a photograph still renders as
  * the plain card it used to be.
  */
 export function ServiceGrid({ services }: { services: readonly Service[] }) {
+  if (services.length === 0) return null;
+
   return (
-    <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      {services.map((service) => (
-        <li key={service.slug}>
-          <article className="group relative flex h-full flex-col overflow-hidden rounded-lg border border-paper-edge bg-white">
-            {service.image && (
-              <div className="relative aspect-[16/9] overflow-hidden bg-ink">
-                <Image
-                  src={service.image.src}
-                  alt={service.image.alt}
-                  fill
-                  loading="lazy"
-                  sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 100vw"
-                  className={`object-cover ${mediaZoom}`}
-                />
+    <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {services.map((service, index) => {
+        const lead = index === 0;
+
+        return (
+          <li key={service.slug} className={cn(lead && 'sm:col-span-2 lg:col-span-4')}>
+            <article
+              className={cn(
+                'group relative flex h-full flex-col overflow-hidden rounded-lg border border-paper-edge bg-white',
+                lead && 'lg:flex-row',
+              )}
+            >
+              {service.image && (
+                <div
+                  className={cn(
+                    'relative aspect-[16/9] overflow-hidden bg-ink',
+                    lead && 'lg:aspect-[3/2] lg:w-1/2 lg:shrink-0',
+                  )}
+                >
+                  <Image
+                    src={service.image.src}
+                    alt={service.image.alt}
+                    fill
+                    loading="lazy"
+                    sizes={
+                      lead
+                        ? '(min-width: 1024px) 50vw, 100vw'
+                        : '(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 100vw'
+                    }
+                    className={`object-cover ${mediaZoom}`}
+                  />
+                </div>
+              )}
+              <div
+                className={cn(
+                  'flex flex-1 flex-col gap-3 p-5',
+                  lead && 'gap-4 p-6 lg:justify-center lg:p-10',
+                )}
+              >
+                <h3
+                  className={cn(
+                    'font-display text-lg tracking-tight',
+                    lead && 'text-2xl lg:text-3xl',
+                  )}
+                >
+                  {service.title}
+                </h3>
+                <p
+                  className={cn(
+                    'flex-1 text-sm text-ink-soft',
+                    lead && 'max-w-prose flex-none text-base',
+                  )}
+                >
+                  {service.summary}
+                </p>
+                {lead && service.body[0] && (
+                  <p className="hidden max-w-prose text-sm text-ink-soft lg:block">
+                    {service.body[0]}
+                  </p>
+                )}
+                <ul className="mt-1 flex flex-wrap gap-1.5">
+                  {service.includes.slice(0, lead ? 5 : 3).map((item) => (
+                    <li
+                      key={item}
+                      className="rounded bg-paper-sunken px-2 py-1 text-xs font-medium text-ink-soft"
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </div>
-            )}
-            <div className="flex flex-1 flex-col gap-3 p-5">
-              <h3 className="font-display text-lg tracking-tight">{service.title}</h3>
-              <p className="flex-1 text-sm text-ink-soft">{service.summary}</p>
-              <ul className="mt-1 flex flex-wrap gap-1.5">
-                {service.includes.slice(0, 4).map((item) => (
-                  <li
-                    key={item}
-                    className="rounded bg-paper-sunken px-2 py-1 text-xs font-medium text-ink-soft"
-                  >
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </article>
-        </li>
-      ))}
+            </article>
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -504,12 +498,12 @@ export function FaqList({ items }: { items: readonly Faq[] }) {
   return (
     <div className="divide-y divide-paper-edge border-y border-paper-edge">
       {items.map((faq) => (
-        <details key={faq.question} className="group py-4">
+        <details key={faq.question} className="faq-accordion group py-4">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded font-semibold text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600">
             {faq.question}
             <span
               aria-hidden="true"
-              className="shrink-0 text-ink-muted transition-transform group-open:rotate-45 motion-reduce:transition-none"
+              className="shrink-0 text-ink-muted transition-transform duration-300 ease-out group-open:rotate-45 motion-reduce:transition-none"
             >
               +
             </span>
@@ -708,69 +702,102 @@ export function MediaBand({
  * cannot drift into describing the same process differently.
  *
  * Rendered as an <ol> because the order is the content — these are not
- * interchangeable features.
+ * interchangeable features. It is drawn as a rail for the same reason: this was
+ * a three-column card grid, which put the stages in a zigzag reading order and
+ * sat the last one beside a hole, and which made a sequence look exactly like
+ * the four unordered card grids surrounding it on the page. A process has a
+ * direction; nothing else in these sections does, and now nothing else looks
+ * like it.
+ *
+ * The stages stand on one rule, and a red line runs the length of it on a loop
+ * — drawing from Enquiry to Handover, lighting each stage's glyph as it reaches
+ * it, then clearing and going again. The loop is the same gesture as the fold
+ * seam in the hero. See `.process-rail` in app/globals.css for the timing and
+ * for why the rule's resting state is a fully drawn line.
+ *
+ * It runs on wall-clock time, not on scroll: `InView` pauses it whenever the
+ * rail is off screen, so it plays for exactly as long as it is being looked at
+ * and costs nothing the rest of the time. Scroll-linking it meant a reader who
+ * stopped moving got a half-drawn line, and a reader who flicked past got the
+ * whole sequence in three frames — neither of which is the sequence.
+ *
+ * The rule is horizontal from `lg`, with the numerals and glyphs standing on
+ * it; below that it rotates into the left gutter and the stages stack beside
+ * it. One relationship, two orientations — a timeline reads the same way turned
+ * on its side, and a five-across rail does not survive a phone.
  */
 export function ProcessSteps({
   steps,
   stepLabel = 'Stage',
 }: {
-  steps: readonly { step: string; body: string }[];
+  steps: readonly { step: string; body: string; icon?: ProcessIconName }[];
   stepLabel?: string;
 }) {
   return (
-    <ol className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {steps.map((item, index) => (
-        <Card as="li" key={item.step} className="gap-2">
-          <span className="text-xs font-semibold uppercase tracking-label text-brand-600">
-            {stepLabel} {index + 1}
-          </span>
-          <h3 className="font-display text-lg tracking-tight">{item.step}</h3>
-          <p className="text-sm text-ink-soft">{item.body}</p>
-        </Card>
-      ))}
-    </ol>
-  );
-}
+    <InView>
+      <ol
+        className="process-rail relative lg:flex lg:gap-10"
+        // The stage count drives the glyph stagger: each one lights when the
+        // line reaches its column, so the offsets have to know how many
+        // columns there are rather than assume five.
+        style={{ '--rail-count': steps.length } as CSSProperties}
+      >
+        {/*
+         * The rule, and the red line that draws along it. Inset by a few pixels
+         * on the vertical run so it starts at the first numeral rather than at
+         * the container's corner, and pinned to the numerals' baseline from
+         * `lg`.
+         */}
+        <span
+          aria-hidden="true"
+          className="absolute left-0 top-1 h-[calc(100%-0.5rem)] w-px bg-paper-edge lg:left-0 lg:top-16 lg:h-px lg:w-full"
+        />
+        <span
+          aria-hidden="true"
+          className="process-rail__progress absolute left-0 top-1 h-[calc(100%-0.5rem)] w-0.5 bg-brand-500 lg:left-0 lg:top-[3.9375rem] lg:h-0.5 lg:w-full"
+        />
 
-/* ------------------------------------------------------------------ */
-/* Figures                                                              */
-/* ------------------------------------------------------------------ */
+        {steps.map((item, index) => (
+          <li
+            key={item.step}
+            className="process-rail__step relative pb-9 pl-7 last:pb-0 lg:flex-1 lg:pb-0 lg:pl-0"
+            style={{ '--rail-index': index } as CSSProperties}
+          >
+            {/*
+             * The ordinal and the stage glyph, on one baseline, standing on the
+             * rule. The ordinal is at display size and quiet enough that the
+             * headings still lead the section — on a rail the numbers are how a
+             * reader works out where they are in the run. The glyph is what
+             * makes five columns of near-identical text tell themselves apart
+             * at a glance, and it is the thing the red line lights on its way
+             * past.
+             */}
+            <span
+              aria-hidden="true"
+              className="process-rail__marker flex items-end gap-2.5 text-ink-muted lg:h-16"
+            >
+              <span className="font-display text-4xl leading-none lg:text-5xl">{index + 1}</span>
+              <ProcessIcon
+                name={item.icon}
+                className="process-rail__glyph mb-0.5 h-6 w-6 shrink-0 lg:mb-1.5 lg:h-8 lg:w-8"
+              />
+            </span>
+            <span className="sr-only">
+              {stepLabel} {index + 1}
+            </span>
 
-/**
- * A black band of plain figures.
- *
- * Every value passed in must be derived from lib/site.ts or the content files,
- * never typed as a literal in the page — that is what stops a "500+ projects"
- * style claim appearing here later. Each figure carries a label precise enough
- * to be defensible on its own.
- */
-export function FactStrip({
-  facts,
-}: {
-  facts: readonly { figure: string; label: string; detail: string }[];
-}) {
-  return (
-    <Section tone="ink" className="border-t-4 border-brand-600 py-12 sm:py-14">
-      <Container width="wide">
-        <dl className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {facts.map((fact) => (
-            <div key={fact.label}>
-              <dt className="text-xs font-semibold uppercase tracking-label text-white/60">
-                {fact.label}
-              </dt>
-              <dd className="mt-2">
-                <span className="font-display text-3xl font-semibold leading-none tracking-tight text-brand-400">
-                  {fact.figure}
-                </span>
-                <span className="mt-2 block text-sm leading-relaxed text-white/70">
-                  {fact.detail}
-                </span>
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </Container>
-    </Section>
+            {/* Two lines' worth of room on the rail, so a stage whose name wraps
+                ("Written scope and quote") does not push its body a line below
+                its neighbours'. Across five columns that misalignment is the
+                first thing the eye finds. */}
+            <h3 className="mt-3 font-display text-lg tracking-tight lg:mt-6 lg:min-h-[3.5rem]">
+              {item.step}
+            </h3>
+            <p className="mt-2 text-sm text-ink-soft">{item.body}</p>
+          </li>
+        ))}
+      </ol>
+    </InView>
   );
 }
 
@@ -797,37 +824,36 @@ export function FeatureGrid({ items }: { items: readonly { heading: string; body
 /* ------------------------------------------------------------------ */
 
 /**
- * Suburbs grouped by region, showing only where a project is actually
- * documented. Suburbs with no evidence are counted, not listed — the homepage
- * links to the areas hub for the full directory rather than shipping a wall of
- * name-swapped links, which is the exact pattern the rebuild is undoing.
+ * The suburbs that carry a dedicated, indexed page — currently every Tier 1
+ * locality, all of them Victorian, since Queensland has no indexable locality
+ * while `qldPresence` is false. `Locality` carries no per-suburb project
+ * count the way the old hand-written `Location` records did, so this lists
+ * the suburbs themselves rather than a project tally, and links to the areas
+ * hub for the full directory rather than shipping a wall of name-swapped
+ * links, which is the exact pattern the rebuild is undoing.
  */
-export function ServiceAreas({ locations }: { locations: readonly Location[] }) {
-  const evidenced = locations.filter((l) => l.projectSlugs.length > 0);
-  const regions = [...new Set(locations.map((l) => l.region))];
+export function ServiceAreas({ locations }: { locations: readonly Locality[] }) {
+  const regionNames = [...new Set(locations.map((l) => getRegion(l.regionSlug)?.name ?? l.regionSlug))];
 
   return (
     <div className="flex flex-col gap-6">
       <ul className="flex flex-wrap gap-2">
-        {evidenced.map((location) => (
-          <li key={location.slug}>
+        {locations.map((location) => (
+          <li key={location.href}>
             <Link
-              href={`/areas/${location.slug}/`}
+              href={location.href}
               className="inline-flex items-baseline gap-2 rounded-md border border-paper-edge bg-white px-3 py-2 text-sm font-semibold text-ink hover:border-ink-muted/40 hover:bg-paper-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
             >
-              {location.suburb}
-              <span className="text-xs font-medium text-brand-600">
-                {location.projectSlugs.length} project
-                {location.projectSlugs.length === 1 ? '' : 's'}
-              </span>
+              {displayName(location.name)}
             </Link>
           </li>
         ))}
       </ul>
       <p className="max-w-prose text-sm text-ink-soft">
-        Those are the suburbs with a documented job behind them. We work right across{' '}
-        {regions.length} regions of metropolitan Melbourne — {regions.slice(0, -1).join(', ')} and{' '}
-        {regions[regions.length - 1]} — from our base at {site.address.suburb}.{' '}
+        Those are the suburbs with a dedicated page. We work right across {regionNames.length}{' '}
+        regions of Victoria — {regionNames.slice(0, -1).join(', ')} and{' '}
+        {regionNames[regionNames.length - 1]} — from our base at {site.address.suburb}, and we
+        service Brisbane, Gold Coast and Sunshine Coast in Queensland.{' '}
         <Link
           href="/areas/"
           className="font-semibold text-brand-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
@@ -843,50 +869,6 @@ export function ServiceAreas({ locations }: { locations: readonly Location[] }) 
 /* ------------------------------------------------------------------ */
 /* Reviews                                                              */
 /* ------------------------------------------------------------------ */
-
-/**
- * The Google "G", inline.
- *
- * Inline rather than an asset because it is four flat paths, it has to sit
- * beside text at whatever size the line box is, and a reviews section that
- * shows a broken image where the attribution should be is worse than one with
- * no mark at all.
- */
-function GoogleMark({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false" className={className}>
-      <path
-        fill="#4285F4"
-        d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"
-      />
-      <path
-        fill="#34A853"
-        d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"
-      />
-      <path
-        fill="#EA4335"
-        d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"
-      />
-    </svg>
-  );
-}
-
-/** Five stars, `rating` of them filled. Announced once, as text, to a reader. */
-function Stars({ rating }: { rating: number }) {
-  return (
-    <p className="text-sm tracking-[0.15em] text-brand-600">
-      <span className="sr-only">{rating} out of 5</span>
-      <span aria-hidden="true">
-        {'★'.repeat(rating)}
-        <span className="text-paper-edge">{'★'.repeat(5 - rating)}</span>
-      </span>
-    </p>
-  );
-}
 
 /**
  * Reviews on Google, as their own section.
@@ -930,34 +912,7 @@ export function GoogleReviewWall() {
           </ButtonLink>
         </div>
 
-        {/* Columns, not a grid. Reviews run from two lines to twelve, and a
-            grid stretches every card in a row to the tallest one — which left
-            half the wall as whitespace. Columns let each card be its own
-            height and pack the next one underneath. */}
-        <ul className="columns-1 gap-5 sm:columns-2 lg:columns-3">
-          {googleReviews.map((review) => (
-            <Card as="li" key={review.id} className="mb-5 h-auto break-inside-avoid gap-3">
-              {/* figure/blockquote/figcaption is the house pattern for an
-                  attributed quotation — see TestimonialBlock. A <footer> here
-                  would scope to the section, not the card, and put seven of
-                  them on the page. */}
-              <figure className="flex flex-col gap-3">
-                <Stars rating={review.rating} />
-                <blockquote className="flex-1 text-sm leading-relaxed text-ink-soft">
-                  &ldquo;{review.quote}&rdquo;
-                </blockquote>
-                <figcaption className="flex items-center gap-2 border-t border-paper-edge pt-3 text-xs text-ink-muted">
-                  <GoogleMark className="h-3.5 w-3.5 shrink-0" />
-                  <span>
-                    <span className="font-semibold text-ink">{review.attribution}</span>
-                    {review.organisation && <span> · {review.organisation}</span>}
-                    <span className="block">on {review.source}</span>
-                  </span>
-                </figcaption>
-              </figure>
-            </Card>
-          ))}
-        </ul>
+        <GoogleReviewCarousel reviews={googleReviews} />
 
         <p className="mt-6 text-xs text-ink-muted">
           Reviews are reproduced from APMG&rsquo;s Google Business Profile as written. The seven

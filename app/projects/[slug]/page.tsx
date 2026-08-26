@@ -10,7 +10,7 @@ import { projectSchema } from '@/lib/schema';
 import { getProject, projects } from '@/content/projects';
 import { getSector } from '@/content/sectors';
 import { getService } from '@/content/services';
-import { getLocation } from '@/content/locations';
+import { displayName, getLocalityByHref, hrefForVicSlug } from '@/lib/locations';
 import { isPlaceholder } from '@/lib/content/types';
 
 export function generateStaticParams() {
@@ -32,6 +32,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     path: `/projects/${project.slug}/`,
     ogImage: project.images[0]?.src,
   });
+}
+
+/**
+ * `relatedLocationSlugs` predates the two-state dataset and stores bare,
+ * un-prefixed slugs. Every documented APMG project is Victorian, so Victoria
+ * is the only correct scope for resolving one — see `hrefForVicSlug`.
+ */
+function vicLocality(slug: string) {
+  const href = hrefForVicSlug(slug);
+  return href ? getLocalityByHref(href) : undefined;
 }
 
 function DetailList({ heading, items }: { heading: string; items?: readonly string[] }) {
@@ -183,11 +193,11 @@ export default async function ProjectPage({ params }: Props) {
               <RelatedLinks
                 heading="Nearby"
                 links={project.relatedLocationSlugs
-                  .map((locationSlug) => getLocation(locationSlug))
+                  .map((locationSlug) => vicLocality(locationSlug))
                   .filter((location) => location !== undefined)
                   .map((location) => ({
-                    label: location.suburb,
-                    href: `/areas/${location.slug}/`,
+                    label: displayName(location.name),
+                    href: location.href,
                   }))}
               />
             </aside>

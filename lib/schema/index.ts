@@ -1,6 +1,5 @@
 import { formattedAddress, site, siteUrl, verifiedAccreditations } from '@/lib/site';
 import { averageRating, firstPartyReviews } from '@/content/reviews';
-import { locations } from '@/content/locations';
 import { services } from '@/content/services';
 import type { Project } from '@/lib/content/types';
 
@@ -59,29 +58,18 @@ export function organizationSchema(): JsonLdValue {
 /**
  * Where APMG works, as structured data.
  *
- * A single `City: Melbourne` node — which is what this used to emit — tells
- * Google the business serves one place. APMG is a service-area business
- * covering a 60km radius, and the suburb-level queries ("painters Brighton")
- * are the ones a local trade actually wins. So the area is stated three ways,
- * from narrowest to broadest, all of it derived from data already in the repo:
- * every suburb with a page, the metro area, and the state.
+ * This used to enumerate every suburb with a page as a `City` node. At 7
+ * locations that was merely verbose; at 1,440 it would put a megabyte of
+ * near-identical nodes into the JSON-LD on every page of the site, and it
+ * hardcoded `addressRegion: VIC`, which would have labelled all 828
+ * Queensland suburbs Victorian.
  *
- * The `GeoCircle` is the form Google most directly associates with a
- * service-area business, and it appears only once APMG confirms the base
- * coordinates. See the note on `site.coords`.
+ * Stated at the level the entity actually operates at instead: a GeoCircle for
+ * the Victorian radius once coordinates exist, the state, and an
+ * AdministrativeArea per Queensland service region. Suburb-level coverage is
+ * expressed by the pages themselves, which is what Google reads them for.
  */
 function areaServedFragment(): JsonLdValue[] {
-  const suburbs = locations.map((location) => ({
-    '@type': 'City',
-    name: location.suburb,
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: location.suburb,
-      addressRegion: site.address.state,
-      addressCountry: site.address.country,
-    },
-  }));
-
   const circle = site.coords
     ? [
         {
@@ -98,9 +86,13 @@ function areaServedFragment(): JsonLdValue[] {
 
   return [
     ...circle,
-    { '@type': 'City', name: 'Melbourne' },
     { '@type': 'State', name: 'Victoria' },
-    ...suburbs,
+    { '@type': 'City', name: 'Melbourne' },
+    // Queensland is areaServed and nothing more — no address, no projects, no
+    // second LocalBusiness entity (spec §9).
+    { '@type': 'AdministrativeArea', name: 'Brisbane' },
+    { '@type': 'AdministrativeArea', name: 'Gold Coast' },
+    { '@type': 'AdministrativeArea', name: 'Sunshine Coast' },
   ];
 }
 

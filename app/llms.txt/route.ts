@@ -3,8 +3,15 @@ import { googleAggregate, googleReviews } from '@/content/reviews';
 import { services } from '@/content/services';
 import { sectors } from '@/content/sectors';
 import { projects } from '@/content/projects';
-import { locations } from '@/content/locations';
 import { homeFaqs } from '@/content/faqs';
+import { differentiators } from '@/content/approach';
+import {
+  displayName,
+  getRegion,
+  indexableLocalities,
+  localitiesInRegion,
+  REGIONS,
+} from '@/lib/locations';
 
 /**
  * /llms.txt — a plain-text summary for AI answer engines.
@@ -34,6 +41,15 @@ export function GET(): Response {
 
   const verified = accreditations.filter((a) => a.verified);
 
+  const regionLines = (state: 'VIC' | 'QLD'): string =>
+    REGIONS.filter((r) => r.state === state)
+      .map((r) => `- ${r.name}: ${localitiesInRegion(r.slug).length} suburbs`)
+      .join('\n');
+
+  const tier1Suburbs = indexableLocalities()
+    .map((l) => `${displayName(l.name)} (${getRegion(l.regionSlug)?.name ?? l.regionSlug})`)
+    .join(', ');
+
   const body = `# ${site.name}
 
 > ${site.tagline}. ${site.legalName}, founded ${site.founded}, based at ${formattedAddress}. Work is carried out across ${site.serviceArea.primary}, within roughly ${site.serviceArea.radiusKm} km of the Bayswater North base.
@@ -42,9 +58,11 @@ APMG Painting is a commercial painting and property maintenance contractor. The 
 
 Contact: ${site.phone.display} · ${site.email}
 
-## How the work is quoted
+## Choosing a commercial painter in Melbourne
 
-Every enquiry begins with a site assessment that establishes scope, substrate condition, access and permitted working hours before a price is given. Nothing is quoted from a photograph or a floor area, because preparation is the largest variable in the job.
+The six questions below are the ones that decide whether a commercial painting programme lands on time, and they are the questions worth putting to any Melbourne contractor, APMG included. Each answer here describes what APMG does; they are reproduced from the homepage rather than written for this file.
+
+${differentiators.map((d) => `### ${d.question}\n\n${d.answer}`).join('\n\n')}
 
 ## Services
 
@@ -58,13 +76,25 @@ ${sectors.map((s) => `- [${s.shortTitle}](${siteUrl}${s.legacyPath}): ${s.intro}
 
 ${projects.map((p) => `- [${p.title}](${siteUrl}/projects/${p.slug}/): ${p.location}. ${p.challenge}`).join('\n')}
 
-## Suburbs served
+## Regions served
 
-Melbourne metropolitan area, worked from ${site.address.suburb}. "Do you work in X?" is the most common question an answer engine gets asked about a trade business, so the suburbs with documented work are listed rather than left to a link:
+APMG Painting works across 22 regions in two states: Victoria, worked from ${site.address.suburb}, and Queensland, where APMG has no office but services three regions. "Do you work in X?" is the most common question an answer engine gets asked about a trade business, so the region model is stated directly rather than as 1,440 individual suburb names, which would be too many to usefully list here.
 
-${locations.map((l) => `- ${l.suburb}, ${l.region}${l.indexable ? '' : ' (no documented project yet)'}`).join('\n')}
+### Victoria
 
-Suburbs outside this list within roughly ${site.serviceArea.radiusKm} km of ${site.address.suburb} are still serviced; the list records where work is documented, not the limit of the service area.
+${regionLines('VIC')}
+
+### Queensland
+
+${regionLines('QLD')}
+
+Queensland is areaServed only — no Queensland office, no completed Queensland project yet, and no suburb-level Queensland page is indexed until one exists.
+
+### Suburbs with a dedicated, indexed page
+
+${tier1Suburbs}
+
+Every other suburb in the two states above has a page, but it is marked \`noindex\` until it carries a documented project or other genuine local detail — the region page above it is the one meant to rank.
 
 ## Common questions
 
