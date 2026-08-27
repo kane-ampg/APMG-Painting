@@ -16,7 +16,7 @@ import { allLocalities, localitiesInRegion, regionsInState, type StateKey } from
  * no longer a subset.
  */
 export const metadata: Metadata = buildMetadata({
-  title: 'Areas We Service | Commercial Painters VIC & QLD | APMG Painting',
+  title: 'Areas We Service | Commercial Painters | APMG Painting',
   description:
     'APMG Painting works across metropolitan Melbourne from Bayswater North and services south-east Queensland. Every region and suburb, with the council notes that shape the work.',
   path: '/areas/',

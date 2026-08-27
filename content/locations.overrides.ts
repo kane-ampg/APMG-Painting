@@ -40,6 +40,16 @@ export const qldPresence = false;
  */
 export const TIER_1_OVERRIDES: Readonly<Record<string, true>> = {
   'VIC|bayswater-north': true,
+  /**
+   * Brighton carries the exact evidence the tiering exists to demand — a
+   * hand-written intro and the documented Newbay Medical clinic project
+   * (content/projects.ts, relatedLocationSlugs ['brighton']) — yet generated
+   * at Tier 3 because it was never on the seed list. Leaving the suburb with
+   * both copy and a project noindex while evidence-free seeds stay indexed
+   * would invert the rule. (Noble Park also has a documented project but no
+   * hand-written copy yet — write its intro and it earns the same promotion.)
+   */
+  'VIC|brighton': true,
 };
 
 export const localityOverrides: Readonly<Record<string, LocalityOverride>> = {

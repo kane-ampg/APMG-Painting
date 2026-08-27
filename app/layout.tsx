@@ -3,10 +3,10 @@ import { Inter, Fraunces } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
-import { QuoteChat } from '@/components/chat/quote-chat';
+import { QuoteChatLazy } from '@/components/chat/quote-chat-lazy';
 import { ScrollReveal } from '@/components/motion/scroll-reveal';
 import { JsonLd } from '@/components/seo/json-ld';
-import { localBusinessSchema, organizationSchema } from '@/lib/schema';
+import { localBusinessSchema } from '@/lib/schema';
 import { site, siteUrl } from '@/lib/site';
 
 /**
@@ -44,7 +44,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
 
-        <JsonLd data={organizationSchema()} />
+        {/* One entity node, not an Organization + LocalBusiness pair —
+            lib/schema/index.ts explains the merge. */}
         <JsonLd data={localBusinessSchema()} />
 
         <Header />
@@ -58,7 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           reaches the page's own content first, and the panel is additive — the
           full forms on /contact-us/ remain the primary, no-JavaScript route.
         */}
-        <QuoteChat />
+        <QuoteChatLazy />
 
         <ScrollReveal />
       </body>

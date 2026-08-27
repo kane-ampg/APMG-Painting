@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import {
@@ -28,7 +29,7 @@ import { faqsFor } from '@/content/faqs';
 export const metadata: Metadata = buildMetadata({
   title: 'Commercial Painters Melbourne | APMG Painting',
   description:
-    'Commercial painting contractors in Melbourne. Schools, healthcare, aged care, strata, retail, hospitality and industrial sites — programmed around your operating hours.',
+    'Commercial painting contractors in Melbourne. Schools, healthcare, aged care, strata, retail and industrial sites — programmed around your operating hours.',
   path: '/commercial/',
 });
 
@@ -95,9 +96,13 @@ export default function CommercialPage() {
         <Prose>
           <p>
             We deliver interior and exterior painting for commercial and industrial sites across
-            Melbourne — from tenancy repaints and office fit-outs through to large-format building
-            exteriors. Projects range from a two-person, two-day job through to programmes requiring
-            boom lifts, scissor lifts, scaffolding and roof rigging.
+            Melbourne — from tenancy repaints and{' '}
+            <Link href="/office-painters/" className="font-semibold text-brand-700 hover:underline">
+              office repaints and fit-outs
+            </Link>{' '}
+            through to large-format building exteriors. Projects range from a two-person, two-day
+            job through to programmes requiring boom lifts, scissor lifts, scaffolding and roof
+            rigging.
           </p>
           <p>
             The harder projects need surface knowledge more than they need labour. Older buildings

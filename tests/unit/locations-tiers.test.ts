@@ -15,18 +15,27 @@ import { qldPresence } from '@/content/locations.overrides';
 /**
  * Tiers and indexability — the mechanism that makes 1,387 pages safe.
  *
- * 16 indexable pages, not 1,387. If this count moves, someone has changed the
+ * 17 indexable pages, not 1,387. If this count moves, someone has changed the
  * risk profile of the whole site and should have to say so in a diff.
+ *
+ * 2026-08-27: 16 -> 17. Brighton VIC promoted to Tier 1: it carries
+ * hand-written copy and the documented Newbay Medical project — the exact
+ * evidence bar the tiering exists to enforce.
  */
 
 describe('indexability', () => {
-  it('makes exactly 16 suburbs indexable', () => {
-    expect(indexableLocalities()).toHaveLength(16);
+  it('makes exactly 17 suburbs indexable', () => {
+    expect(indexableLocalities()).toHaveLength(17);
   });
 
   it('includes Bayswater North, which is APMG’s own office', () => {
     const slugs = indexableLocalities().map((l) => `${l.state}|${l.slug}`);
     expect(slugs).toContain('VIC|bayswater-north');
+  });
+
+  it('includes Brighton, which carries a documented project and hand-written copy', () => {
+    const slugs = indexableLocalities().map((l) => `${l.state}|${l.slug}`);
+    expect(slugs).toContain('VIC|brighton');
   });
 
   it('indexes no Queensland locality while qldPresence is false', () => {
@@ -39,7 +48,7 @@ describe('indexability', () => {
   });
 
   it('marks every other locality noindex', () => {
-    expect(allLocalities().filter((l) => !l.indexable)).toHaveLength(1371);
+    expect(allLocalities().filter((l) => !l.indexable)).toHaveLength(1370);
   });
 
   it('never marks a Tier 3 locality indexable', () => {

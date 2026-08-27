@@ -123,7 +123,10 @@ export const projects: readonly Project[] = [
       attribution: 'Client feedback',
     },
     relatedServiceSlugs: ['exterior-painting', 'protective-coatings'],
-    relatedLocationSlugs: [],
+    // The suburb layer already resolves this project to Noble Park by its
+    // location string (components/sections/locality.tsx); this is the reverse
+    // link, so the case study points back at the suburb page too.
+    relatedLocationSlugs: ['noble-park'],
     isFeatured: true,
   },
 
@@ -211,4 +214,22 @@ export const featuredProjects = projects.filter((p) => p.isFeatured);
 
 export function projectsForSector(sectorSlug: string): Project[] {
   return projects.filter((p) => p.sectorSlug === sectorSlug);
+}
+
+/**
+ * Whether a sector carries documented evidence — the predicate its
+ * indexability and sitemap presence both run on.
+ *
+ * Checks BOTH directions because there are two lists that can drift: the
+ * sector's curated `projectSlugs` (what its Evidence grid shows) and each
+ * project's own `sectorSlug`. The NDIS repaint is filed under industrial by
+ * sectorSlug but is not in industrial's curated grid; a future project added
+ * the same way must still flip its sector to index rather than leaving it
+ * noindex while the project page links to it.
+ */
+export function sectorHasDocumentedProject(sector: {
+  slug: string;
+  projectSlugs: readonly string[];
+}): boolean {
+  return sector.projectSlugs.length > 0 || projectsForSector(sector.slug).length > 0;
 }

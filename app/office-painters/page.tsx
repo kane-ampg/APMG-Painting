@@ -22,10 +22,11 @@ import { officeFaqs } from '@/content/faqs';
  * URL preserved. The live page is titled "Office Painting - APMG Painting" with
  * no "Melbourne" — weak for its own target query — so the title changes while
  * the URL does not. The duplicated office section has been removed from
- * /commercial/, which now links here instead.
+ * /commercial/, whose body copy links here instead (and the header, footer
+ * and project sidebars do too).
  */
 export const metadata: Metadata = buildMetadata({
-  title: 'Office Painting Melbourne | Office Painters | APMG Painting',
+  title: 'Office Painters Melbourne | APMG Painting',
   description:
     'Office painters in Melbourne. Workplace repaints programmed after hours or in staged zones so your team keeps working through the job.',
   path: '/office-painters/',

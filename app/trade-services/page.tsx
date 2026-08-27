@@ -13,7 +13,7 @@ import { tradeFaqs } from '@/content/faqs';
  * the thinnest page of the lot.
  */
 export const metadata: Metadata = buildMetadata({
-  title: 'Painting for Builders & Head Contractors Melbourne | APMG Painting',
+  title: 'Painting for Builders & Head Contractors | APMG Painting',
   description:
     'Painting delivered into a construction programme across Melbourne — staged to the build, sequenced around other trades, and carried through to handover.',
   path: '/trade-services/',

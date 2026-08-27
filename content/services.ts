@@ -121,3 +121,18 @@ export const services: readonly Service[] = [
 export function getService(slug: string): Service | undefined {
   return services.find((s) => s.slug === slug);
 }
+
+/**
+ * The page a service actually lives on.
+ *
+ * Two services have dedicated pages; the other three are sections of
+ * /commercial/. Kept here as the single mapping so every surface that links a
+ * service — project sidebars, llms.txt — sends it to the same place, instead
+ * of each hardcoding '/commercial/' and quietly mislinking the two that have
+ * their own URLs.
+ */
+export function servicePath(slug: string): string {
+  if (slug === 'office-painting') return '/office-painters/';
+  if (slug === 'builders-and-head-contractors') return '/trade-services/';
+  return '/commercial/';
+}

@@ -97,7 +97,7 @@ describe('nearestAnchor', () => {
    */
   it('resolves an overlapping locality to Brisbane when Brisbane is nearer', () => {
     // Beenleigh — 32.17km from Brisbane, 34.39km from Southport.
-    const result = nearestAnchor({ lat: -27.7130, lng: 153.2020 }, 'QLD');
+    const result = nearestAnchor({ lat: -27.713, lng: 153.202 }, 'QLD');
     expect(result?.anchor.key).toBe('brisbane');
   });
 

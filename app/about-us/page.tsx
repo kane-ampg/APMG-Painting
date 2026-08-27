@@ -8,7 +8,7 @@ import { accreditations, directionsUrl, formattedAddress, site } from '@/lib/sit
 export const metadata: Metadata = buildMetadata({
   title: 'About APMG Painting | Melbourne Painting Contractor',
   description:
-    'APMG Painting is a Melbourne commercial painting and property maintenance contractor founded in 2015, based in Bayswater North and working across schools, healthcare, strata, retail and industrial sites.',
+    'APMG Painting is a commercial painting and property maintenance contractor founded in 2015, based in Bayswater North and working across metropolitan Melbourne.',
   path: '/about-us/',
 });
 
@@ -93,11 +93,9 @@ export default function AboutPage() {
             </a>
             .
           </p>
-          <p>
-            {site.abn
-              ? `ABN ${site.abn}.`
-              : 'An ABN is not currently published on the website. It is required for complete business structured data and should be supplied.'}
-          </p>
+          {/* Omitted while unsupplied, like the footer legal line — an
+              internal to-do is not visitor copy. */}
+          {site.abn && <p>ABN {site.abn}.</p>}
         </Prose>
       </ContentBlock>
 

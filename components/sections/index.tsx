@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import type { CSSProperties, ReactNode } from 'react';
+import { Fragment, type CSSProperties, type ReactNode } from 'react';
 import { ProcessIcon, type ProcessIconName } from '@/components/icons/process-icons';
 import { SectorIcon } from '@/components/icons/sector-icons';
 import { HeroReel } from '@/components/media/hero-reel';
@@ -25,7 +25,7 @@ import {
   googleAggregate,
   googleReviews,
 } from '@/content/reviews';
-import { displayName, getRegion, type Locality } from '@/lib/locations';
+import { displayName, getRegion, stateSlug, type Locality } from '@/lib/locations';
 import type { Faq, Project, Sector, Service } from '@/lib/content/types';
 
 /* ------------------------------------------------------------------ */
@@ -648,12 +648,22 @@ export function ContentBlock({
 /* ------------------------------------------------------------------ */
 
 /**
- * One wide photograph between two blocks of prose.
+ * One photograph and the claim it evidences, on a full-bleed slab.
  *
  * For the pages that carry long sequencing copy and nothing to break it with.
  * The caption is where the photograph is explained rather than captioned: a
  * process shot only earns its place if it shows the thing the surrounding
  * paragraphs are claiming, and the caption is what ties the two together.
+ *
+ * Which is why this is a two-part spread and not a picture with a label under
+ * it. The caption used to be `text-sm` at 70% white on its own line under a
+ * full-width frame, with most of a screen of empty black beside it — typeset
+ * as a label, orphaned as a composition, and carrying the page's actual
+ * argument while looking like an afterthought. Now the photograph takes seven
+ * columns and the claim takes five, the two are locked on a shared bottom
+ * line, and the air above the caption is the margin of a spread rather than a
+ * hole. The rule over the caption is what makes that read as intentional: it
+ * defines the column the text sits at the foot of.
  *
  * Wider than the reading measure on purpose — a band the same width as the
  * text reads as an illustration inside the argument, and this is meant to be a
@@ -668,30 +678,46 @@ export function ContentBlock({
  * grading would: the surround supplies the contrast the photograph does not
  * have, and the same picture reads as a lit panel.
  *
- * The frame carries a hairline either way. It is the guarantee that the
- * photograph's own edge is always visible, whatever lands inside it.
+ * `aspect` defaults to the 3:2 these photographs are shot at, i.e. no crop at
+ * all. It was `21/9`, which centre-cropped a 3:2 frame down to its emptiest
+ * horizontal band: the ceiling and the drop-sheeted floor went, and what was
+ * left was a blank wall with the tradesman pushed against one edge. A crop
+ * that discards the evidence defeats the caption above. Anything passed here
+ * should be a ratio the photograph was actually composed for.
+ *
+ * The frame carries an inset hairline. Sitting inside the rounded corner
+ * rather than around it, it is the one edge that survives both cases — a pale
+ * photograph needs no help against the ink, but the dark quarter of the same
+ * picture does.
  */
 export function MediaBand({
   src,
   alt,
   caption,
   tone = 'paper',
+  aspect = 'aspect-[3/2]',
 }: {
   src: string;
   alt: string;
   caption?: string;
   tone?: 'paper' | 'sunken' | 'ink';
+  /** Tailwind aspect class for the frame. Match the photograph's own ratio. */
+  aspect?: string;
 }) {
   const onInk = tone === 'ink';
 
   return (
-    <Section tone={tone} className="py-10 sm:py-12">
+    <Section tone={tone}>
       <Container width="wide">
-        <figure className="group">
+        <figure
+          className={cn('group grid gap-8', caption && 'lg:grid-cols-12 lg:items-end lg:gap-10')}
+        >
           <div
             className={cn(
-              'relative aspect-[16/10] overflow-hidden ring-1 sm:aspect-[21/9]',
-              onInk ? 'bg-ink-raised ring-white/15' : 'bg-paper-sunken ring-paper-edge',
+              'relative overflow-hidden rounded-lg ring-1 ring-inset',
+              aspect,
+              caption && 'lg:col-span-7',
+              onInk ? 'bg-ink-raised ring-white/[0.12]' : 'bg-paper-sunken ring-ink/10',
             )}
           >
             <Image
@@ -699,15 +725,44 @@ export function MediaBand({
               alt={alt}
               fill
               loading="lazy"
-              sizes="(min-width: 1280px) 1216px, 100vw"
+              sizes="(min-width: 1024px) 692px, 100vw"
               className={`object-cover ${mediaZoom}`}
             />
           </div>
+
           {caption && (
-            <figcaption
-              className={cn('mt-3 max-w-prose text-sm', onInk ? 'text-white/70' : 'text-ink-soft')}
-            >
-              {caption}
+            <figcaption className="lg:col-span-5 lg:pb-1">
+              {/*
+               * A printer's rule, not a divider. The red tab marking its start
+               * is the same mark the hero fold puts before its label and the
+               * same red the ink slabs rule themselves with — the house accent
+               * at the smallest size it is used at, and the only red on this
+               * band.
+               */}
+              <span aria-hidden="true" className="mb-6 flex h-px w-full">
+                <span className={cn('h-px w-10', onInk ? 'bg-brand-500' : 'bg-brand-600')} />
+                <span className={cn('h-px flex-1', onInk ? 'bg-white/15' : 'bg-paper-edge')} />
+              </span>
+              {/*
+               * `sm:leading-[1.55]` is not redundant with `leading-relaxed`.
+               * Tailwind's `text-xl` sets a line-height of its own, and it
+               * arrives inside a media query, so at `sm` and up it quietly
+               * wins and the serif drops to 1.4 — tight for five lines of it,
+               * and a different rhythm from the same paragraph on a phone.
+               *
+               * `text-pretty` is here for the last line. At this measure the
+               * caption breaks with "it." alone on line five, which under a
+               * bottom-aligned column is the one rag that reads as a mistake.
+               */}
+              <p
+                className={cn(
+                  'text-pretty font-display text-lg leading-relaxed tracking-tight',
+                  'sm:text-xl sm:leading-[1.55]',
+                  onInk ? 'text-white/85' : 'text-ink',
+                )}
+              >
+                {caption}
+              </p>
             </figcaption>
           )}
         </figure>
@@ -856,8 +911,19 @@ export function FeatureGrid({ items }: { items: readonly { heading: string; body
  * links, which is the exact pattern the rebuild is undoing.
  */
 export function ServiceAreas({ locations }: { locations: readonly Locality[] }) {
-  const regionNames = [
-    ...new Set(locations.map((l) => getRegion(l.regionSlug)?.name ?? l.regionSlug)),
+  // One entry per region, carrying the hub URL: the region hubs are the pages
+  // meant to rank for region-level queries, and this paragraph used to name
+  // them as plain text while linking only /areas/.
+  const regions = [
+    ...new Map(
+      locations.map((l) => [
+        l.regionSlug,
+        {
+          name: getRegion(l.regionSlug)?.name ?? l.regionSlug,
+          href: `/areas/${stateSlug(l.state)}/${l.regionSlug}/`,
+        },
+      ]),
+    ).values(),
   ];
 
   return (
@@ -875,10 +941,21 @@ export function ServiceAreas({ locations }: { locations: readonly Locality[] }) 
         ))}
       </ul>
       <p className="max-w-prose text-sm text-ink-soft">
-        Those are the suburbs with a dedicated page. We work right across {regionNames.length}{' '}
-        regions of Victoria — {regionNames.slice(0, -1).join(', ')} and{' '}
-        {regionNames[regionNames.length - 1]} — from our base at {site.address.suburb}, and we
-        service Brisbane, Gold Coast and Sunshine Coast in Queensland.{' '}
+        Those are the suburbs with a dedicated page. We work right across {regions.length} regions
+        of Victoria —{' '}
+        {regions.map((region, i) => (
+          <Fragment key={region.href}>
+            {i > 0 && (i === regions.length - 1 ? ' and ' : ', ')}
+            <Link
+              href={region.href}
+              className="font-semibold text-brand-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
+            >
+              {region.name}
+            </Link>
+          </Fragment>
+        ))}{' '}
+        — from our base at {site.address.suburb}, and we service Brisbane, Gold Coast and Sunshine
+        Coast in Queensland.{' '}
         <Link
           href="/areas/"
           className="font-semibold text-brand-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"

@@ -61,10 +61,10 @@ describe('region and state params', () => {
 });
 
 describe('the page count the spec commits to', () => {
-  it('is 1,412 pages of which 41 are indexable', () => {
+  it('is 1,412 pages of which 42 are indexable', () => {
     const pages = suburbParams().length + regionParams().length + stateParams().length + 1;
     expect(pages).toBe(1412);
-    expect(indexableLocalities().length + 22 + 2 + 1).toBe(41);
+    expect(indexableLocalities().length + 22 + 2 + 1).toBe(42);
   });
 });
 

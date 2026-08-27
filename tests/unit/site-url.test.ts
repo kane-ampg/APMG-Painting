@@ -1,3 +1,6 @@
+// @vitest-environment node
+// This file tests module-load behavior that depends on `typeof window`;
+// jsdom would make every case look like a browser bundle.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 /**
@@ -80,6 +83,29 @@ describe('siteUrl', () => {
 
   it('falls back to localhost when nothing is configured', async () => {
     await expect(resolve({})).resolves.toBe('http://localhost:3000');
+  });
+
+  // The localhost fallback exists for development. A production build that
+  // reaches it would ship localhost canonicals, a localhost sitemap and
+  // localhost JSON-LD with no error — so it must fail the build instead.
+  it('refuses a production build with no origin configured', async () => {
+    await expect(resolve({ NODE_ENV: 'production' })).rejects.toThrow(/NEXT_PUBLIC_SITE_URL/);
+  });
+
+  // The guard must be server-only. Next inlines NODE_ENV ('production') and
+  // NEXT_PUBLIC_* into browser bundles but never the VERCEL_* system vars, so
+  // a client bundle built on Vercel without NEXT_PUBLIC_SITE_URL resolves no
+  // origin — and a module-scope throw there would crash hydration on every
+  // page. lib/site.ts is in the every-page client graph via the header's
+  // mobile menu. Client code only consumes `site`, so the silent localhost
+  // fallback is harmless in the browser.
+  it('never throws in a browser bundle, where only NEXT_PUBLIC_* vars exist', async () => {
+    (globalThis as { window?: unknown }).window = {};
+    try {
+      await expect(resolve({ NODE_ENV: 'production' })).resolves.toBe('http://localhost:3000');
+    } finally {
+      delete (globalThis as { window?: unknown }).window;
+    }
   });
 
   it('never produces a value that throws when passed to new URL()', async () => {

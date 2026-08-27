@@ -209,7 +209,8 @@ for (const row of rows.slice(1)) {
 const decisions = [...seen.values()]
   .map((entry) => ({ ...entry, ...decide(entry) }))
   .sort(
-    (a, b) => ORDER[a.action] - ORDER[b.action] || b.clicks - a.clicks || b.impressions - a.impressions,
+    (a, b) =>
+      ORDER[a.action] - ORDER[b.action] || b.clicks - a.clicks || b.impressions - a.impressions,
   );
 
 const counts = decisions.reduce((acc, d) => ({ ...acc, [d.action]: (acc[d.action] ?? 0) + 1 }), {});
@@ -244,4 +245,6 @@ writeFileSync(
 );
 
 console.log(`\nWritten to ${outPath}`);
-console.log('Review it before touching content/locations.ts. Nothing here is applied automatically.');
+console.log(
+  'Review it before touching content/locations.ts. Nothing here is applied automatically.',
+);

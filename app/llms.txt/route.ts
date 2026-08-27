@@ -1,6 +1,6 @@
 import { accreditations, formattedAddress, site, siteUrl } from '@/lib/site';
 import { googleAggregate, googleReviews } from '@/content/reviews';
-import { services } from '@/content/services';
+import { servicePath, services } from '@/content/services';
 import { sectors } from '@/content/sectors';
 import { projects } from '@/content/projects';
 import { homeFaqs } from '@/content/faqs';
@@ -56,7 +56,7 @@ export function GET(): Response {
 
   const body = `# ${site.name}
 
-> ${site.tagline}. ${site.legalName}, founded ${site.founded}, based at ${formattedAddress}. Victorian work is carried out across ${site.serviceArea.primary}, within roughly ${site.serviceArea.radiusKm} km of the Bayswater North base. APMG also lists ${qldRegions} South East Queensland regions as areas served — there is no Queensland office, address, phone number or completed project, and no Queensland page on this site is indexed.
+> ${site.tagline}. ${site.legalName}, founded ${site.founded}, based at ${formattedAddress}. Victorian work is carried out across ${site.serviceArea.primary}, within roughly ${site.serviceArea.radiusKm} km of the Bayswater North base. APMG also lists ${qldRegions} South East Queensland regions as areas served — there is no Queensland office, address, phone number or completed project, and no suburb-level Queensland page on this site is indexed.
 
 APMG Painting is a commercial painting and property maintenance contractor. The work is painting programmes in buildings that stay open while they are painted — schools, clinics, aged care, strata, retail, hospitality and industrial sites.
 
@@ -70,7 +70,7 @@ ${differentiators.map((d) => `### ${d.question}\n\n${d.answer}`).join('\n\n')}
 
 ## Services
 
-${services.map((s) => `- [${s.title}](${siteUrl}/commercial/): ${s.summary}`).join('\n')}
+${services.map((s) => `- [${s.title}](${siteUrl}${servicePath(s.slug)}): ${s.summary}`).join('\n')}
 
 ## Commercial sectors
 

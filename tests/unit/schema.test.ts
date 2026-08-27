@@ -1,11 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  breadcrumbSchema,
-  localBusinessSchema,
-  organizationSchema,
-  projectSchema,
-  serviceSchema,
-} from '@/lib/schema';
+import { breadcrumbSchema, localBusinessSchema, projectSchema, serviceSchema } from '@/lib/schema';
 import { getProject } from '@/content/projects';
 import { qldPresence } from '@/content/locations.overrides';
 import { site } from '@/lib/site';
@@ -15,18 +9,32 @@ describe('structured data', () => {
     // The live site shows "5.0, based on 70 reviews" from a third-party widget.
     // Review markup must describe reviews the site itself hosts and can
     // evidence, so none is emitted.
-    const payloads = [organizationSchema(), localBusinessSchema()];
+    const payloads = [localBusinessSchema()];
     for (const payload of payloads) {
       expect(JSON.stringify(payload)).not.toMatch(/aggregateRating|reviewCount|ratingValue/);
     }
   });
 
-  it('uses the canonical phone number, not a CallRail tracking number', () => {
-    expect(localBusinessSchema().telephone).toBe('1300 97 97 40');
+  it('uses the canonical phone number in country-coded form', () => {
+    // Google's LocalBusiness guidance asks for a country-coded number, and
+    // this must still be the canonical business line — never a CallRail
+    // tracking number.
+    expect(localBusinessSchema().telephone).toBe('+61 1300 979 740');
+  });
+
+  it('is one entity, not two: a single node carrying the #organization id', () => {
+    // Organization and LocalBusiness used to ship as two separate top-level
+    // nodes describing the same business with no link between them, leaving
+    // Google to reconcile two candidate entities. One node, one @id — and the
+    // Organization-only facts (foundingDate, knowsAbout) ride along on it.
+    const schema = localBusinessSchema();
+    expect(schema['@id']).toMatch(/#organization$/);
+    expect(schema.foundingDate).toBe(String(site.founded));
+    expect(Array.isArray(schema.knowsAbout)).toBe(true);
   });
 
   it('states one legal entity name', () => {
-    expect(organizationSchema().legalName).toBe('APMG Painting Services Pty Ltd');
+    expect(localBusinessSchema().legalName).toBe('APMG Painting Services Pty Ltd');
   });
 
   it('scopes the service area to Melbourne', () => {

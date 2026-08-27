@@ -143,15 +143,42 @@ export function HeroReel({
 
     // Autoplay is a promise that rejects rather than throws. A refusal is a
     // valid outcome here, not an error: the poster is already on screen.
-    void video.play().catch(() => undefined);
+    //
+    // Playback needs BOTH gates before it starts, whichever opens second:
+    // the idle deadline (so the encode never competes with the LCP poster and
+    // hydration for bandwidth) AND visibility (the observer's initial entry —
+    // without the visibility gate the observer's first callback started the
+    // download one frame after mount, which defeated the idle deferral; and
+    // without the idle gate a hero scrolled past before idle started playing
+    // off-screen with the progress loop running). The user's pause outranks
+    // both.
+    let idleReached = false;
+    let heroVisible = false;
+    const tryPlay = () => {
+      if (idleReached && heroVisible && !pausedByUser.current) {
+        void video.play().catch(() => undefined);
+      }
+    };
+
+    let idleId: number | undefined;
+    const onIdle = () => {
+      idleReached = true;
+      tryPlay();
+    };
+    if (typeof window.requestIdleCallback === 'function') {
+      idleId = window.requestIdleCallback(onIdle, { timeout: 2000 });
+    } else {
+      idleId = window.setTimeout(onIdle, 800);
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry) return;
+        heroVisible = entry.isIntersecting;
         if (!entry.isIntersecting) {
           video.pause();
-        } else if (!pausedByUser.current) {
-          void video.play().catch(() => undefined);
+        } else {
+          tryPlay();
         }
       },
       // Any sliver of the fold still on screen counts as visible.
@@ -164,6 +191,10 @@ export function HeroReel({
       video.removeEventListener('playing', start);
       video.removeEventListener('pause', stop);
       cancelAnimationFrame(frame);
+      if (idleId !== undefined) {
+        if (typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(idleId);
+        else window.clearTimeout(idleId);
+      }
     };
   }, [quality]);
 
@@ -210,7 +241,10 @@ export function HeroReel({
             muted
             loop
             playsInline
-            preload="auto"
+            // "metadata", not "auto": the play() call fetches what it needs
+            // when it fires at idle; "auto" started the full download the
+            // moment the element mounted.
+            preload="metadata"
             disablePictureInPicture
             onCanPlay={() => setReady(true)}
             className={cn(

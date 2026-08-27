@@ -120,47 +120,53 @@ export function DesktopNav() {
                 {marker}
               </button>
 
-              {isOpen && (
-                <div id={panelId} className="absolute left-0 top-full z-40 w-64 pt-1">
-                  <ul className="rounded-lg border border-paper-edge bg-white p-2 shadow-lg">
-                    {item.children.map((child) => {
-                      const isCurrent = isCurrentPage(pathname, child.href);
-                      // The "Overview" child is the same destination as the
-                      // trigger above it, which already carries aria-current.
-                      // Styled, so the open menu still shows where you are —
-                      // but not announced twice.
-                      const announce = isCurrent && !isSamePath(child.href, item.href);
-                      return (
-                        <li key={child.href}>
-                          <Link
-                            href={child.href}
-                            onClick={() => setOpenLabel(null)}
-                            aria-current={announce ? 'page' : undefined}
-                            className={cn(
-                              'block rounded-md px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600',
-                              isCurrent
-                                ? 'bg-brand-50 font-semibold text-brand-700'
-                                : 'text-ink-soft hover:bg-paper-sunken hover:text-ink',
-                            )}
-                          >
-                            {child.label}
-                            {child.description && (
-                              <span
-                                className={cn(
-                                  'block text-xs',
-                                  isCurrent ? 'text-brand-700/80' : 'text-ink-muted',
-                                )}
-                              >
-                                {child.description}
-                              </span>
-                            )}
-                          </Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              )}
+              {/* Always in the DOM, `hidden` when closed: a conditional
+                  render kept every sector page, /office-painters/ and the
+                  state hubs out of the server HTML, so the primary nav's
+                  second level was invisible to crawlers. */}
+              <div
+                id={panelId}
+                hidden={!isOpen}
+                className="absolute left-0 top-full z-40 w-64 pt-1"
+              >
+                <ul className="rounded-lg border border-paper-edge bg-white p-2 shadow-lg">
+                  {item.children.map((child) => {
+                    const isCurrent = isCurrentPage(pathname, child.href);
+                    // The "Overview" child is the same destination as the
+                    // trigger above it, which already carries aria-current.
+                    // Styled, so the open menu still shows where you are —
+                    // but not announced twice.
+                    const announce = isCurrent && !isSamePath(child.href, item.href);
+                    return (
+                      <li key={child.href}>
+                        <Link
+                          href={child.href}
+                          onClick={() => setOpenLabel(null)}
+                          aria-current={announce ? 'page' : undefined}
+                          className={cn(
+                            'block rounded-md px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600',
+                            isCurrent
+                              ? 'bg-brand-50 font-semibold text-brand-700'
+                              : 'text-ink-soft hover:bg-paper-sunken hover:text-ink',
+                          )}
+                        >
+                          {child.label}
+                          {child.description && (
+                            <span
+                              className={cn(
+                                'block text-xs',
+                                isCurrent ? 'text-brand-700/80' : 'text-ink-muted',
+                              )}
+                            >
+                              {child.description}
+                            </span>
+                          )}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
             </li>
           );
         })}

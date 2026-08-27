@@ -1,6 +1,15 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ButtonLink, Container, Section } from '@/components/ui';
 import { site } from '@/lib/site';
+
+// Without its own title this page inherits the layout default — the site's
+// money-keyword title on an HTTP 404. The template appends the brand.
+export const metadata: Metadata = {
+  title: 'Page not found',
+  description:
+    'That page does not exist. The commercial painting, projects and service-area pages are one click away.',
+};
 
 /**
  * 404.

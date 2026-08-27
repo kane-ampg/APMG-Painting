@@ -8,8 +8,12 @@ export function JsonLd({ data }: { data: Record<string, unknown> }) {
   return (
     <script
       type="application/ld+json"
-      // Payloads are built from typed, first-party content — never user input.
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+      // Payloads are built from typed, first-party content — but content is
+      // still text: the day a first-party review quote contains "</script>",
+      // an unescaped "<" terminates this block and injects markup. The
+      // < escape is valid JSON and inert in HTML, so parsers see
+      // identical data.
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, '\\u003c') }}
     />
   );
 }

@@ -482,3 +482,20 @@ by a later well-meaning edit, and a lint rule catches it where a review will not
 Phases 2 and 3 are deliberately early and independent of the rest. Phase 2 is a live
 launch-blocking defect, not part of this feature. Phase 3 lands before the new routes so
 they inherit a settled pattern rather than copying whichever neighbour they sat next to.
+
+---
+
+## Addendum — 2026-08-27 SEO audit changes
+
+Figures above that say **16 Tier 1 / 41 indexable / 1,371 Tier 3** are now
+**17 / 42 / 1,370**: Brighton VIC was promoted to Tier 1 on the evidence rule
+itself (hand-written intro + the documented Newbay Medical project). Five
+Tier 1 councils were corrected in the generator's override table (Bayswater →
+Knox, Ringwood → Maroondah, Vermont → Whitehorse, Dandenong South → Greater
+Dandenong, Port Melbourne → Port Phillip), pinned by
+tests/unit/tier1-councils.test.ts. Sector pages now follow the same evidence
+rule as the tiers: no documented project → noindex,follow and out of the
+sitemap (app/[sector]/page.tsx + app/sitemap.ts, same predicate). §10.3's
+`lastModified` build-date floor is also superseded: the sitemap now emits no
+lastmod at all — no content model carries a real modification date yet, and a
+build-date on every URL is a claim Google learns to ignore.

@@ -14,7 +14,7 @@ import { Card, Container, Placeholder, Prose, Section, SectionHeading } from '@/
 import { JsonLd } from '@/components/seo/json-ld';
 import { faqSchema, serviceSchema } from '@/lib/schema';
 import { sectors } from '@/content/sectors';
-import { getProject } from '@/content/projects';
+import { getProject, sectorHasDocumentedProject } from '@/content/projects';
 
 /**
  * Sector pages.
@@ -45,6 +45,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: sector.metaTitle,
     description: sector.metaDescription,
     path: sector.legacyPath,
+    // The same evidence rule the suburb tiers run on: a sector page with no
+    // documented project is a placeholder, and it says so in its own body
+    // copy — so it is `noindex, follow` (still crawlable, still passing
+    // equity) until a project is published. app/sitemap.ts filters on the
+    // same predicate, so the two surfaces cannot disagree.
+    index: sectorHasDocumentedProject(sector),
   });
 }
 
@@ -117,7 +123,7 @@ export default async function SectorPage({ params }: Props) {
             <ProjectGrid projects={projects} />
           ) : (
             <Placeholder
-              note={`no completed ${sector.shortTitle.toLowerCase()} project is documented yet. This page makes no sector experience claim until APMG supplies one. Until then it should stay noindex or be folded into /commercial/.`}
+              note={`no completed ${sector.shortTitle.toLowerCase()} project is documented yet, so this page makes no sector experience claim. Documented case studies from other sectors are on the projects page.`}
             />
           )}
         </Container>
@@ -138,6 +144,12 @@ export default async function SectorPage({ params }: Props) {
           heading="Other sectors"
           links={sectors
             .filter((other) => other.slug !== sector.slug)
+            // Sectors with a documented project first: a plain slice(0, 6) of
+            // the content order dropped Industrial & warehouse — last in the
+            // file, one of only three sectors with a case study — from every
+            // other sector page on the site. Stable sort, so content order
+            // still decides within each group.
+            .sort((a, b) => Number(b.projectSlugs.length > 0) - Number(a.projectSlugs.length > 0))
             .slice(0, 6)
             .map((other) => ({ label: other.shortTitle, href: other.legacyPath }))}
         />

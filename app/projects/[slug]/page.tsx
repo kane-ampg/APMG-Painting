@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { buildMetadata } from '@/lib/seo/metadata';
+import { buildMetadata, metaDescription } from '@/lib/seo/metadata';
+import { site } from '@/lib/site';
 import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import { CtaBand, RelatedLinks, TestimonialBlock } from '@/components/sections';
 import { Container, mediaZoom, Placeholder, Section, SectionHeading } from '@/components/ui';
@@ -9,7 +11,7 @@ import { JsonLd } from '@/components/seo/json-ld';
 import { projectSchema } from '@/lib/schema';
 import { getProject, projects } from '@/content/projects';
 import { getSector } from '@/content/sectors';
-import { getService } from '@/content/services';
+import { getService, servicePath } from '@/content/services';
 import { displayName, getLocalityByHref, hrefForVicSlug } from '@/lib/locations';
 import { isPlaceholder } from '@/lib/content/types';
 
@@ -27,10 +29,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!project) return {};
 
   return buildMetadata({
-    title: project.title,
-    description: project.challenge.slice(0, 155),
+    // buildMetadata renders titles absolute, so the brand must be appended
+    // here — passing the bare project title shipped all four case studies
+    // unbranded in the SERP.
+    title: `${project.title} | ${site.name}`,
+    description: metaDescription(project.challenge),
     path: `/projects/${project.slug}/`,
     ogImage: project.images[0]?.src,
+    ogImageAlt: project.images[0]?.alt,
   });
 }
 
@@ -42,6 +48,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 function vicLocality(slug: string) {
   const href = hrefForVicSlug(slug);
   return href ? getLocalityByHref(href) : undefined;
+}
+
+/**
+ * Service chips used to hard-code href '/commercial/', which rendered several
+ * same-page links to one URL under mismatched anchors — including an "Office"
+ * chip pointing at /commercial/ while /office-painters/ exists. servicePath()
+ * is the shared mapping to each service's real page, and services that share
+ * a page collapse into one chip so the sidebar never repeats a destination.
+ */
+const SERVICE_PAGE_LABELS: Record<string, string> = {
+  '/office-painters/': 'Office painting',
+  '/trade-services/': 'Trade services',
+  '/commercial/': 'Commercial painting',
+};
+
+function relatedServiceLinks(slugs: readonly string[]) {
+  const seen = new Set<string>();
+  return slugs
+    .map((slug) => getService(slug))
+    .filter((service) => service !== undefined)
+    .map((service) => {
+      const href = servicePath(service.slug);
+      return { label: SERVICE_PAGE_LABELS[href] ?? service.shortTitle, href };
+    })
+    .filter((link) => (seen.has(link.href) ? false : (seen.add(link.href), true)));
 }
 
 function DetailList({ heading, items }: { heading: string; items?: readonly string[] }) {
@@ -163,7 +194,17 @@ export default async function ProjectPage({ params }: Props) {
                   {sector && (
                     <div>
                       <dt className="text-ink-muted">Sector</dt>
-                      <dd className="font-medium">{sector.shortTitle}</dd>
+                      {/* A link, not a label: sector pages link their case
+                          studies via ProjectGrid, and without this the
+                          relationship was one-way. */}
+                      <dd className="font-medium">
+                        <Link
+                          href={sector.legacyPath}
+                          className="text-brand-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
+                        >
+                          {sector.shortTitle}
+                        </Link>
+                      </dd>
                     </div>
                   )}
                   <div>
@@ -181,13 +222,7 @@ export default async function ProjectPage({ params }: Props) {
 
               <RelatedLinks
                 heading="Related services"
-                links={project.relatedServiceSlugs
-                  .map((serviceSlug) => getService(serviceSlug))
-                  .filter((service) => service !== undefined)
-                  .map((service) => ({
-                    label: service.shortTitle,
-                    href: '/commercial/',
-                  }))}
+                links={relatedServiceLinks(project.relatedServiceSlugs)}
               />
 
               <RelatedLinks

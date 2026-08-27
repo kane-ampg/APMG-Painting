@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { buildMetadata } from '@/lib/seo/metadata';
+import { buildMetadata, metaDescription } from '@/lib/seo/metadata';
 import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import { CtaBand, RelatedLinks } from '@/components/sections';
 import {
@@ -49,7 +49,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return buildMetadata({
     title: `Commercial ${vic ? 'Painters' : 'Painting'} ${name} | APMG Painting`,
     description:
-      locality.intro?.slice(0, 155) ??
+      // Sentence-boundary cut, not slice(0, 155): Vermont's snippet used to
+      // end "…school stayed open. Vermo" in the SERP.
+      (locality.intro ? metaDescription(locality.intro) : undefined) ??
       (vic
         ? `Commercial painting in ${name}, ${locality.council.name} council. APMG Painting services ${name} from our Bayswater North base.`
         : `Commercial painting in ${name}, ${locality.council.name} council. APMG Painting services ${name} — building stock, access and coating notes.`),

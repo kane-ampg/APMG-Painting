@@ -43,7 +43,7 @@ import { site } from '@/lib/site';
 export const metadata: Metadata = buildMetadata({
   title: 'APMG Painting | Commercial Painters, Melbourne',
   description:
-    'APMG Painting is a Melbourne commercial painting contractor working across schools, healthcare, aged care, strata, retail and industrial sites across the metro area.',
+    'APMG Painting is a commercial painting contractor working across schools, healthcare, aged care, strata, retail and industrial sites in metropolitan Melbourne.',
   path: '/',
 });
 

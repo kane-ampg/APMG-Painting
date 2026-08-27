@@ -24,37 +24,6 @@ export const brandLogoPath = '/images/brand/apmg-logo-ink.webp';
 
 type JsonLdValue = Record<string, unknown>;
 
-export function organizationSchema(): JsonLdValue {
-  const knowsAbout = verifiedAccreditations.map((a) => a.label);
-
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
-    '@id': `${siteUrl}/#organization`,
-    name: site.name,
-    legalName: site.legalName,
-    url: `${siteUrl}/`,
-    // The mark the header renders, so the entity Google resolves and the
-    // entity a visitor sees are the same one.
-    logo: `${siteUrl}${brandLogoPath}`,
-    foundingDate: String(site.founded),
-    email: site.email,
-    telephone: site.phone.display,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: site.address.street,
-      addressLocality: site.address.suburb,
-      addressRegion: site.address.state,
-      postalCode: site.address.postcode,
-      addressCountry: site.address.country,
-    },
-    // Same three profiles as the LocalBusiness node, so both nodes point Google
-    // at one entity rather than two half-described ones.
-    sameAs: [site.social.instagram, site.social.facebook, site.social.google].filter(Boolean),
-    ...(knowsAbout.length > 0 ? { knowsAbout } : {}),
-  };
-}
-
 /**
  * Where APMG works, as structured data.
  *
@@ -136,20 +105,38 @@ function offerCatalogFragment(): JsonLdValue {
   };
 }
 
+/**
+ * The business, as one node.
+ *
+ * This used to be two top-level nodes — an Organization at `#organization`
+ * and a LocalBusiness at `#localbusiness` — duplicating name, legal name,
+ * address, phone and profiles with no link between them, which left Google
+ * two candidate entities to reconcile. LocalBusiness is a subtype of
+ * Organization, so one node carries everything, and it keeps the
+ * `#organization` id because that is what serviceSchema and projectSchema
+ * reference as provider/author/publisher.
+ */
 export function localBusinessSchema(): JsonLdValue {
+  const knowsAbout = verifiedAccreditations.map((a) => a.label);
+
   return {
     '@context': 'https://schema.org',
     // HomeAndConstructionBusiness is the parent category; HousePainter is the
     // specific one. Emitting both keeps the broad type that other consumers
     // understand while telling Google exactly what trade this is.
     '@type': ['HomeAndConstructionBusiness', 'HousePainter'],
-    '@id': `${siteUrl}/#localbusiness`,
+    '@id': `${siteUrl}/#organization`,
     name: site.name,
     legalName: site.legalName,
     url: `${siteUrl}/`,
+    // The mark the header renders, so the entity Google resolves and the
+    // entity a visitor sees are the same one.
     logo: `${siteUrl}${brandLogoPath}`,
     image: `${siteUrl}${brandLogoPath}`,
-    telephone: site.phone.display,
+    foundingDate: String(site.founded),
+    // Country-coded per Google's LocalBusiness guidance; prose keeps the
+    // local display format.
+    telephone: site.phone.international,
     email: site.email,
     address: {
       '@type': 'PostalAddress',
@@ -172,7 +159,11 @@ export function localBusinessSchema(): JsonLdValue {
     // The Google Business Profile is the entity link that matters most for the
     // map pack. Resolved from the review widget on the live site.
     sameAs: [site.social.instagram, site.social.facebook, site.social.google].filter(Boolean),
-    description: `${site.name} is a commercial painting contractor based in ${site.address.suburb}, serving metropolitan Melbourne.`,
+    // The description states the same footprint areaServed declares — it
+    // used to say Melbourne only while areaServed listed three Queensland
+    // regions, a contradiction inside a single node.
+    description: `${site.name} is a commercial painting contractor based in ${site.address.suburb}, serving metropolitan Melbourne and South East Queensland.`,
+    ...(knowsAbout.length > 0 ? { knowsAbout } : {}),
     ...offerCatalogFragment(),
     ...openingHoursFragment(),
     // Spreads to nothing while content/reviews.ts holds no first-party entries.

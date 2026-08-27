@@ -128,43 +128,35 @@ export const tradeFaqs: readonly Faq[] = [
 /**
  * Homepage FAQs.
  *
- * Deliberately a different set of questions from the two above. These are the
- * top-of-funnel ones — asked before a visitor has drilled into a specific
- * service — so the homepage carries its own FAQPage markup without
- * duplicating the commercial pages.
+ * Deliberately a different set of questions from the two above AND from the
+ * differentiator grid in content/approach.ts. The homepage merges both sets
+ * into one FAQPage node, and the previous five questions here restated four
+ * of the six differentiators a few hundred pixels above them — near-duplicate
+ * questions inside a single FAQPage, which splits the extractable answer
+ * across two weaker versions and is against Google's own guidance. These
+ * three ask questions the differentiator grid does not, so the merged node
+ * never carries two versions of one answer.
  *
  * Same rule as everywhere else: nothing here asserts a credential, a warranty
  * or a turnaround that has not been verified.
  */
 export const homeFaqs: readonly Faq[] = [
   {
-    question: 'Will you quote without seeing the site?',
-    answer:
-      'No. Preparation is the largest variable in a painting job and it cannot be assessed from a photograph or a floor area. Attending first is what stops a quote becoming a variation later.',
-    audience: 'commercial',
-  },
-  {
-    question: 'Can you work while the building stays open?',
-    answer:
-      'That is most of what we do. Schools mid-term, clinics between patients, offices during trading hours, warehouses mid-shift. Work is staged zone by zone or run after hours, areas are isolated and handed back progressively, and the programme is built around your hours rather than ours.',
-    audience: 'commercial',
-  },
-  {
     question: 'Which parts of Melbourne do you cover?',
     answer:
-      'Metropolitan Melbourne, worked from our base at Bayswater North. Our documented projects run from Vermont and Noble Park through to Brighton and Glen Iris, and multi-site programmes have covered offices across the metro area. If you are not sure whether you are in range, calling is a faster answer than a form.',
+      'Metropolitan Melbourne, worked from our base at Bayswater North. Our documented projects run from Vermont and Noble Park through to Brighton, and multi-site programmes have covered offices across the metro area. If you are not sure whether you are in range, calling is a faster answer than a form.',
     audience: 'commercial',
   },
   {
-    question: 'What paints and materials do you use?',
+    question: 'What warranty do you offer on the work?',
     answer:
-      'Premium-grade systems including Dulux, selected for the substrate and the conditions rather than for the quote. On industrial substrates the existing coating is identified and the surface assessed before anything is specified — concrete, render, colorbond and structural steel each behave differently.',
+      'Five years on workmanship, backed by APMG’s standing as a Dulux Accredited Painter. A workmanship warranty covers the application — how the surface was prepared and how the system was applied — which is why both are established on site rather than assumed.',
     audience: 'commercial',
   },
   {
-    question: 'Do you handle the work around the painting?',
+    question: 'What do you need from us before you can quote?',
     answer:
-      'Usually, yes. Plastering, patching, rendering, tiling, flooring and making good are frequently needed before a coating can go on. Running them under one programme avoids the gap between trades that stalls a job.',
+      'Three answers: the building, the areas involved, and when contractors are allowed on site. Those decide whether a site assessment can be scheduled, and the assessment is what turns them into a written scope and price.',
     audience: 'commercial',
   },
 ] as const;

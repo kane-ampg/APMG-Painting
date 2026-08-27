@@ -19,7 +19,7 @@ export const sectors: readonly Sector[] = [
     primaryQuery: 'school painting Melbourne',
     metaTitle: 'School & Childcare Painting Melbourne | APMG Painting',
     metaDescription:
-      'Painting for Melbourne schools, colleges and childcare centres. Work staged around term dates and live campuses, by personnel holding Working with Children Checks.',
+      'Painting for Melbourne schools, colleges and childcare centres. Staged around term dates and live campuses by personnel holding Working with Children Checks.',
     intro:
       'Painting a school means working around a campus that never really stops. Term dates, exam periods, playground access and the presence of children all shape when work can happen and how a site is set up each day.',
     considerations: [

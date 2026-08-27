@@ -34,6 +34,12 @@ export const site = {
   phone: {
     display: '1300 97 97 40',
     href: 'tel:1300979740',
+    /**
+     * Country-coded form for structured data. Google's LocalBusiness guidance
+     * asks for the number with its country code; prose and the header keep
+     * the local display format above.
+     */
+    international: '+61 1300 979 740',
   },
 
   email: 'info@apmgpainting.com.au',
@@ -335,7 +341,7 @@ function normaliseOrigin(value: string | undefined): string | undefined {
   }
 }
 
-export const siteUrl =
+const resolvedOrigin =
   normaliseOrigin(process.env.NEXT_PUBLIC_SITE_URL) ??
   // No explicit origin on Vercel: use the stable production domain in
   // production and the per-deployment host everywhere else, so preview builds
@@ -344,6 +350,27 @@ export const siteUrl =
     process.env.VERCEL_ENV === 'production'
       ? process.env.VERCEL_PROJECT_PRODUCTION_URL
       : process.env.VERCEL_URL,
-  ) ??
-  'http://localhost:3000';
+  );
 
+// The localhost fallback exists for development. A production build that
+// reached it would ship localhost canonicals, a localhost sitemap reference
+// and localhost JSON-LD on every one of ~640 URLs — silently. Fail the build
+// instead: a mis-deployed environment is a one-line fix, a localhost sitemap
+// in Search Console is not.
+//
+// Server-only, deliberately. Next inlines NODE_ENV and NEXT_PUBLIC_* into
+// browser bundles but never the VERCEL_* system vars, so on a Vercel deploy
+// without NEXT_PUBLIC_SITE_URL the server resolves an origin while the
+// browser cannot — and this file is in the every-page client graph via the
+// header's mobile menu. A module-scope throw here would pass the build, then
+// crash hydration on every page. Client code only consumes `site`, so the
+// browser's silent localhost fallback is unused anyway.
+if (!resolvedOrigin && typeof window === 'undefined' && process.env.NODE_ENV === 'production') {
+  throw new Error(
+    'No site origin configured. Set NEXT_PUBLIC_SITE_URL (or deploy on Vercel, ' +
+      'whose system env vars provide one) — a production build must never fall ' +
+      'back to http://localhost:3000.',
+  );
+}
+
+export const siteUrl = resolvedOrigin ?? 'http://localhost:3000';

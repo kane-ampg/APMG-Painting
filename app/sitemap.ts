@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { siteUrl } from '@/lib/site';
 import { sectors } from '@/content/sectors';
-import { projects } from '@/content/projects';
+import { projects, sectorHasDocumentedProject } from '@/content/projects';
 import { indexableLocalities, REGIONS, stateSlug } from '@/lib/locations';
 
 /**
@@ -34,44 +34,46 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/areas/queensland/', priority: 0.7 },
   ];
 
-  /**
-   * Build time, used as a floor rather than as a claim about every page.
+  /*
+   * No `lastmod` at all, deliberately.
    *
-   * `lastmod` was previously `new Date()` on every URL. That tells Google the
+   * It was previously `new Date()` on every URL, which tells Google the
    * entire site changed on every deploy, including a deploy that only touched
    * a stylesheet — and a `lastmod` that is always "now" is a `lastmod` Google
    * learns to ignore, which costs the recrawl priority the field exists to
-   * buy. Pages with a real content date now carry it.
+   * buy. No content model on this site carries a real modification date yet,
+   * and an invented one is worse than none: omit the field until a genuine
+   * date exists to put in it.
    */
-  const buildDate = new Date();
-
   return [
     ...staticPaths.map((entry) => ({
       url: `${siteUrl}${entry.path}`,
-      lastModified: buildDate,
       changeFrequency: 'monthly' as const,
       priority: entry.priority,
     })),
-    ...sectors.map((sector) => ({
+    /*
+     * Sectors follow the same evidence rule as the suburb tiers: no
+     * documented project, no index — the page itself renders `noindex` from
+     * the same predicate (app/[sector]/page.tsx), and a noindex URL in a
+     * sitemap sends Google two contradictory instructions.
+     */
+    ...sectors.filter(sectorHasDocumentedProject).map((sector) => ({
       url: `${siteUrl}${sector.legacyPath}`,
-      lastModified: buildDate,
       changeFrequency: 'monthly' as const,
       priority: 0.7,
     })),
     ...projects.map((project) => ({
       url: `${siteUrl}/projects/${project.slug}/`,
-      lastModified: buildDate,
       changeFrequency: 'yearly' as const,
       priority: 0.6,
     })),
     /*
-     * Region hubs — 22 of them, all indexable. Each carries real writing and
-     * is the page meant to rank for a region-level query ("commercial
-     * painters eastern suburbs Melbourne").
+     * Region hubs — 22 of them, all indexable (spec §4/§9): each is the page
+     * meant to rank for a region-level query ("commercial painters eastern
+     * suburbs Melbourne").
      */
     ...REGIONS.map((region) => ({
       url: `${siteUrl}/areas/${stateSlug(region.state)}/${region.slug}/`,
-      lastModified: buildDate,
       changeFrequency: 'monthly' as const,
       priority: 0.7,
     })),
@@ -90,7 +92,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
      */
     ...indexableLocalities().map((location) => ({
       url: `${siteUrl}${location.href}`,
-      lastModified: buildDate,
       changeFrequency: 'monthly' as const,
       priority: 0.8,
     })),

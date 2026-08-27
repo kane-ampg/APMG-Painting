@@ -260,6 +260,32 @@ const COUNCIL_OVERRIDES_BY_LOCALITY: Record<string, string> = {
 
   // Sunshine Coast, currently tagged Gympie.
   KENILWORTH: 'Sunshine Coast',
+
+  // Tier 1 corrections, 2026-08-27. These five render as facts on indexable
+  // pages, so each was verified by hand against the suburb's own record
+  // (tests/unit/tier1-councils.test.ts pins all of them). Ringwood was tagged
+  // Manningham while being the seat of Maroondah; Vermont sits in Whitehorse,
+  // not Maroondah; Bayswater is Knox (Bayswater North is the Maroondah one);
+  // Dandenong South is Greater Dandenong, not Casey. Port Melbourne is split
+  // along the West Gate Freeway — Port Phillip holds the suburb's commercial
+  // core, the dataset's "Melbourne" only the Fishermans Bend side. None of
+  // these names exists as a QLD locality, so the name-keyed override is safe.
+  BAYSWATER: 'Knox',
+  RINGWOOD: 'Maroondah',
+  VERMONT: 'Whitehorse',
+  'DANDENONG SOUTH': 'Greater Dandenong',
+  'PORT MELBOURNE': 'Port Phillip',
+
+  // Same error class in the adjacent suburbs, surfaced when the Tier 1 fixes
+  // were reviewed. All Tier 3 (noindex), but the council still renders as a
+  // fact on each page. Verified the same way as the five above. The full
+  // dataset likely holds more of these (~7% per the note above); these are
+  // the ones checked and confirmed so far.
+  'VERMONT SOUTH': 'Whitehorse',
+  'RINGWOOD NORTH': 'Maroondah',
+  'FERNTREE GULLY': 'Knox',
+  'FOREST HILL': 'Whitehorse',
+  NUNAWADING: 'Whitehorse',
 };
 
 /**

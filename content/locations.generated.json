@@ -21135,7 +21135,7 @@
         "lat": -37.843,
         "lng": 145.268
       },
-      "council": "Maroondah",
+      "council": "Knox",
       "anchorKey": "bayswater-north",
       "distanceKm": 0.3,
       "regionSlug": "eastern",
@@ -21751,7 +21751,7 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/south-east/ferntree-gully/",
+        "/areas/victoria/eastern/ferntree-gully/",
         "/areas/victoria/eastern/bayswater/",
         "/areas/victoria/eastern/the-basin/",
         "/areas/victoria/south-east/mountain-gate/",
@@ -24402,7 +24402,7 @@
         "lat": -38.0146698,
         "lng": 145.2153096
       },
-      "council": "Casey",
+      "council": "Greater Dandenong",
       "anchorKey": "bayswater-north",
       "distanceKm": 19.46,
       "regionSlug": "south-east",
@@ -25568,10 +25568,10 @@
         "lat": -37.8826855,
         "lng": 145.2776105
       },
-      "council": "Casey",
+      "council": "Knox",
       "anchorKey": "bayswater-north",
       "distanceKm": 4.23,
-      "regionSlug": "south-east",
+      "regionSlug": "eastern",
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
@@ -25750,7 +25750,7 @@
         "lat": -37.8347413,
         "lng": 145.1727369
       },
-      "council": "Manningham",
+      "council": "Whitehorse",
       "anchorKey": "bayswater-north",
       "distanceKm": 8.63,
       "regionSlug": "eastern",
@@ -28033,7 +28033,7 @@
       "neighbourHrefs": [
         "/areas/victoria/south-east/mountain-gate/",
         "/areas/victoria/eastern/wantirna-south/",
-        "/areas/victoria/south-east/ferntree-gully/",
+        "/areas/victoria/eastern/ferntree-gully/",
         "/areas/victoria/eastern/scoresby/",
         "/areas/victoria/eastern/studfield/",
         "/areas/victoria/eastern/rowville/"
@@ -29664,7 +29664,7 @@
       "ruralFringe": false,
       "tier": 3,
       "neighbourHrefs": [
-        "/areas/victoria/south-east/ferntree-gully/",
+        "/areas/victoria/eastern/ferntree-gully/",
         "/areas/victoria/eastern/knoxfield/",
         "/areas/victoria/south-east/upper-ferntree-gully/",
         "/areas/victoria/eastern/boronia/",
@@ -30161,7 +30161,7 @@
         "lat": -37.8184273,
         "lng": 145.1760206
       },
-      "council": "Manningham",
+      "council": "Whitehorse",
       "anchorKey": "bayswater-north",
       "distanceKm": 8.78,
       "regionSlug": "eastern",
@@ -30882,7 +30882,7 @@
         "lat": -37.8315264,
         "lng": 144.9226452
       },
-      "council": "Melbourne",
+      "council": "Port Phillip",
       "anchorKey": "bayswater-north",
       "distanceKm": 30.55,
       "regionSlug": "inner-melbourne",
@@ -31421,7 +31421,7 @@
         "lat": -37.8106372,
         "lng": 145.2307011
       },
-      "council": "Manningham",
+      "council": "Maroondah",
       "anchorKey": "bayswater-north",
       "distanceKm": 5.17,
       "regionSlug": "eastern",
@@ -31473,7 +31473,7 @@
         "lat": -37.799883,
         "lng": 145.226877
       },
-      "council": "Manningham",
+      "council": "Maroondah",
       "anchorKey": "bayswater-north",
       "distanceKm": 6.3,
       "regionSlug": "eastern",
@@ -33533,7 +33533,7 @@
       "neighbourHrefs": [
         "/areas/victoria/eastern/upwey/",
         "/areas/victoria/eastern/ferny-creek/",
-        "/areas/victoria/south-east/ferntree-gully/",
+        "/areas/victoria/eastern/ferntree-gully/",
         "/areas/victoria/eastern/tecoma/",
         "/areas/victoria/south-east/mountain-gate/",
         "/areas/victoria/south-east/lysterfield/"
@@ -33576,7 +33576,7 @@
         "lat": -37.838,
         "lng": 145.198
       },
-      "council": "Maroondah",
+      "council": "Whitehorse",
       "anchorKey": "bayswater-north",
       "distanceKm": 6.38,
       "regionSlug": "eastern",
@@ -33602,7 +33602,7 @@
         "lat": -37.8565882,
         "lng": 145.183373
       },
-      "council": "Maroondah",
+      "council": "Whitehorse",
       "anchorKey": "bayswater-north",
       "distanceKm": 7.72,
       "regionSlug": "eastern",
@@ -33756,7 +33756,7 @@
         "/areas/victoria/eastern/scoresby/",
         "/areas/victoria/eastern/wantirna/",
         "/areas/victoria/south-east/mountain-gate/",
-        "/areas/victoria/south-east/ferntree-gully/"
+        "/areas/victoria/eastern/ferntree-gully/"
       ]
     },
     {
