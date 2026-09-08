@@ -7,29 +7,30 @@
  * Run: node --env-file=.env.local scripts/seed-cms.mjs
  */
 import { readFile } from 'node:fs/promises';
-import { createHash } from 'node:crypto';
 import path from 'node:path';
-import sharp from 'sharp';
 import { createClient } from '@supabase/supabase-js';
-import { register } from 'node:module';
-import { pathToFileURL } from 'node:url';
+import { tsImport } from 'tsx/esm/api';
 
-// Load the TS content through tsx so the arrays are the single source.
-register('tsx/esm', pathToFileURL('./'));
-const { projects } = await import('../content/projects.ts');
-const { services } = await import('../content/services.ts');
+// Load the TS content and the TS media helpers through tsx so the arrays and
+// the naming/URL logic both stay single-sourced with the rest of the app.
+//
+// `tsImport` (rather than `register('tsx/esm', ...)` from node:module) is
+// what this installed tsx version documents for programmatic use: the
+// generic node:module registration errors under Node 24 ("must be loaded
+// with --import instead of --loader"), and even once that is worked around,
+// the CJS-style fallback it uses to resolve tsconfig `paths` cannot find
+// extensionless `@/...` specifiers. `tsImport` resolves both the content
+// files' `@/lib/content/types` import and lib/media's `@/lib/supabase/env`
+// import correctly against this repo's tsconfig.
+const { projects } = await tsImport('../content/projects.ts', import.meta.url);
+const { services } = await tsImport('../content/services.ts', import.meta.url);
+const { processImage } = await tsImport('../lib/media/process.ts', import.meta.url);
+const { publicUrlFor } = await tsImport('../lib/media/url.ts', import.meta.url);
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 if (!url || !key) throw new Error('Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY');
 const supabase = createClient(url, key, { auth: { persistSession: false } });
-
-const MIME = { webp: 'image/webp', jpeg: 'image/jpeg', png: 'image/png', avif: 'image/avif' };
-const slugify = (s) =>
-  s
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
 
 /** Uploads one local file, returns a MediaRef. Caches by local path. */
 const uploaded = new Map();
@@ -37,32 +38,29 @@ async function uploadLocal(localSrc, alt) {
   if (uploaded.has(localSrc)) return { ...uploaded.get(localSrc), alt };
   const file = path.join('public', localSrc);
   const buffer = await readFile(file);
-  const meta = await sharp(buffer).metadata();
-  const sha = createHash('sha256').update(buffer).digest('hex');
   const folder = localSrc.split('/')[2]; // /images/<folder>/name
-  const base = path.basename(localSrc, path.extname(localSrc));
-  const ext = path.extname(localSrc).slice(1).toLowerCase();
-  const storagePath = `${folder}/${sha.slice(0, 6)}-${slugify(base)}.${ext}`;
-  const blur = await sharp(buffer).resize(16).webp({ quality: 40 }).toBuffer();
+  const processed = await processImage(buffer, path.basename(localSrc), folder);
 
-  const { error: upErr } = await supabase.storage.from('media').upload(storagePath, buffer, {
-    contentType: MIME[meta.format],
-    cacheControl: '31536000',
-    upsert: false,
-  });
+  const { error: upErr } = await supabase.storage
+    .from('media')
+    .upload(processed.storagePath, buffer, {
+      contentType: processed.mimeType,
+      cacheControl: '31536000',
+      upsert: false,
+    });
   if (upErr && !/already exists/i.test(upErr.message)) throw upErr;
 
-  const publicUrl = `${url}/storage/v1/object/public/media/${storagePath}`;
+  const publicUrl = publicUrlFor(processed.storagePath);
   const { error: rowErr } = await supabase.from('media').upsert(
     {
-      storage_path: storagePath,
+      storage_path: processed.storagePath,
       public_url: publicUrl,
-      width: meta.width,
-      height: meta.height,
-      blur_data_url: `data:image/webp;base64,${blur.toString('base64')}`,
+      width: processed.width,
+      height: processed.height,
+      blur_data_url: processed.blurDataURL,
       alt,
-      mime_type: MIME[meta.format],
-      bytes: buffer.byteLength,
+      mime_type: processed.mimeType,
+      bytes: processed.bytes,
       created_by: 'seed',
     },
     { onConflict: 'storage_path' },
@@ -71,12 +69,12 @@ async function uploadLocal(localSrc, alt) {
 
   const ref = {
     src: publicUrl,
-    width: meta.width,
-    height: meta.height,
-    blurDataURL: `data:image/webp;base64,${blur.toString('base64')}`,
+    width: processed.width,
+    height: processed.height,
+    blurDataURL: processed.blurDataURL,
   };
   uploaded.set(localSrc, ref);
-  console.log('media', storagePath);
+  console.log('media', processed.storagePath);
   return { ...ref, alt };
 }
 
