@@ -12,8 +12,7 @@ import {
 import { Container, Prose, Section, SectionHeading } from '@/components/ui';
 import { JsonLd } from '@/components/seo/json-ld';
 import { faqSchema, serviceSchema } from '@/lib/schema';
-import { getService } from '@/content/services';
-import { getProject } from '@/content/projects';
+import { getProject, getService } from '@/lib/content/source';
 import { officeFaqs } from '@/content/faqs';
 
 /**
@@ -30,9 +29,6 @@ export const metadata: Metadata = buildMetadata({
     'Office painters in Melbourne. Workplace repaints programmed after hours or in staged zones so your team keeps working through the job.',
   path: '/office-painters/',
 });
-
-const service = getService('office-painting');
-const ndis = getProject('ndis-commercial-painting');
 
 /**
  * Trade content for the office page — general workplace-repaint knowledge, not
@@ -73,7 +69,12 @@ const OFFICE_SURFACES = [
   },
 ];
 
-export default function OfficePaintersPage() {
+export default async function OfficePaintersPage() {
+  const [service, ndis] = await Promise.all([
+    getService('office-painting'),
+    getProject('ndis-commercial-painting'),
+  ]);
+
   return (
     <>
       <JsonLd

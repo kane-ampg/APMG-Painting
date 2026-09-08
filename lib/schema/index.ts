@@ -1,8 +1,7 @@
 import { formattedAddress, site, siteUrl, verifiedAccreditations } from '@/lib/site';
 import { averageRating, firstPartyReviews } from '@/content/reviews';
 import { locations } from '@/content/locations';
-import { services } from '@/content/services';
-import type { Project } from '@/lib/content/types';
+import type { Project, Service } from '@/lib/content/types';
 
 /** The APMG mark, dark-on-transparent — the header variant. */
 export const brandLogoPath = '/images/brand/apmg-logo-ink.webp';
@@ -124,7 +123,7 @@ function openingHoursFragment(): JsonLdValue {
  * This is what lets a search engine — or an answer engine — enumerate what
  * APMG actually does without parsing prose out of the page.
  */
-function offerCatalogFragment(): JsonLdValue {
+function offerCatalogFragment(services: readonly Service[]): JsonLdValue {
   return {
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
@@ -144,7 +143,7 @@ function offerCatalogFragment(): JsonLdValue {
   };
 }
 
-export function localBusinessSchema(): JsonLdValue {
+export function localBusinessSchema(services: readonly Service[]): JsonLdValue {
   return {
     '@context': 'https://schema.org',
     // HomeAndConstructionBusiness is the parent category; HousePainter is the
@@ -181,7 +180,7 @@ export function localBusinessSchema(): JsonLdValue {
     // map pack. Resolved from the review widget on the live site.
     sameAs: [site.social.instagram, site.social.facebook, site.social.google].filter(Boolean),
     description: `${site.name} is a commercial painting contractor based in ${site.address.suburb}, serving metropolitan Melbourne.`,
-    ...offerCatalogFragment(),
+    ...offerCatalogFragment(services),
     ...openingHoursFragment(),
     // Spreads to nothing while content/reviews.ts holds no first-party entries.
     // priceRange stays absent until APMG supplies a defensible band.

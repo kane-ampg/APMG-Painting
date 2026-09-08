@@ -7,6 +7,7 @@ import { QuoteChat } from '@/components/chat/quote-chat';
 import { ScrollReveal } from '@/components/motion/scroll-reveal';
 import { JsonLd } from '@/components/seo/json-ld';
 import { localBusinessSchema, organizationSchema } from '@/lib/schema';
+import { getServices } from '@/lib/content/source';
 import { isSandbox, site, siteUrl } from '@/lib/site';
 
 /**
@@ -38,7 +39,9 @@ export const metadata: Metadata = {
   robots: isSandbox ? { index: false, follow: false } : undefined,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const services = await getServices();
+
   return (
     <html lang="en-AU" className={`${sans.variable} ${display.variable}`}>
       <body className="flex min-h-screen flex-col font-sans">
@@ -47,7 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
 
         <JsonLd data={organizationSchema()} />
-        <JsonLd data={localBusinessSchema()} />
+        <JsonLd data={localBusinessSchema(services)} />
 
         <Header />
         <main id="main" className="flex-1">

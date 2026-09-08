@@ -4,7 +4,7 @@ import { ContentBlock, CtaBand, FaqList, Hero, MediaBand } from '@/components/se
 import { JsonLd } from '@/components/seo/json-ld';
 import { faqSchema, serviceSchema } from '@/lib/schema';
 import { Card, Prose } from '@/components/ui';
-import { getService } from '@/content/services';
+import { getService } from '@/lib/content/source';
 import { tradeFaqs } from '@/content/faqs';
 
 /**
@@ -17,8 +17,6 @@ export const metadata: Metadata = buildMetadata({
     'Painting delivered into a construction programme across Melbourne — staged to the build, sequenced around other trades, and carried through to handover.',
   path: '/trade-services/',
 });
-
-const service = getService('builders-and-head-contractors');
 
 const TRADES = [
   {
@@ -54,7 +52,9 @@ const SEQUENCE = [
   'What cannot be seen cannot be priced firm. Water damage, unstable render and previous poor repairs are usually hidden under a coating and only surface once preparation starts. The honest way to handle that is a labelled provisional sum against the areas that cannot be assessed until they are opened, with anything found reported and priced before it is carried out.',
 ];
 
-export default function TradeServicesPage() {
+export default async function TradeServicesPage() {
+  const service = await getService('builders-and-head-contractors');
+
   return (
     <>
       <JsonLd

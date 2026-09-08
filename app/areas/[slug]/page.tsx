@@ -5,7 +5,7 @@ import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import { CtaBand, ProjectGrid, TestimonialBlock } from '@/components/sections';
 import { Container, Placeholder, Prose, Section, SectionHeading } from '@/components/ui';
 import { getLocation, locations } from '@/content/locations';
-import { getProject } from '@/content/projects';
+import { getProject } from '@/lib/content/source';
 import { site } from '@/lib/site';
 
 export function generateStaticParams() {
@@ -37,9 +37,9 @@ export default async function LocationPage({ params }: Props) {
   const location = getLocation(slug);
   if (!location) notFound();
 
-  const projects = location.projectSlugs
-    .map((projectSlug) => getProject(projectSlug))
-    .filter((project) => project !== undefined);
+  const projects = (
+    await Promise.all(location.projectSlugs.map((projectSlug) => getProject(projectSlug)))
+  ).filter((project) => project !== undefined);
 
   return (
     <>

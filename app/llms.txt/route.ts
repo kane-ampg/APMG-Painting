@@ -1,8 +1,7 @@
 import { accreditations, formattedAddress, isSandbox, site, siteUrl } from '@/lib/site';
 import { googleAggregate, googleReviews } from '@/content/reviews';
-import { services } from '@/content/services';
+import { getProjects, getServices } from '@/lib/content/source';
 import { sectors } from '@/content/sectors';
-import { projects } from '@/content/projects';
 import { locations } from '@/content/locations';
 import { homeFaqs } from '@/content/faqs';
 
@@ -24,7 +23,7 @@ import { homeFaqs } from '@/content/faqs';
  */
 export const dynamic = 'force-static';
 
-export function GET(): Response {
+export async function GET(): Promise<Response> {
   if (isSandbox) {
     return new Response('User-agent: *\n# Preview build. No content published.\n', {
       status: 404,
@@ -32,6 +31,7 @@ export function GET(): Response {
     });
   }
 
+  const [services, projects] = await Promise.all([getServices(), getProjects()]);
   const verified = accreditations.filter((a) => a.verified);
 
   const body = `# ${site.name}

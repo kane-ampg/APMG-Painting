@@ -3,7 +3,7 @@ import { buildMetadata } from '@/lib/seo/metadata';
 import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import { CtaBand, ProjectGrid } from '@/components/sections';
 import { Container, Placeholder, Prose, Section, SectionHeading } from '@/components/ui';
-import { featuredProjects, projects } from '@/content/projects';
+import { getFeaturedProjects, getProjects } from '@/lib/content/source';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Painting Projects & Case Studies | APMG Painting',
@@ -12,9 +12,10 @@ export const metadata: Metadata = buildMetadata({
   path: '/projects/',
 });
 
-const thin = projects.filter((project) => !project.isFeatured);
+export default async function ProjectsPage() {
+  const [featuredProjects, projects] = await Promise.all([getFeaturedProjects(), getProjects()]);
+  const thin = projects.filter((project) => !project.isFeatured);
 
-export default function ProjectsPage() {
   return (
     <>
       <Section tone="sunken" className="py-10">

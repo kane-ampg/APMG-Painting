@@ -14,7 +14,7 @@ import { Container, Prose, Section, SectionHeading } from '@/components/ui';
 import { JsonLd } from '@/components/seo/json-ld';
 import { faqSchema, serviceSchema } from '@/lib/schema';
 import { sectors } from '@/content/sectors';
-import { featuredProjects } from '@/content/projects';
+import { getFeaturedProjects } from '@/lib/content/source';
 import { faqsFor } from '@/content/faqs';
 
 /**
@@ -55,7 +55,9 @@ const PROCESS = [
   },
 ];
 
-export default function CommercialPage() {
+export default async function CommercialPage() {
+  const featuredProjects = await getFeaturedProjects();
+
   return (
     <>
       <JsonLd

@@ -22,9 +22,8 @@ import { ButtonLink, Container, Prose, Section, SectionHeading } from '@/compone
 import { faqSchema } from '@/lib/schema';
 import { homeFaqs } from '@/content/faqs';
 import { locations } from '@/content/locations';
-import { featuredProjects } from '@/content/projects';
+import { getFeaturedProjects, getServices } from '@/lib/content/source';
 import { sectors } from '@/content/sectors';
-import { services } from '@/content/services';
 import { site } from '@/lib/site';
 
 /**
@@ -114,8 +113,9 @@ const APPROACH = [
   },
 ] as const;
 
-export default function HomePage() {
+export default async function HomePage() {
   const yearsTrading = new Date().getFullYear() - site.founded;
+  const [services, featuredProjects] = await Promise.all([getServices(), getFeaturedProjects()]);
 
   return (
     <>

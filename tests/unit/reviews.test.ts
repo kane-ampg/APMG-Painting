@@ -9,6 +9,7 @@ import {
   reviews,
 } from '@/content/reviews';
 import { localBusinessSchema } from '@/lib/schema';
+import { services } from '@/content/services';
 import { accreditationLogos, accreditations, addressNote, site } from '@/lib/site';
 
 /**
@@ -40,7 +41,7 @@ describe('Google reviews stay out of review markup', () => {
   });
 
   it('emits no aggregateRating or review block on the business', () => {
-    const schema = localBusinessSchema();
+    const schema = localBusinessSchema(services);
 
     expect(schema.aggregateRating).toBeUndefined();
     expect(schema.review).toBeUndefined();

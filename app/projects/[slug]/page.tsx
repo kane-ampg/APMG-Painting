@@ -7,23 +7,24 @@ import { CtaBand, RelatedLinks, TestimonialBlock } from '@/components/sections';
 import { Container, mediaZoom, Placeholder, Section, SectionHeading } from '@/components/ui';
 import { JsonLd } from '@/components/seo/json-ld';
 import { projectSchema } from '@/lib/schema';
-import { getProject, projects } from '@/content/projects';
+import { getProject, getProjects, getService } from '@/lib/content/source';
 import { getSector } from '@/content/sectors';
-import { getService } from '@/content/services';
 import { getLocation } from '@/content/locations';
 import { isPlaceholder } from '@/lib/content/types';
 
-export function generateStaticParams() {
-  return projects.map((project) => ({ slug: project.slug }));
+export async function generateStaticParams() {
+  return (await getProjects()).map((project) => ({ slug: project.slug }));
 }
 
-export const dynamicParams = false;
+// A project published from the CMS after the last build renders on first
+// request, then is cached like the rest.
+export const dynamicParams = true;
 
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const project = getProject(slug);
+  const project = await getProject(slug);
   if (!project) return {};
 
   return buildMetadata({
@@ -53,12 +54,15 @@ function DetailList({ heading, items }: { heading: string; items?: readonly stri
 
 export default async function ProjectPage({ params }: Props) {
   const { slug } = await params;
-  const project = getProject(slug);
+  const project = await getProject(slug);
   if (!project) notFound();
 
   const sector = getSector(project.sectorSlug);
   const cover = project.images[0];
   const gallery = project.images.slice(1);
+  const relatedServices = (
+    await Promise.all(project.relatedServiceSlugs.map((serviceSlug) => getService(serviceSlug)))
+  ).filter((service) => service !== undefined);
 
   return (
     <>
@@ -171,13 +175,10 @@ export default async function ProjectPage({ params }: Props) {
 
               <RelatedLinks
                 heading="Related services"
-                links={project.relatedServiceSlugs
-                  .map((serviceSlug) => getService(serviceSlug))
-                  .filter((service) => service !== undefined)
-                  .map((service) => ({
-                    label: service.shortTitle,
-                    href: '/commercial/',
-                  }))}
+                links={relatedServices.map((service) => ({
+                  label: service.shortTitle,
+                  href: '/commercial/',
+                }))}
               />
 
               <RelatedLinks
