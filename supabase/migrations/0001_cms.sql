@@ -24,15 +24,15 @@ create table if not exists public.media (
 );
 
 create table if not exists public.admin_allowlist (
-  email text primary key
+  email text primary key check (email = lower(email))
 );
 
 -- Who may edit. Add editors here, never in code.
 insert into public.admin_allowlist (email) values
   ('kaner@simple.biz')
 on conflict do nothing;
--- TODO for the operator, not the code: add Farbod's and Zac's addresses with
--- the same statement once APMG confirms them.
+-- TODO for the operator, not the code: add Farbod's and Zac's addresses (in
+-- lowercase) with the same statement once APMG confirms them.
 
 -- Row level security --------------------------------------------------------
 alter table public.content_entries enable row level security;
@@ -43,7 +43,7 @@ create or replace function public.is_admin() returns boolean
 language sql stable security definer set search_path = public as $$
   select exists (
     select 1 from public.admin_allowlist
-    where email = lower(coalesce(auth.jwt() ->> 'email', ''))
+    where lower(email) = lower(coalesce(auth.jwt() ->> 'email', ''))
   );
 $$;
 
