@@ -1,7 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+// Hoisted so the vi.mock factory below (itself hoisted above these imports)
+// can close over it. Recording the call lets tests assert on the cache key,
+// tags and revalidate config actually passed to unstable_cache, not just
+// that the wrapped function still runs.
+const { unstableCache } = vi.hoisted(() => ({
+  unstableCache: vi.fn((...args: unknown[]) => args[0] as (...a: unknown[]) => unknown),
+}));
+
 vi.mock('next/cache', () => ({
-  unstable_cache: (fn: (...args: unknown[]) => unknown) => fn,
+  unstable_cache: (...args: unknown[]) => unstableCache(...args),
 }));
 
 describe('content source without Supabase', () => {
@@ -35,6 +43,7 @@ describe('content source with Supabase', () => {
     vi.unstubAllEnvs();
     vi.resetModules();
     vi.doUnmock('@/lib/supabase/server');
+    unstableCache.mockClear();
   });
 
   it('parses published rows and drops rows that fail the schema', async () => {
@@ -74,5 +83,28 @@ describe('content source with Supabase', () => {
     const posts = await getPosts();
     expect(posts.map((p) => p.slug)).toEqual(['first-post']);
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('broken'), expect.anything());
+  });
+
+  it('tags the posts cache and never expires it on a timer', async () => {
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://abc.supabase.co');
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon');
+    vi.doMock('@/lib/supabase/server', () => ({
+      createServerSupabase: async () => ({
+        from: () => ({
+          select: () => ({
+            eq: () => ({
+              eq: () => ({ order: async () => ({ data: [], error: null }) }),
+            }),
+          }),
+        }),
+      }),
+    }));
+    const { getPosts } = await import('@/lib/content/source');
+    await getPosts();
+    expect(unstableCache).toHaveBeenCalledWith(
+      expect.any(Function),
+      expect.arrayContaining(['posts']),
+      { tags: ['content:posts'], revalidate: false },
+    );
   });
 });
