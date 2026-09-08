@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Fragment, type CSSProperties, type ReactNode } from 'react';
 import { ProcessIcon, type ProcessIconName } from '@/components/icons/process-icons';
 import { SectorIcon } from '@/components/icons/sector-icons';
+import { CmsImage } from '@/components/media/cms-image';
 import { HeroReel } from '@/components/media/hero-reel';
 import { InView } from '@/components/motion/in-view';
 import { GoogleReviewCarousel } from '@/components/sections/google-review-carousel';
@@ -348,11 +349,9 @@ export function ServiceGrid({ services }: { services: readonly Service[] }) {
                     lead && 'lg:aspect-[3/2] lg:w-1/2 lg:shrink-0',
                   )}
                 >
-                  <Image
-                    src={service.image.src}
-                    alt={service.image.alt}
+                  <CmsImage
+                    image={service.image}
                     fill
-                    loading="lazy"
                     sizes={
                       lead
                         ? '(min-width: 1024px) 50vw, 100vw'
