@@ -13,7 +13,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/'],
+        disallow: ['/api/', '/admin/'],
       },
       {
         // Named explicitly so a later blanket rule cannot quietly lock the
@@ -32,7 +32,7 @@ export default function robots(): MetadataRoute.Robots {
           'Bingbot',
         ],
         allow: '/',
-        disallow: ['/api/'],
+        disallow: ['/api/', '/admin/'],
       },
     ],
     sitemap: `${siteUrl}/sitemap.xml`,
