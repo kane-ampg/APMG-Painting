@@ -208,3 +208,36 @@ export type Differentiator = {
   /** Project slugs from content/projects.ts that `answer` relies on. */
   projects?: readonly string[];
 };
+
+/**
+ * A CMS-managed image. Width and height are stored at upload so pages can
+ * reserve space before the bytes arrive; the blur is a 16px data URI.
+ * `src` is the full public URL. The legacy `{ src, alt }` shape used by
+ * services and projects is a structural subset, so a MediaRef can be passed
+ * anywhere those are accepted.
+ */
+export type MediaRef = {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  blurDataURL?: string;
+};
+
+/** Blog post. Body is Markdown; rendering sanitises it. */
+export type Post = {
+  slug: string;
+  title: string;
+  /** Under 300 characters. Shown on the index and used as the OG description. */
+  excerpt: string;
+  body: string;
+  cover?: MediaRef;
+  /** ISO date. */
+  publishedAt: string;
+  /** ISO date, set on every save. Drives sitemap lastmod. */
+  updatedAt?: string;
+  author: string;
+  tags: readonly string[];
+  metaTitle: string;
+  metaDescription: string;
+};
