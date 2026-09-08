@@ -29,11 +29,11 @@ const display = Fraunces({
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${site.name} | Commercial & Residential Painters Melbourne`,
+    default: `${site.name} | Commercial Painters Melbourne`,
     template: `%s | ${site.name}`,
   },
   description:
-    'APMG Painting is a Melbourne commercial and residential painting contractor, working across schools, healthcare, aged care, strata, retail and industrial sites.',
+    'APMG Painting is a Melbourne commercial painting contractor, working across schools, healthcare, aged care, strata, retail and industrial sites.',
   // Sandbox-wide guard. Flipped only at production go-live.
   robots: isSandbox ? { index: false, follow: false } : undefined,
 };

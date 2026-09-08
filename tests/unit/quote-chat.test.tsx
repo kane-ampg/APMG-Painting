@@ -61,7 +61,7 @@ describe('the launcher', () => {
     expect(launcher().getAttribute('aria-controls')).toBe(screen.getByRole('dialog').id);
   });
 
-  it('stays out of the way on the contact page, where the full forms already are', () => {
+  it('stays out of the way on the contact page, where the full form already is', () => {
     pathname.current = '/contact-us/';
     render(<QuoteChat />);
     expect(screen.queryByRole('button', { name: /get a quote|chat/i })).not.toBeInTheDocument();
@@ -87,7 +87,7 @@ describe('keyboard and assistive-technology access', () => {
     await openChat();
     const log = screen.getByRole('log');
     expect(log).toHaveAttribute('aria-live', 'polite');
-    expect(log).toHaveTextContent(/what can we help you paint/i);
+    expect(log).toHaveTextContent(/which organisation are you with/i);
   });
 
   it('offers the phone number as a way out at every turn', async () => {
@@ -100,48 +100,51 @@ describe('keyboard and assistive-technology access', () => {
 });
 
 describe('walking the conversation', () => {
-  it('asks the next question once the audience is chosen', async () => {
-    const user = await openChat();
-
-    await user.click(screen.getByRole('button', { name: 'My home' }));
-
-    expect(screen.getByRole('log')).toHaveTextContent(/whereabouts is the property/i);
-    expect(screen.getByLabelText('Suburb')).toBeInTheDocument();
-  });
-
-  it('branches to the commercial questions for a business', async () => {
-    const user = await openChat();
-
-    await user.click(screen.getByRole('button', { name: 'A business or facility' }));
+  it('opens straight on the flow’s first question — there is no audience choice to make', async () => {
+    await openChat();
 
     expect(screen.getByLabelText('Organisation')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /my home|a business or facility/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('asks the next question once the organisation is given', async () => {
+    const user = await openChat();
+
+    await user.type(screen.getByLabelText('Organisation'), 'Ramset Aged Care');
+    await user.click(screen.getByRole('button', { name: /next/i }));
+
+    expect(screen.getByRole('log')).toHaveTextContent(/what kind of site is it/i);
+    expect(screen.getByRole('button', { name: 'School or childcare' })).toBeInTheDocument();
   });
 
   it('refuses to advance on an answer the server would reject', async () => {
     const user = await openChat();
-    await user.click(screen.getByRole('button', { name: 'My home' }));
 
-    await user.type(screen.getByLabelText('Suburb'), 'a');
+    await user.type(screen.getByLabelText('Organisation'), 'a');
     await user.click(screen.getByRole('button', { name: /next/i }));
 
-    expect(screen.getByText('Enter your suburb.')).toBeInTheDocument();
-    expect(screen.getByLabelText('Suburb')).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByText('Enter your organisation.')).toBeInTheDocument();
+    expect(screen.getByLabelText('Organisation')).toHaveAttribute('aria-invalid', 'true');
     // Still on the same question.
-    expect(screen.getByRole('log')).not.toHaveTextContent(/what needs painting/i);
+    expect(screen.getByRole('log')).not.toHaveTextContent(/what kind of site is it/i);
   });
 
   it('lets the visitor correct a wrong turn', async () => {
     const user = await openChat();
-    await user.click(screen.getByRole('button', { name: 'My home' }));
 
-    await user.click(screen.getByRole('button', { name: /back/i }));
+    await user.type(screen.getByLabelText('Organisation'), 'Ramset Aged Care');
+    await user.click(screen.getByRole('button', { name: /next/i }));
 
-    expect(screen.getByRole('button', { name: 'My home' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /^back$/i }));
+
+    expect(screen.getByLabelText('Organisation')).toHaveValue('Ramset Aged Care');
   });
 
   it('skips a question the schema says is optional', async () => {
     const user = await openChat();
-    await user.click(screen.getByRole('button', { name: 'A business or facility' }));
+
     await user.type(screen.getByLabelText('Organisation'), 'Ramset Aged Care');
     await user.click(screen.getByRole('button', { name: /next/i }));
     await user.click(screen.getByRole('button', { name: 'Aged care or retirement living' }));
@@ -174,7 +177,7 @@ describe('answering a question without starting a quote', () => {
     );
 
     expect(screen.getByRole('log')).toHaveTextContent(/metropolitan Melbourne from our base/i);
-    expect(screen.getByRole('button', { name: 'My home' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Organisation')).toBeInTheDocument();
   });
 
   it('does not count an answered question as a step in the quote', async () => {
@@ -183,9 +186,8 @@ describe('answering a question without starting a quote', () => {
     await user.click(
       screen.getByRole('button', { name: 'Which areas of Melbourne do you cover?' }),
     );
-    await user.click(screen.getByRole('button', { name: 'My home' }));
 
-    expect(screen.getByRole('dialog')).toHaveTextContent('Question 2 of 7');
+    expect(screen.getByRole('dialog')).toHaveTextContent('Question 1 of 8');
   });
 
   it('folds the question list away once one is answered, so the answer has room', async () => {
@@ -196,7 +198,7 @@ describe('answering a question without starting a quote', () => {
     );
 
     expect(
-      screen.queryByRole('button', { name: 'Do I need to move out?' }),
+      screen.queryByRole('button', { name: 'What documentation do you provide before starting?' }),
     ).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /ask something else/i })).toBeInTheDocument();
   });
@@ -209,13 +211,16 @@ describe('answering a question without starting a quote', () => {
     );
     await user.click(screen.getByRole('button', { name: /ask something else/i }));
 
-    expect(screen.getByRole('button', { name: 'Do I need to move out?' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'What documentation do you provide before starting?' }),
+    ).toBeInTheDocument();
   });
 
-  it('stops offering questions once the visitor is answering them', async () => {
+  it('stops offering questions once the visitor moves past the opening question', async () => {
     const user = await openChat();
 
-    await user.click(screen.getByRole('button', { name: 'My home' }));
+    await user.type(screen.getByLabelText('Organisation'), 'Ramset Aged Care');
+    await user.click(screen.getByRole('button', { name: /next/i }));
 
     expect(
       screen.queryByRole('button', { name: 'Which areas of Melbourne do you cover?' }),
@@ -224,23 +229,30 @@ describe('answering a question without starting a quote', () => {
 });
 
 describe('submitting', () => {
-  /** Drives the residential branch end to end. */
-  async function completeResidential() {
+  /** Drives the (only) commercial branch end to end. */
+  async function completeCommercial() {
     const user = await openChat();
 
-    await user.click(screen.getByRole('button', { name: 'My home' }));
-    await user.type(screen.getByLabelText('Suburb'), 'Chirnside Park');
+    await user.type(screen.getByLabelText('Organisation'), 'Ramset Aged Care');
     await user.click(screen.getByRole('button', { name: /next/i }));
 
-    await user.click(screen.getByRole('button', { name: 'Both' }));
-    await user.click(screen.getByRole('button', { name: 'House' }));
-    await user.click(screen.getByRole('button', { name: 'As soon as possible' }));
+    await user.click(screen.getByRole('button', { name: 'Aged care or retirement living' }));
+
+    await user.type(screen.getByLabelText('Project location'), 'Chirnside Park');
+    await user.click(screen.getByRole('button', { name: /next/i }));
 
     await user.type(
-      screen.getByLabelText(/about the job/i),
-      'Weatherboard exterior plus three bedrooms inside.',
+      screen.getByLabelText('Scope summary'),
+      'Repaint of two resident wings and the common areas.',
     );
     await user.click(screen.getByRole('button', { name: /next/i }));
+
+    await user.click(screen.getByRole('button', { name: 'Going to tender' }));
+
+    await user.type(screen.getByLabelText(/operating-hours constraints/i), 'After 6pm only.');
+    await user.click(screen.getByRole('button', { name: /next/i }));
+
+    await user.click(screen.getByRole('button', { name: 'Yes, please' }));
 
     await user.type(screen.getByLabelText('Your name'), 'Sam Taylor');
     await user.type(screen.getByLabelText('Phone'), '0400 000 000');
@@ -251,18 +263,20 @@ describe('submitting', () => {
   }
 
   it('hands over every answer the visitor gave', async () => {
-    await completeResidential();
+    await completeCommercial();
 
     await waitFor(() => expect(submitSpy).toHaveBeenCalledTimes(1));
 
     const data = submitSpy.mock.calls[0]?.[1] as FormData;
     expect(Object.fromEntries(data)).toMatchObject({
-      formType: 'residential',
-      suburb: 'Chirnside Park',
-      workType: 'both',
-      propertyType: 'house',
-      timeframe: 'asap',
-      description: 'Weatherboard exterior plus three bedrooms inside.',
+      formType: 'commercial',
+      organisation: 'Ramset Aged Care',
+      propertyType: 'aged-care-and-retirement',
+      projectLocation: 'Chirnside Park',
+      scopeSummary: 'Repaint of two resident wings and the common areas.',
+      timeframe: 'tender',
+      operatingHoursConstraints: 'After 6pm only.',
+      siteAssessmentRequested: 'true',
       name: 'Sam Taylor',
       phone: '0400 000 000',
       email: 'sam@example.com',
@@ -270,8 +284,8 @@ describe('submitting', () => {
     });
   });
 
-  it('submits through the same anti-spam checks as the forms', async () => {
-    await completeResidential();
+  it('submits through the same anti-spam checks as the form', async () => {
+    await completeCommercial();
     await waitFor(() => expect(submitSpy).toHaveBeenCalledTimes(1));
 
     const data = submitSpy.mock.calls[0]?.[1] as FormData;
@@ -279,16 +293,16 @@ describe('submitting', () => {
   });
 
   it('never counts past the last question', async () => {
-    await completeResidential();
+    await completeCommercial();
 
-    // The residential branch is the opening question plus six more.
+    // The commercial branch is the eight steps in lib/enquiry/chat-flow.ts.
     expect(await screen.findByRole('status')).toBeInTheDocument();
-    expect(screen.getByRole('dialog')).not.toHaveTextContent(/Question 8 of 7/);
-    expect(screen.getByRole('dialog')).not.toHaveTextContent(/Question 7 of 7/);
+    expect(screen.getByRole('dialog')).not.toHaveTextContent(/Question 9 of 8/);
+    expect(screen.getByRole('dialog')).not.toHaveTextContent(/Question 8 of 8/);
   });
 
   it('says plainly that nothing was delivered when no transport is configured', async () => {
-    await completeResidential();
+    await completeCommercial();
 
     expect(await screen.findByRole('status')).toHaveTextContent(/were not sent/i);
     expect(screen.getByRole('status')).toHaveTextContent('1300 97 97 40');
@@ -301,7 +315,7 @@ describe('submitting', () => {
       message: 'Thanks — your enquiry is with us. We will be in touch shortly.',
     });
 
-    await completeResidential();
+    await completeCommercial();
 
     expect(await screen.findByRole('status')).toHaveTextContent(/your enquiry is with us/i);
   });
@@ -312,7 +326,7 @@ describe('submitting', () => {
       message: 'Too many enquiries from this connection.',
     });
 
-    await completeResidential();
+    await completeCommercial();
 
     expect(await screen.findByRole('status')).toHaveTextContent(/too many enquiries/i);
   });

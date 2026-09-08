@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { buildMetadata } from '@/lib/seo/metadata';
-import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import {
   ContentBlock,
   CtaBand,
@@ -75,16 +74,11 @@ export default async function SectorPage({ params }: Props) {
         lede={sector.intro}
         primaryCta={{ label: 'Request a site assessment', href: '/contact-us/#commercial' }}
         secondaryCta={{ label: 'All commercial work', href: '/commercial/' }}
+        crumbs={[
+          { name: 'Commercial painting', path: '/commercial/' },
+          { name: sector.shortTitle, path: sector.legacyPath },
+        ]}
       />
-
-      <Container width="wide">
-        <Breadcrumbs
-          crumbs={[
-            { name: 'Commercial painting', path: '/commercial/' },
-            { name: sector.shortTitle, path: sector.legacyPath },
-          ]}
-        />
-      </Container>
 
       <TrustBar />
 

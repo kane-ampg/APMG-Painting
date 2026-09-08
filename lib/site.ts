@@ -29,7 +29,7 @@ export const site = {
 
   founded: 2015,
 
-  tagline: 'Commercial and residential painters in Melbourne',
+  tagline: 'Commercial painters in Melbourne',
 
   phone: {
     display: '1300 97 97 40',
@@ -38,17 +38,34 @@ export const site = {
 
   email: 'info@apmgpainting.com.au',
 
+  /**
+   * The Bayswater North office.
+   *
+   * APMG confirmed the move on 24 August 2026: out of Factory 15/30 Ramset Dr,
+   * Chirnside Park VIC 3116, into 1 Turbo Drive, Bayswater North VIC 3153.
+   * The site publishes the destination rather than the origin so that nothing
+   * has to be rewritten on moving day.
+   *
+   * `effectiveFrom` exists because until the move completes this address
+   * disagrees with the Google Business Profile, and an unexplained NAP
+   * mismatch is a local-ranking cost. Surfaces that show the address render
+   * the qualifier from `addressNote` alongside it while that date is in the
+   * future, and drop it silently once the date passes — no follow-up edit,
+   * no stale "we are moving" line left on the contact page a year later.
+   */
   address: {
-    street: 'Factory 15/30 Ramset Dr',
-    suburb: 'Chirnside Park',
+    street: '1 Turbo Drive',
+    suburb: 'Bayswater North',
     state: 'VIC',
-    postcode: '3116',
+    postcode: '3153',
     country: 'AU',
+    /** ISO date APMG occupies the new office. Client said "a couple of months". */
+    effectiveFrom: '2026-10-01',
   },
 
   /**
    * Service area as APMG can actually evidence it. All five case studies are
-   * Victorian and the office is in Chirnside Park. The single
+   * Victorian and the office is in Bayswater North. The single
    * "throughout Australia" line on the live /commercial/ page is not carried
    * across — a separate VIC + QLD commercial site is planned instead.
    */
@@ -58,13 +75,18 @@ export const site = {
   },
 
   /**
-   * Geographic coordinates of the Chirnside Park base.
+   * Geographic coordinates of the Bayswater North base.
    *
    * Null until APMG confirms them. A service-area business is ranked partly on
    * a `GeoCircle` built from this point plus `serviceArea.radiusKm`, so this is
    * the single highest-value missing local signal — but a guessed latitude is
    * worse than none, because it moves the entity to a place APMG does not
    * work from. Geocode the published street address and paste the result.
+   *
+   * Still null after the August 2026 address change. The VIC + QLD commercial
+   * spec carries a suburb-level geocode for Bayswater North
+   * (-37.845116, 145.270141), but that is the suburb centroid, not 1 Turbo
+   * Drive, and this field is what a GeoCircle is built from.
    */
   coords: null as { latitude: number; longitude: number } | null,
 
@@ -89,82 +111,207 @@ export const site = {
     /**
      * Google Business Profile.
      *
-     * Null until APMG supplies the profile URL. For a local trade business
-     * this is the largest single ranking asset there is, and `sameAs` is how
-     * the site tells Google that this entity and that profile are the same
-     * business. Nothing else in this file matters as much for map-pack
-     * visibility.
+     * Resolved from the review widget on apmgpainting.com.au, which links to
+     * `search.google.com/local/reviews?placeid=ChIJnV9lqRIw1moRftY3Ankvfdw`.
+     * Stored in `maps.google.com/?q=place_id:` form because that is the URL
+     * Google itself documents for `sameAs`.
+     *
+     * For a local trade business this is the largest single ranking asset there
+     * is, and `sameAs` is how the site tells Google that this entity and that
+     * profile are the same business. Nothing else in this file matters as much
+     * for map-pack visibility.
+     *
+     * NOTE: the profile is still registered to Chirnside Park. It has to be
+     * updated to Bayswater North when APMG moves, or the site and the profile
+     * will disagree on the one fact the map pack cares most about.
      */
-    google: null as string | null,
+    google: 'https://www.google.com/maps/place/?q=place_id:ChIJnV9lqRIw1moRftY3Ankvfdw',
   },
 } as const;
 
 /**
  * Accreditations.
  *
- * `verified` means APMG has supplied a certificate. Only verified entries are
- * rendered as trust indicators or emitted in structured data — an unverified
- * claim is worse than a missing one.
+ * `verified` means APMG has confirmed the credential and it may be published.
+ * Unverified entries never render as a credential and never reach structured
+ * data — an unverified claim is worse than a missing one.
  *
- * Every entry is currently false: the audit found five different renderings of
- * the Master Painters body, a non-existent body ("registered with Workplace
- * Safety"), and "NDIS Accreditation" where the real credential is an NDIS
- * Worker Screening Check. All are pending certificates from APMG.
+ * Every entry was false until 24 August 2026, when APMG confirmed the set and
+ * pointed at apmgpainting.com.au as the source. `evidence` records how each one
+ * was established, because "the client said so" and "there is a current
+ * certificate on file" are different strengths of claim and the difference
+ * should survive in the repo rather than in somebody's memory.
+ *
+ * Two corrections from the original audit are kept: the body is Master Painters
+ * Australia (the live site names it five different ways), and the NDIS
+ * credential is a Worker Screening Check, not an "NDIS Accreditation".
+ *
+ * Cm3 and Haymes are new. Neither was on APMG's list; both are badged on the
+ * live site, which is the source APMG nominated. Cm3 in particular is a
+ * contractor OHS prequalification that education, health and facilities clients
+ * screen on, so it is the most commercially useful badge of the set.
  */
 export type Accreditation = {
   id: string;
   /** Exact, correctly capitalised name. */
   label: string;
   detail: string;
+  /** Publishable. Only true entries render or reach structured data. */
   verified: boolean;
+  /** How the credential was established. Never rendered; provenance only. */
+  evidence: string;
+  /**
+   * The body's mark, where APMG's own site carries one. Absent for the
+   * personnel screening checks, which are held per-person and have no badge.
+   */
+  logo?: {
+    src: string;
+    width: number;
+    height: number;
+    alt: string;
+  };
 };
+
+const CLIENT_CONFIRMED = 'APMG confirmed 2026-08-24; logo taken from apmgpainting.com.au' as const;
 
 export const accreditations: readonly Accreditation[] = [
   {
     id: 'master-painters',
     label: 'Master Painters Australia',
     detail: 'Registered Master Painter',
-    verified: false,
+    verified: true,
+    evidence: CLIENT_CONFIRMED,
+    logo: {
+      src: '/images/accreditations/master-painters-australia.webp',
+      width: 444,
+      height: 390,
+      alt: 'Master Painters Australia',
+    },
   },
   {
     id: 'dulux',
     label: 'Dulux Accredited Painter',
     detail: 'Supports the 5-year workmanship warranty',
-    verified: false,
+    verified: true,
+    evidence: CLIENT_CONFIRMED,
+    logo: {
+      src: '/images/accreditations/dulux-accredited-painter.webp',
+      width: 197,
+      height: 98,
+      alt: 'Dulux Accredited Painter',
+    },
+  },
+  {
+    id: 'cm3',
+    label: 'Cm3 prequalified',
+    detail: 'Contractor OHS prequalification, recognised across education, health and facilities',
+    verified: true,
+    evidence: CLIENT_CONFIRMED,
+    logo: {
+      src: '/images/accreditations/cm3.webp',
+      width: 182,
+      height: 84,
+      alt: 'Cm3 contractor OHS prequalification',
+    },
+  },
+  {
+    id: 'haymes',
+    label: 'Haymes Paint',
+    detail: 'Accredited applicator for the Australian-made Haymes range',
+    verified: true,
+    evidence: CLIENT_CONFIRMED,
+    logo: {
+      src: '/images/accreditations/haymes-paint.webp',
+      width: 178,
+      height: 92,
+      alt: 'Haymes Paint',
+    },
   },
   {
     id: 'insured',
     label: 'Fully insured',
     detail: 'Public liability and workers compensation',
-    verified: false,
+    verified: true,
+    // No badge and no certificate on file — this one rests on APMG's word.
+    // Certificates of currency are the thing to collect: a facilities manager
+    // will ask for them by name before a purchase order is raised.
+    evidence: 'APMG confirmed 2026-08-24; certificates of currency not yet supplied',
   },
   {
     id: 'wwcc',
     label: 'Working with Children Checks',
     detail: 'Held by personnel working on education and childcare sites',
-    verified: false,
+    verified: true,
+    evidence: 'APMG confirmed 2026-08-24; held per person, no company-level certificate',
   },
   {
     id: 'police-check',
     label: 'Police checks',
     detail: 'Held by personnel working on healthcare and aged care sites',
-    verified: false,
+    verified: true,
+    evidence: 'APMG confirmed 2026-08-24; held per person, no company-level certificate',
   },
   {
     id: 'ndis-screening',
     label: 'NDIS Worker Screening Check',
     detail: 'Held by personnel working on NDIS sites',
-    verified: false,
+    verified: true,
+    evidence: 'APMG confirmed 2026-08-24; held per person, no company-level certificate',
   },
 ] as const;
 
 export const verifiedAccreditations = accreditations.filter((a) => a.verified);
+
+/**
+ * The logo wall. Four marks, in the order APMG's own site shows them.
+ *
+ * The screening checks are deliberately not here: they are held per person, so
+ * a badge implying a company-level certification would overstate them. They are
+ * stated in words on the about page instead.
+ */
+export const accreditationLogos = verifiedAccreditations.filter((a) => a.logo !== undefined);
 
 /** Formatted one-line address for the footer and contact page. */
 export const formattedAddress = [
   site.address.street,
   `${site.address.suburb} ${site.address.state} ${site.address.postcode}`,
 ].join(', ');
+
+/** The address APMG occupies until the Bayswater North move completes. */
+export const previousAddress = 'Factory 15/30 Ramset Dr, Chirnside Park VIC 3116';
+
+const MONTHS = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+] as const;
+
+/**
+ * The qualifier that runs beside the address until the move completes, or null
+ * once it has.
+ *
+ * Formatted by hand rather than through `toLocaleDateString`, because month
+ * names from ICU differ between the build container and a developer's machine
+ * and this string is baked into static HTML.
+ *
+ * `now` is injectable so the expiry is testable without touching the clock.
+ */
+export function addressNote(now: Date = new Date()): string | null {
+  const effective = new Date(`${site.address.effectiveFrom}T00:00:00Z`);
+  if (Number.isNaN(effective.getTime()) || now >= effective) return null;
+
+  const month = MONTHS[effective.getUTCMonth()];
+  return `Our office from ${month} ${effective.getUTCFullYear()}. Until then we work from ${previousAddress}.`;
+}
 
 /**
  * Canonical origin, resolved in priority order.

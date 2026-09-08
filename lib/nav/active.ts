@@ -41,7 +41,7 @@ export function isSamePath(a: string, b: string): boolean {
   return normalise(a) === normalise(b);
 }
 
-/** An in-page anchor such as `/residential-painting/#interior`. */
+/** An in-page anchor such as `/commercial/#preparation`. */
 function isAnchorLink(href: string): boolean {
   return href.includes('#');
 }
@@ -49,10 +49,10 @@ function isAnchorLink(href: string): boolean {
 /**
  * Is `href` the page currently being viewed?
  *
- * Anchor links are never "the current page". `#interior` and `#exterior` both
- * live on `/residential-painting/`, so marking them current would put three
- * `aria-current="page"` links in one menu and tell a screen-reader user that
- * they are in three places at once. Which anchor is on screen is a scroll
+ * Anchor links are never "the current page". Several anchors can point into
+ * one page, so marking them current would put several `aria-current="page"`
+ * links in one menu and tell a screen-reader user that they are in several
+ * places at once. Which anchor is on screen is a scroll
  * position, not a route, and the navigation has no business guessing it.
  */
 export function isCurrentPage(pathname: string, href: string): boolean {

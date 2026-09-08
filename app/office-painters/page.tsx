@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { buildMetadata } from '@/lib/seo/metadata';
-import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import {
   ContentBlock,
   CtaBand,
@@ -93,16 +92,11 @@ export default function OfficePaintersPage() {
         lede="Office work is judged on disruption as much as finish. Most programmes run after hours or in staged zones, so desks stay occupied and the business keeps operating."
         primaryCta={{ label: 'Request a site assessment', href: '/contact-us/#commercial' }}
         secondaryCta={{ label: 'All commercial work', href: '/commercial/' }}
+        crumbs={[
+          { name: 'Commercial painting', path: '/commercial/' },
+          { name: 'Office painting', path: '/office-painters/' },
+        ]}
       />
-
-      <Container width="wide">
-        <Breadcrumbs
-          crumbs={[
-            { name: 'Commercial painting', path: '/commercial/' },
-            { name: 'Office painting', path: '/office-painters/' },
-          ]}
-        />
-      </Container>
 
       <TrustBar />
 

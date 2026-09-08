@@ -153,17 +153,30 @@ export function ButtonLink({
   className?: string;
 } & Omit<ComponentProps<typeof Link>, 'href' | 'className'>) {
   const isInternal = href.startsWith('/');
+  const classes = cn(buttonBase, buttonVariants[variant], className);
 
   if (!isInternal) {
+    // `rest` is not spread here: it is typed as Next <Link> props, and the
+    // router-only ones (prefetch, scroll, replace) are not valid DOM
+    // attributes. Only the two that mean something on an external anchor are
+    // carried across — and a target="_blank" without rel="noopener" hands the
+    // opened page a live window.opener handle, so that default is filled in.
+    const { target, rel } = rest;
+
     return (
-      <a href={href} className={cn(buttonBase, buttonVariants[variant], className)}>
+      <a
+        href={href}
+        className={classes}
+        target={target}
+        rel={target === '_blank' ? (rel ?? 'noopener noreferrer') : rel}
+      >
         {children}
       </a>
     );
   }
 
   return (
-    <Link href={href} className={cn(buttonBase, buttonVariants[variant], className)} {...rest}>
+    <Link href={href} className={classes} {...rest}>
       {children}
     </Link>
   );

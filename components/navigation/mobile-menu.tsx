@@ -292,13 +292,6 @@ export function MobileMenu() {
                 >
                   Request a site assessment
                 </Link>
-                <Link
-                  href="/contact-us/#residential"
-                  onClick={() => setOpen(false)}
-                  className="rounded-md border border-paper-edge px-5 py-3 text-center text-sm font-semibold text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
-                >
-                  Request a free quote
-                </Link>
                 <a
                   href={site.phone.href}
                   className="rounded py-2 text-center text-sm font-semibold text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"

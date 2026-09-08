@@ -64,7 +64,7 @@ export const projects: readonly Project[] = [
       'No testimonial was published for this project — request one from the school if permission allows.',
     ),
     relatedServiceSlugs: ['interior-painting', 'exterior-painting'],
-    relatedLocationSlugs: ['painters-vermont'],
+    relatedLocationSlugs: ['vermont'],
     isFeatured: true,
   },
 
@@ -196,34 +196,9 @@ export const projects: readonly Project[] = [
     outcome: ['A clean, clinical finish delivered as part of the fit-out programme'],
     testimonial: placeholder('No testimonial published.'),
     relatedServiceSlugs: ['interior-painting'],
-    relatedLocationSlugs: ['painters-brighton'],
+    relatedLocationSlugs: ['brighton'],
     // 164 words on the live site with no scope, preparation or access detail.
     // Excluded from featured slots until APMG supplies the project record.
-    isFeatured: false,
-  },
-
-  {
-    slug: 'house-painting-glen-iris',
-    title: 'House painting, Glen Iris',
-    clientOrPropertyType: 'Detached home',
-    location: 'Glen Iris, Victoria',
-    // Residential work sits outside the commercial sector taxonomy.
-    sectorSlug: 'residential',
-    challenge: 'Residential repaint of a Glen Iris home.',
-    scopeOfWork: ['House painting works'],
-    duration: placeholder('Not stated on the source page.'),
-    images: [
-      {
-        src: '/images/projects/glen-iris-house-01.webp',
-        alt: 'Repainted weatherboard house exterior in Glen Iris',
-      },
-    ],
-    outcome: ['Completed residential repaint'],
-    testimonial: placeholder('No testimonial published.'),
-    relatedServiceSlugs: ['interior-painting', 'exterior-painting'],
-    relatedLocationSlugs: ['painters-glen-iris'],
-    // 155 words on the live site. Needs a real project record before it earns
-    // a place in the case-study set.
     isFeatured: false,
   },
 ] as const;

@@ -6,21 +6,15 @@ import { submitEnquiry } from '@/app/actions/enquiry';
 import { initialEnquiryState } from '@/lib/enquiry/state';
 import { CheckboxField, Honeypot, SelectField, TextAreaField, TextField } from './fields';
 import { FormStatus } from './form-status';
-import {
-  COMMERCIAL_PROPERTY_TYPES,
-  COMMERCIAL_TIMEFRAMES,
-  RESIDENTIAL_PROPERTY_TYPES,
-  RESIDENTIAL_TIMEFRAMES,
-  RESIDENTIAL_WORK_TYPES,
-} from '@/lib/enquiry/options';
+import { COMMERCIAL_PROPERTY_TYPES, COMMERCIAL_TIMEFRAMES } from '@/lib/enquiry/options';
 import { Button } from '@/components/ui';
 
 /**
- * Both enquiry forms.
+ * The commercial enquiry form.
  *
- * Built on a Server Action via useActionState, so they submit and validate with
- * JavaScript disabled — the progressive-enhancement requirement. The client
- * adds a pending state and focus management, nothing load-bearing.
+ * Built on a Server Action via useActionState, so it submits and validates
+ * with JavaScript disabled — the progressive-enhancement requirement. The
+ * client adds a pending state and focus management, nothing load-bearing.
  */
 
 /**
@@ -54,88 +48,6 @@ function SubmitButton({ children }: { children: string }) {
     </Button>
   );
 }
-
-/* ------------------------------------------------------------------ */
-/* Residential                                                          */
-/* ------------------------------------------------------------------ */
-
-export function ResidentialEnquiryForm() {
-  const [state, formAction] = useActionState(submitEnquiry, initialEnquiryState);
-
-  return (
-    <form action={formAction} className="relative flex flex-col gap-5" noValidate>
-      <input type="hidden" name="formType" value="residential" />
-      <RenderedAtField />
-      <Honeypot />
-
-      <FormStatus status={state.status} message={state.message} delivered={state.delivered} />
-
-      <div className="grid gap-5 sm:grid-cols-2">
-        <TextField label="Your name" name="name" autoComplete="name" errors={state.errors?.name} />
-        <TextField
-          label="Phone"
-          name="phone"
-          type="tel"
-          autoComplete="tel"
-          errors={state.errors?.phone}
-        />
-        <TextField
-          label="Email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          errors={state.errors?.email}
-        />
-        <TextField
-          label="Suburb"
-          name="suburb"
-          autoComplete="address-level2"
-          errors={state.errors?.suburb}
-        />
-      </div>
-
-      <div className="grid gap-5 sm:grid-cols-2">
-        <SelectField
-          label="Property type"
-          name="propertyType"
-          errors={state.errors?.propertyType}
-          options={RESIDENTIAL_PROPERTY_TYPES}
-        />
-        <SelectField
-          label="What needs painting?"
-          name="workType"
-          errors={state.errors?.workType}
-          options={RESIDENTIAL_WORK_TYPES}
-        />
-      </div>
-
-      <SelectField
-        label="Approximate timeframe"
-        name="timeframe"
-        errors={state.errors?.timeframe}
-        options={RESIDENTIAL_TIMEFRAMES}
-      />
-
-      <TextAreaField
-        label="Tell us about the job"
-        name="description"
-        hint="Rough size, number of rooms, condition of the surfaces — whatever you know."
-        errors={state.errors?.description}
-      />
-
-      <p className="rounded-md border border-dashed border-paper-edge bg-paper-sunken px-4 py-3 text-xs text-ink-muted">
-        Photo upload is not enabled in this preview. It ships once file storage is provisioned, with
-        server-side type and size checks.
-      </p>
-
-      <SubmitButton>Request a free quote</SubmitButton>
-    </form>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Commercial                                                           */
-/* ------------------------------------------------------------------ */
 
 export function CommercialEnquiryForm() {
   const [state, formAction] = useActionState(submitEnquiry, initialEnquiryState);

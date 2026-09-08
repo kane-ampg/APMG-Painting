@@ -2,20 +2,19 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { buildMetadata } from '@/lib/seo/metadata';
 import {
-  AudienceSplit,
   CtaBand,
   ContentBlock,
   FactStrip,
   FaqList,
   FeatureGrid,
   HomeHero,
+  MediaFigure,
   ProcessSteps,
   ProjectGrid,
-  ReviewWall,
+  GoogleReviewWall,
   SectorGrid,
   ServiceAreas,
   ServiceGrid,
-  TestimonialBlock,
   TrustBar,
 } from '@/components/sections';
 import { JsonLd } from '@/components/seo/json-ld';
@@ -23,10 +22,9 @@ import { ButtonLink, Container, Prose, Section, SectionHeading } from '@/compone
 import { faqSchema } from '@/lib/schema';
 import { homeFaqs } from '@/content/faqs';
 import { locations } from '@/content/locations';
-import { featuredProjects, getProject } from '@/content/projects';
+import { featuredProjects } from '@/content/projects';
 import { sectors } from '@/content/sectors';
 import { services } from '@/content/services';
-import { isPlaceholder } from '@/lib/content/types';
 import { site } from '@/lib/site';
 
 /**
@@ -35,8 +33,8 @@ import { site } from '@/lib/site';
  * The single most important change on the site: the live homepage is titled
  * "Commercial Painters Melbourne | APMG Painting" — the exact phrase
  * /commercial/ is trying to rank for — and backs it with 3,136 words against
- * that page's 541. This title is brand-led, and the page's job is to split the
- * two audiences and carry proof, not to compete for a service query.
+ * that page's 541. This title is brand-led, and the page's job is to carry
+ * proof, not to compete for a service query.
  *
  * Everything below is assembled from the typed content files. No figure, quote
  * or credential is written as a literal in this file — if it appears on this
@@ -44,21 +42,21 @@ import { site } from '@/lib/site';
  * verification rule as every other surface.
  */
 export const metadata: Metadata = buildMetadata({
-  title: 'APMG Painting | Commercial & Residential Painters, Melbourne',
+  title: 'APMG Painting | Commercial Painters, Melbourne',
   description:
-    'APMG Painting is a Melbourne painting contractor working across schools, healthcare, aged care, strata, retail and industrial sites, and on homes across the metro area.',
+    'APMG Painting is a Melbourne commercial painting contractor working across schools, healthcare, aged care, strata, retail and industrial sites across the metro area.',
   path: '/',
 });
 
 /**
- * The audience-neutral version of the process. /commercial/ carries its own,
- * which adds a pre-start documentation stage — that stage is genuinely
- * commercial-only, so the two lists differ by exactly that one step.
+ * The general version of the process. /commercial/ carries its own, which adds
+ * a pre-start documentation stage — that stage is genuinely specific to larger
+ * programmes, so the two lists differ by exactly that one step.
  */
 const PROCESS = [
   {
     step: 'Enquiry',
-    body: 'Tell us the building, the areas involved and when we are allowed on site. The commercial and residential forms ask different questions because different things matter.',
+    body: 'Tell us the building, the areas involved and when we are allowed on site. Those three answers are what decide whether a site assessment can be scheduled.',
   },
   {
     step: 'Site visit',
@@ -85,26 +83,32 @@ const PROCESS = [
  */
 const APPROACH = [
   {
+    icon: 'site-visit',
     heading: 'We attend before we quote',
     body: 'Preparation is the largest variable in any painting job, and it cannot be judged from a photograph or a floor area. Attending first is what stops a quote turning into a variation.',
   },
   {
+    icon: 'scheduling',
     heading: 'The building keeps running',
     body: 'Schools mid-term, clinics between patients, warehouses mid-shift. Zones are isolated, work is staged or run after hours, and each area is handed back as it finishes.',
   },
   {
+    icon: 'surface-prep',
     heading: 'Preparation matched to the substrate',
     body: 'Existing coatings identified and the surface assessed before anything is specified — hot or cold power washing, steam cleaning, abrasion or chemical treatment, depending on what we find.',
   },
   {
+    icon: 'access',
     heading: 'Access planned per elevation',
     body: 'Not site-wide. Multi-level and hard-to-reach areas are reached with the appropriate equipment rather than the most convenient one, and exterior work is scheduled around suitable weather.',
   },
   {
+    icon: 'itemised-quote',
     heading: 'An itemised number, not one figure',
     body: 'Labour, materials and scheduling are broken out, and multi-site programmes are broken down per location, so a budget holder can see what they are approving.',
   },
   {
+    icon: 'one-programme',
     heading: 'One programme for the adjacent trades',
     body: 'Plastering, patching, rendering, tiling, flooring and making good coordinated under the same programme, because the gap between trades is what usually stalls a job.',
   },
@@ -112,13 +116,6 @@ const APPROACH = [
 
 export default function HomePage() {
   const yearsTrading = new Date().getFullYear() - site.founded;
-
-  // The one attributable testimonial APMG has published. The other four
-  // projects carry an editorial placeholder instead, and that holds here too:
-  // one real quote rather than three invented ones.
-  const quoted = getProject('case-study-factory-exterior-painting-in-noble-park-victoria');
-  const testimonial =
-    quoted?.testimonial && !isPlaceholder(quoted.testimonial) ? quoted.testimonial : null;
 
   return (
     <>
@@ -128,24 +125,22 @@ export default function HomePage() {
         eyebrow="Melbourne painting contractor"
         heading="Painters for buildings that"
         headingAccent="cannot stop running"
-        lede="Commercial and residential painting across metropolitan Melbourne — schools mid-term, clinics between patients, warehouses mid-shift, and homes people are still living in."
+        lede="Commercial painting across metropolitan Melbourne — schools mid-term, clinics between patients, warehouses mid-shift, and buildings that cannot stop operating for the job to get done."
         primaryCta={{ label: 'Commercial painting', href: '/commercial/' }}
-        secondaryCta={{ label: 'House painting', href: '/residential-painting/' }}
+        secondaryCta={{ label: 'See our projects', href: '/projects/' }}
         proof={[
           { figure: `${yearsTrading} years`, label: 'In business' },
           { figure: '~30 years', label: 'Combined experience' },
-          { figure: `${site.serviceArea.radiusKm} km`, label: 'Across Melbourne' },
+          { figure: 'Cm3', label: 'OHS prequalified' },
         ]}
-        image={{
-          src: '/images/hero/home-hero.webp',
-          alt: 'Two APMG Painting tradespeople sanding back an exterior post before recoating',
+        poster={{
+          src: '/images/hero/banner-poster.webp',
+          alt: 'Melbourne from the air over Docklands, looking across the Yarra to the CBD skyline',
         }}
         scrollTo={{ label: 'What we paint', href: '#services' }}
       />
 
       <TrustBar />
-
-      <AudienceSplit />
 
       <FactStrip
         facts={[
@@ -157,7 +152,8 @@ export default function HomePage() {
           {
             label: 'Combined experience',
             figure: '~30 years',
-            detail: 'The team’s industry experience, across homes and complex commercial sites.',
+            detail:
+              'The team’s industry experience, across offices, schools, healthcare and industrial sites.',
           },
           {
             label: 'Commercial sectors',
@@ -166,9 +162,10 @@ export default function HomePage() {
               'Each with its own access, compliance and scheduling constraints, set out sector by sector.',
           },
           {
-            label: 'Service area',
-            figure: `${site.serviceArea.radiusKm} km`,
-            detail: `Metropolitan Melbourne, worked from ${site.address.suburb}.`,
+            label: 'Workmanship warranty',
+            figure: '5 years',
+            detail:
+              'Backed by the Dulux Accredited Painter programme, covering peeling, flaking and blistering.',
           },
         ]}
       />
@@ -199,8 +196,8 @@ export default function HomePage() {
         <Container>
           <SectionHeading className="mb-3">How a job runs</SectionHeading>
           <p className="mb-8 max-w-prose text-ink-soft">
-            The same five steps whether it is a house or a campus. Commercial programmes add a
-            documentation and pre-start stage on top of them.
+            The same five steps whether it is a single tenancy or a whole campus. Larger programmes
+            add a documentation and pre-start stage on top of them.
           </p>
           <ProcessSteps steps={PROCESS} stepLabel="Step" />
         </Container>
@@ -217,6 +214,14 @@ export default function HomePage() {
             that lands on time from one that does not.
           </p>
         </Prose>
+        <MediaFigure
+          src="/images/projects/noble-park-factory-02.webp"
+          alt="Two APMG team members standing on the roof of the Noble Park factory during the site assessment, one pointing out a section of the elevation"
+          caption="Noble Park: the site walked before the scope was written. Access on that factory ended up split three ways — boom lifts for the high runs, scissor lifts across mid-level walls, scaffolding into the tight corners — and none of that is decidable from a floor area."
+          aspect="inset"
+          sizes="(min-width: 1152px) 1088px, 100vw"
+          className="mb-10"
+        />
         <FeatureGrid items={APPROACH} />
       </ContentBlock>
 
@@ -237,18 +242,7 @@ export default function HomePage() {
         </Container>
       </Section>
 
-      <ContentBlock tone="sunken" eyebrow="In their words" heading="What clients say">
-        {testimonial && (
-          <div className="mb-8 max-w-2xl">
-            <TestimonialBlock
-              quote={testimonial.quote}
-              attribution={testimonial.attribution}
-              organisation={testimonial.organisation}
-            />
-          </div>
-        )}
-        <ReviewWall />
-      </ContentBlock>
+      <GoogleReviewWall />
 
       <ContentBlock eyebrow="Areas" heading="Where we work across Melbourne">
         <ServiceAreas locations={locations} />
@@ -259,8 +253,8 @@ export default function HomePage() {
           <p>
             APMG Painting was founded in {site.founded}. The team brings around 30 years of combined
             industry experience, and the business has grown into a painting and property maintenance
-            contractor working across both residential properties and complex commercial
-            environments.
+            contractor working across schools, healthcare, aged care, strata, retail and industrial
+            sites.
           </p>
           <p>
             The approach has not changed much: do the work properly, keep the standard consistent,
@@ -281,25 +275,18 @@ export default function HomePage() {
 
       <ContentBlock eyebrow="Questions" heading="Before you enquire">
         <p className="mb-8 max-w-prose text-ink-soft">
-          The questions that come up before anyone has decided which service they need. The{' '}
+          The questions that come up before anyone has decided on scope. The{' '}
           <Link href="/commercial/" className="font-semibold text-brand-700 hover:underline">
             commercial
           </Link>{' '}
-          and{' '}
-          <Link
-            href="/residential-painting/"
-            className="font-semibold text-brand-700 hover:underline"
-          >
-            residential
-          </Link>{' '}
-          pages answer the ones specific to each.
+          page answers the ones specific to a sector.
         </p>
         <FaqList items={homeFaqs} />
       </ContentBlock>
 
       <CtaBand
         heading="Tell us what needs painting"
-        body="Commercial enquiries get a site assessment before a number. Residential enquiries get a quote after we have seen the property."
+        body="Commercial enquiries get a site assessment before a number."
         cta={{ label: 'Request a quote', href: '/contact-us/' }}
       />
     </>

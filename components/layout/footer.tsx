@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { Container } from '@/components/ui';
 import { footerNav } from '@/components/navigation/nav-data';
 import { FooterNavList } from '@/components/navigation/footer-nav-list';
-import { formattedAddress, site } from '@/lib/site';
+import { addressNote, formattedAddress, site } from '@/lib/site';
 
 function FooterColumn({
   heading,
@@ -40,6 +40,8 @@ export function Footer() {
             />
             <address className="text-sm not-italic leading-relaxed text-white/85">
               {formattedAddress}
+              {/* Self-expiring: see site.address.effectiveFrom. */}
+              {addressNote() && <span className="block text-white/60">from October 2026</span>}
               <br />
               <a
                 href={site.phone.href}
@@ -58,7 +60,6 @@ export function Footer() {
           </div>
 
           <FooterColumn heading="Commercial" links={footerNav.commercial} />
-          <FooterColumn heading="Residential" links={footerNav.residential} />
           <FooterColumn heading="Company" links={footerNav.company} />
         </div>
 

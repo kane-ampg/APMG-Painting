@@ -18,9 +18,9 @@ export default function NotFound() {
       body: 'Schools, healthcare, strata, retail and industrial sites.',
     },
     {
-      label: 'House painting',
-      href: '/residential-painting/',
-      body: 'Interior and exterior work on Melbourne homes.',
+      label: 'Trade services',
+      href: '/trade-services/',
+      body: 'Coordinating the work that runs alongside a painting programme.',
     },
     { label: 'Projects', href: '/projects/', body: 'Documented case studies from completed work.' },
     { label: 'Contact', href: '/contact-us/', body: 'Site assessments and quotes.' },

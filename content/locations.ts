@@ -25,9 +25,9 @@ export const locations: readonly Location[] = [
     region: 'Eastern suburbs',
     projectSlugs: ['emmaus-college-school-repaint-vermont'],
     intro:
-      'APMG Painting completed a full interior and exterior repaint at Emmaus College in Vermont, working across a live campus while the school stayed open. Vermont sits in Melbourne’s eastern suburbs, roughly fifteen minutes from our Chirnside Park base.',
+      'APMG Painting completed a full interior and exterior repaint at Emmaus College in Vermont, working across a live campus while the school stayed open. Vermont sits in Melbourne’s eastern suburbs, roughly ten minutes from our Bayswater North base.',
     localNotes: [
-      'Eastern-suburbs housing stock here is largely post-war brick and weatherboard, so exterior programmes commonly combine render, brick and timber in a single scope.',
+      'Vermont’s commercial stock is largely low-rise brick and render — schools, childcare, medical suites and light industrial along Canterbury and Boronia Roads — so exterior programmes commonly combine render, brick and metal in a single scope.',
       'The Emmaus College project is documented in full, including the access methods and the coordination required alongside a neighbouring construction site.',
     ],
     indexable: true,
@@ -56,12 +56,13 @@ export const locations: readonly Location[] = [
     slug: 'painters-glen-iris',
     suburb: 'Glen Iris',
     region: 'Inner east',
-    projectSlugs: ['house-painting-glen-iris'],
-    intro:
-      'APMG Painting has completed residential repaint work in Glen Iris, in Melbourne’s inner east.',
+    // The case study this page referenced was removed when the site narrowed
+    // to commercial only (spec §3). No commercial project is documented in
+    // this suburb yet.
+    projectSlugs: [],
     indexable: false,
     indexabilityReason:
-      'A project exists but its record is 155 words with no scope, preparation or outcome detail. Noindex until APMG supplies the project record; then reassess.',
+      'No commercial project documented in this suburb yet. Noindex pending evidence.',
     legacyPath: '/areas/painters-glen-iris/',
   },
   {

@@ -11,9 +11,10 @@ import { QUICK_ANSWERS, QUICK_QUESTIONS } from '@/lib/enquiry/chat-faqs';
  * chat stops being purely scripted. A grounding document that has drifted from
  * the site is worse than none: it launders stale claims into confident answers.
  *
- * So the canonical facts are asserted to be present and correct, and every
- * unverified credential is asserted to be listed as unsayable. This cannot
- * check prose for honesty — it can stop the specific drift that matters.
+ * So the canonical facts are asserted to be present and correct, every verified
+ * credential is asserted to be reproduced, and any credential that is *not*
+ * verified is asserted to be listed as unsayable. This cannot check prose for
+ * honesty — it can stop the specific drift that matters.
  */
 
 // Resolved from the Vitest root, which is the project root.
@@ -39,19 +40,39 @@ describe('the knowledge base carries the canonical business facts', () => {
   });
 });
 
-describe('the knowledge base forbids every unverified claim', () => {
+describe('the knowledge base states the credential set exactly', () => {
+  const verified = accreditations.filter((entry) => entry.verified);
   const unverified = accreditations.filter((entry) => !entry.verified);
 
-  it('has unverified credentials to guard', () => {
-    expect(unverified.length).toBeGreaterThan(0);
+  // §4 is the section a grounded model reads before answering "are you
+  // insured?". Both halves are asserted against lib/site.ts so that flipping a
+  // `verified` flag without updating this document fails the build rather than
+  // quietly teaching the chat to overclaim — or to under-claim a credential
+  // APMG holds.
+  const section = () => KB.slice(KB.indexOf('## 4. What'), KB.indexOf('## 5. What APMG does'));
+
+  it('has a credential set to guard', () => {
+    expect(accreditations.length).toBeGreaterThan(0);
+  });
+
+  it.each(verified.map((entry) => [entry.label] as const))('reproduces "%s"', (label) => {
+    expect(section()).toContain(label);
   });
 
   it.each(unverified.map((entry) => [entry.label] as const))('lists "%s" as unsayable', (label) => {
-    const section = KB.slice(
-      KB.indexOf('## 4. What is NOT verified'),
-      KB.indexOf('## 5. What APMG does'),
-    );
-    expect(section).toContain(label);
+    expect(section()).toContain(label);
+  });
+
+  it('holds the line on the two corrections from the audit', () => {
+    // The live site calls it an "NDIS Accreditation" and cites a body called
+    // "Workplace Safety". Neither exists. Both are named in §4 so a grounded
+    // model repeats the correction instead of the error.
+    expect(section()).toMatch(/Worker Screening Check/);
+    expect(section()).toMatch(/no body called "Workplace Safety"/i);
+  });
+
+  it('attributes the Google rating to Google rather than to the site', () => {
+    expect(section()).toMatch(/never as the site's own rating/i);
   });
 
   it('tells the model to refuse a price rather than estimate one', () => {

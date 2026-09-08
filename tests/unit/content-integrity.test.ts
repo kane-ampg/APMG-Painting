@@ -1,4 +1,7 @@
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { SECTOR_ICON_PATHS } from '@/components/icons/sector-icons';
 import { projects } from '@/content/projects';
 import { sectors } from '@/content/sectors';
 import { locations } from '@/content/locations';
@@ -126,6 +129,45 @@ describe('featured project quality gate', () => {
       expect(project.scopeOfWork.length, project.slug).toBeGreaterThan(0);
       expect(project.outcome.length, project.slug).toBeGreaterThan(0);
       expect(project.accessAndSafety?.length ?? 0, project.slug).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe('card imagery', () => {
+  /**
+   * The service cards and the sector cards are the two grids on the homepage,
+   * and each has its own way of going quietly wrong: a service photograph
+   * renamed in `public/` leaves a broken card, and a sector added to
+   * content/sectors.ts without a glyph leaves a card that is text where its
+   * seven neighbours are not. Both fail here rather than in a screenshot.
+   */
+  it('every service card carries a photograph that exists in public/', () => {
+    for (const service of services) {
+      expect(service.image, `service "${service.slug}" has no photograph`).toBeDefined();
+      const file = resolve(process.cwd(), 'public', service.image!.src.replace(/^\//, ''));
+      expect(existsSync(file), `missing ${service.image!.src}`).toBe(true);
+      expect(service.image!.alt.length, `alt for "${service.slug}"`).toBeGreaterThan(30);
+    }
+  });
+
+  it('every project image exists in public/', () => {
+    for (const project of projects) {
+      for (const image of project.images) {
+        const file = resolve(process.cwd(), 'public', image.src.replace(/^\//, ''));
+        expect(existsSync(file), `missing ${image.src}`).toBe(true);
+      }
+    }
+  });
+
+  it('every sector has a glyph, and no glyph is orphaned', () => {
+    const iconSlugs = Object.keys(SECTOR_ICON_PATHS).sort();
+    expect(iconSlugs).toEqual(sectors.map((s) => s.slug).sort());
+  });
+
+  it('every glyph draws something on the shared 24x24 grid', () => {
+    for (const [slug, paths] of Object.entries(SECTOR_ICON_PATHS)) {
+      expect(paths.length, slug).toBeGreaterThan(0);
+      for (const d of paths) expect(d, slug).toMatch(/^M[\d.]/);
     }
   });
 });

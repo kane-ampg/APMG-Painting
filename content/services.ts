@@ -5,30 +5,30 @@ export const services: readonly Service[] = [
     slug: 'interior-painting',
     title: 'Interior painting',
     shortTitle: 'Interior',
-    audience: 'both',
+    audience: 'commercial',
     summary:
-      'Interior work in occupied spaces — homes, offices, classrooms and clinics — staged so the space keeps working.',
+      'Interior work in occupied buildings — offices, classrooms, wards and retail floors — staged so the space keeps working.',
     body: [
       'Interior painting is mostly a preparation and protection job. The visible result depends on what happens before the first coat: filling, sanding, sealing, and masking everything that is staying.',
-      'In occupied buildings the harder problem is sequencing. Flooring, furniture and fittings are protected, and work is staged room by room or zone by zone so the space stays usable while the programme runs.',
+      'In occupied buildings the harder problem is sequencing. Floors, fittings and equipment are protected, and work is staged zone by zone so the building stays usable while the programme runs.',
     ],
     includes: [
       'Walls and ceilings',
-      'Architraves, skirting and doors',
-      'Feature walls and wallpaper',
-      'Timber staining',
-      'Textured finishes',
+      'Doors, frames and joinery',
+      'Corridors and high-traffic wall zones',
+      'Washable and scrubbable systems',
+      'Exposed services and soffits',
     ],
     image: {
-      src: '/images/work/interior-door-wall-roller.webp',
-      alt: 'An APMG painter rolling the wall beside a glazed door with an extension pole, in a building still in use',
+      src: '/images/work/hall-scaffold-sheeted-floor.webp',
+      alt: 'An APMG painter on a mobile scaffold cutting in the blue band beneath the clerestory windows of a school hall, the whole floor sheeted in black plastic',
     },
   },
   {
     slug: 'exterior-painting',
     title: 'Exterior painting',
     shortTitle: 'Exterior',
-    audience: 'both',
+    audience: 'commercial',
     summary:
       'Exterior systems specified for UV, moisture and temperature movement, with access planned per elevation.',
     body: [
@@ -36,15 +36,15 @@ export const services: readonly Service[] = [
       'Access is planned elevation by elevation. Multi-level and hard-to-reach areas are reached with the appropriate equipment rather than the most convenient one, and works are scheduled around suitable weather.',
     ],
     includes: [
-      'Render, brick and weatherboard',
-      'Roof painting',
+      'Render, brick and precast concrete',
+      'Roof and roof plant',
       'Fascias, gutters and eaves',
-      'Fences and outbuildings',
+      'Car parks, walkways and balustrades',
       'Multi-level building exteriors',
     ],
     image: {
-      src: '/images/work/exterior-render-drop-sheets.webp',
-      alt: 'Two APMG painters coating a rendered house exterior, drop sheets down and a ladder set at the window head',
+      src: '/images/work/exterior-spray-brick-elevation.webp',
+      alt: 'An APMG painter in a respirator spraying the finish coat onto a face-brick elevation, spray line in hand',
     },
   },
   {
@@ -56,18 +56,18 @@ export const services: readonly Service[] = [
       'Workplace repaints programmed around business hours so staff keep working through the job.',
     body: [
       'Office work is judged on disruption as much as finish. Most programmes run after hours or in staged zones so desks stay occupied and the business keeps operating.',
-      'Work covers the whole workplace — open floors, meeting rooms, kitchens, common areas, bathrooms, ceilings, doors and frames — with patching, plastering and rendering handled as part of the same programme.',
+      'Work covers the whole workplace — open floors, meeting rooms, kitchens, common areas, bathrooms, ceilings, doors and frames — with patching and making good handled as part of the same programme.',
     ],
     includes: [
       'Open-plan floors and meeting rooms',
       'Kitchens, common areas and bathrooms',
-      'Patching, plastering and rendering',
+      'Patching and making good',
       'After-hours and staged programmes',
       'Colour consultation',
     ],
     image: {
       src: '/images/work/office-roller-occupied.webp',
-      alt: 'An APMG painter rolling a wall with an extension pole in an occupied office, floors sheeted and desks left in place',
+      alt: 'An APMG painter running a pole roller down an office wall beside occupied desks and monitors, a second painter working the partition line behind',
     },
   },
   {
@@ -85,7 +85,6 @@ export const services: readonly Service[] = [
       'Concrete and tilt-panel',
       'Structural steel',
       'Colorbond and metal cladding',
-      'Line marking and safety colours',
       'Surface assessment and specification',
     ],
     image: {
@@ -94,25 +93,27 @@ export const services: readonly Service[] = [
     },
   },
   {
-    slug: 'property-maintenance',
-    title: 'Associated trade and maintenance services',
-    shortTitle: 'Trade services',
+    slug: 'builders-and-head-contractors',
+    title: 'Painting for builders and head contractors',
+    shortTitle: 'Builders & head contractors',
     audience: 'commercial',
     summary:
-      'The adjacent trades that usually sit around a painting scope, coordinated under one programme.',
+      'Painting delivered into a construction programme — staged to the build, sequenced around other trades, and carried through to handover.',
     body: [
-      'Painting scopes rarely arrive alone. Repairs, patching and making good are frequently needed before a coating can be applied, and coordinating them under one programme avoids the gap between trades that stalls a job.',
+      'Painting sold to a builder or head contractor runs to the construction programme rather than to a single site visit. The trigger is a staged handover from whatever trade is ahead of it, and the painting has to be ready to follow without holding up the trade behind it.',
+      'Substrate preparation is where this work is won or lost. New plasterboard, fresh render and surfaces already touched by other trades all need to be brought to a paintable finish — filled, sanded, sealed and primed — before a coat goes on, and drying time on wet trades ahead of painting is a scheduling constraint the programme has to allow for, not a step that can be compressed.',
     ],
     includes: [
-      'Plastering and patching',
-      'Rendering',
-      'Tiling',
-      'Flooring',
-      'Making good and minor repairs',
+      'New-build painting packages',
+      'Staged painting to a construction programme',
+      'Defect rectification and touch-up painting before handover',
+      'Practical-completion and defects-liability painting',
+      'Painting coordinated around other trades’ sequencing',
+      'Substrate preparation ahead of coating',
     ],
     image: {
-      src: '/images/work/fascia-gutter-ladder.webp',
-      alt: 'An APMG tradesperson on a ladder working along the fascia and gutter line of a weatherboard house',
+      src: '/images/work/new-build-trim-priming.webp',
+      alt: 'An APMG painter rolling primer onto a length of trim laid across trestles on a site still under construction, the rest of the run stacked alongside',
     },
   },
 ] as const;

@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
-import { CommercialEnquiryForm, ResidentialEnquiryForm } from '@/components/forms/enquiry-forms';
+import { CommercialEnquiryForm } from '@/components/forms/enquiry-forms';
 import { Container, Section, SectionHeading } from '@/components/ui';
-import { formattedAddress, site } from '@/lib/site';
+import { addressNote, formattedAddress, site } from '@/lib/site';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Contact APMG Painting | Melbourne Painters',
   description:
-    'Contact APMG Painting in Melbourne. Separate enquiry forms for commercial site assessments and residential quotes, or call 1300 97 97 40.',
+    'Contact APMG Painting. Tell us about the site and the scope, or call 1300 97 97 40 for a commercial site assessment.',
   path: '/contact-us/',
 });
 
@@ -20,7 +20,7 @@ export default function ContactPage() {
           <Breadcrumbs crumbs={[{ name: 'Contact', path: '/contact-us/' }]} />
           <h1 className="font-display text-4xl tracking-tight sm:text-5xl">Contact us</h1>
           <p className="mt-4 max-w-prose text-lg text-ink-soft">
-            Two different jobs, two different sets of questions. Pick whichever fits — or just call.
+            Tell us about the site and we will get back to you — or just call.
           </p>
 
           <dl className="mt-8 grid gap-6 sm:grid-cols-3">
@@ -51,15 +51,21 @@ export default function ContactPage() {
               <dt className="text-xs font-semibold uppercase tracking-label text-ink-muted">
                 Address
               </dt>
-              <dd className="mt-1 text-ink">{formattedAddress}</dd>
+              <dd className="mt-1 text-ink">
+                {formattedAddress}
+                {/* Drops itself once site.address.effectiveFrom passes, so the
+                    move notice cannot outlive the move. */}
+                {addressNote() && (
+                  <span className="mt-1 block text-sm text-ink-soft">{addressNote()}</span>
+                )}
+              </dd>
             </div>
           </dl>
         </Container>
       </Section>
 
-      {/* The header's "Get a quote" lands here: both enquiry forms, one anchor.
-          `#commercial` and `#residential` stay as the deep links from the
-          service pages. */}
+      {/* The header's "Get a quote" lands here. `#commercial` stays as the deep
+          link from the service pages. */}
       <div id="quote" className="scroll-mt-16 sm:scroll-mt-20">
         <Section tone="paper" id="commercial">
           <Container width="narrow">
@@ -73,19 +79,6 @@ export default function ContactPage() {
               allowed on site.
             </p>
             <CommercialEnquiryForm />
-          </Container>
-        </Section>
-
-        <Section tone="sunken" id="residential">
-          <Container width="narrow">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-label text-brand-600">
-              For homeowners
-            </p>
-            <SectionHeading className="mb-3">Request a free quote</SectionHeading>
-            <p className="mb-8 text-ink-soft">
-              For houses, apartments and townhouses across Melbourne, inside or out.
-            </p>
-            <ResidentialEnquiryForm />
           </Container>
         </Section>
       </div>

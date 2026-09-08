@@ -36,12 +36,11 @@ describe('every quick answer comes from the published FAQs', () => {
     expect(new Set(QUICK_QUESTIONS).size).toBe(QUICK_QUESTIONS.length);
   });
 
-  it('covers both audiences, since the opening turn does not know which one it is', () => {
+  it('is drawn from the commercial FAQ pool, the only audience left', () => {
     const audiences = new Set(
       QUICK_ANSWERS.map((entry) => faqs.find((faq) => faq.question === entry.question)?.audience),
     );
-    expect(audiences).toContain('commercial');
-    expect(audiences).toContain('residential');
+    expect(audiences).toEqual(new Set(['commercial']));
   });
 
   it('never invents a price', () => {

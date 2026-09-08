@@ -13,7 +13,7 @@ import { site } from '@/lib/site';
  * Drawn with the APMG black and red rather than an approximation: ink #0F1113,
  * brand red #C8102E, brand-400 #E24356 for the rule.
  */
-export const alt = `${site.name} — commercial and residential painters, Melbourne`;
+export const alt = `${site.name} — commercial painters, Melbourne`;
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -82,7 +82,7 @@ export default function OpengraphImage() {
           color: 'rgba(255,255,255,0.7)',
         }}
       >
-        <span>Commercial &amp; residential · {site.serviceArea.primary}</span>
+        <span>Commercial painting · {site.serviceArea.primary}</span>
         <span style={{ color: '#E24356', fontWeight: 600 }}>{site.phone.display}</span>
       </div>
     </div>,

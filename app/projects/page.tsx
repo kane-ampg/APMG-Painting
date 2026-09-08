@@ -8,7 +8,7 @@ import { featuredProjects, projects } from '@/content/projects';
 export const metadata: Metadata = buildMetadata({
   title: 'Painting Projects & Case Studies | APMG Painting',
   description:
-    'Documented painting projects across Melbourne — schools, factories, offices and homes — including access methods, site constraints and outcomes.',
+    'Documented commercial painting projects across Melbourne — schools, factories, clinics and offices — including access methods, site constraints and outcomes.',
   path: '/projects/',
 });
 

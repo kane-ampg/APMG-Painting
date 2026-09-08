@@ -46,11 +46,11 @@ test.describe('current page marking', () => {
   test('only one thing in the menu is ever the current page', async ({ page, isMobile }) => {
     test.skip(isMobile, 'Desktop dropdown.');
 
-    // The Residential dropdown holds two anchors onto this same page. Neither
-    // may claim to be it.
-    await page.goto('/residential-painting/');
+    // The Commercial dropdown holds an "Overview" link onto this same page as
+    // the trigger. Only one may claim to be it.
+    await page.goto('/commercial/');
     const nav = mainNav(page);
-    await nav.getByRole('button', { name: /^Residential/ }).click();
+    await nav.getByRole('button', { name: /^Commercial/ }).click();
     await expect(nav.locator('[aria-current="page"]')).toHaveCount(1);
   });
 

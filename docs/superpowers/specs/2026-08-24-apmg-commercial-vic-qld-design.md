@@ -10,11 +10,11 @@
 
 Build a commercial-painting-only website for APMG Painting covering Victoria and South East Queensland, as a non-indexable sandbox preview. It is the third APMG site:
 
-| # | Site | Status |
-|---|---|---|
-| 1 | `apmgpainting.com.au` (WordPress) | Live. Commercial + residential, Melbourne only. |
-| 2 | `APMG Painting v2` | Sandbox preview. Commercial + residential, Melbourne only. Stays as-is for comparison. |
-| 3 | **This build** | Sandbox preview. **Commercial only**, VIC + QLD. |
+| #   | Site                              | Status                                                                                 |
+| --- | --------------------------------- | -------------------------------------------------------------------------------------- |
+| 1   | `apmgpainting.com.au` (WordPress) | Live. Commercial + residential, Melbourne only.                                        |
+| 2   | `APMG Painting v2`                | Sandbox preview. Commercial + residential, Melbourne only. Stays as-is for comparison. |
+| 3   | **This build**                    | Sandbox preview. **Commercial only**, VIC + QLD.                                       |
 
 The site must not be launched, indexed, or linked to from anywhere until APMG explicitly approves it.
 
@@ -22,13 +22,13 @@ The site must not be launched, indexed, or linked to from anywhere until APMG ex
 
 1. Commercial painting only. No residential pages, copy, or navigation.
 2. Two service states: Victoria, and Queensland (Brisbane, Sunshine Coast, Gold Coast).
-3. A suburb page for every locality inside the specified radii — 1,516 of them.
+3. A suburb page for every locality inside the specified radii — 1,527 of them.
 4. Materially better SEO than site 1, without incurring scaled-content or doorway-page risk.
 5. Truthful throughout. No claim the business cannot evidence.
 
 ## 3. Non-goals
 
-- **Sector × suburb pages.** 8 sectors × 1,516 suburbs = 12,128 pages. This is the fastest way to get a trade site algorithmically suppressed. Not built, not in phase 2, not ever at suburb granularity.
+- **Sector × suburb pages.** 8 sectors × 1,527 suburbs = 12,216 pages. This is the fastest way to get a trade site algorithmically suppressed. Not built, not in phase 2, not ever at suburb granularity.
 - **Any residential surface.** No house painting, no interior-decor copy, no homeowner FAQs.
 - **Non-painting trades.** Plastering, rendering as a standalone service, repairs, line marking. Painting and painting-preparation only.
 - **Claiming a Queensland presence.** See §9.
@@ -36,16 +36,16 @@ The site must not be launched, indexed, or linked to from anywhere until APMG ex
 
 ## 4. Decisions taken
 
-| Decision | Choice | Rationale |
-|---|---|---|
-| Suburb architecture | Tiered hub-and-spoke | Full coverage without doorway risk |
-| Repo | New repo, new sandbox domain | Site 2 survives as comparison |
-| QLD status | Expansion play — no address, no projects, no phone | Honesty; determines schema and indexability |
-| Scope | Painting strictly only; residential deleted | Client brief |
-| Sector pages | All 8 retained | The commercial service spine |
-| Brand | "APMG Painting", unchanged | Single config value if it changes |
-| URLs | Nested by state → region → suburb | Explicit hierarchy; clean future VIC/QLD split |
-| Design | Reuse v2 design system, re-pitched at B2B | v2 system is sound; saves a rebuild |
+| Decision            | Choice                                             | Rationale                                      |
+| ------------------- | -------------------------------------------------- | ---------------------------------------------- |
+| Suburb architecture | Tiered hub-and-spoke                               | Full coverage without doorway risk             |
+| Repo                | New repo, new sandbox domain                       | Site 2 survives as comparison                  |
+| QLD status          | Expansion play — no address, no projects, no phone | Honesty; determines schema and indexability    |
+| Scope               | Painting strictly only; residential deleted        | Client brief                                   |
+| Sector pages        | All 8 retained                                     | The commercial service spine                   |
+| Brand               | "APMG Painting", unchanged                         | Single config value if it changes              |
+| URLs                | Nested by state → region → suburb                  | Explicit hierarchy; clean future VIC/QLD split |
+| Design              | Reuse v2 design system, re-pitched at B2B          | v2 system is sound; saves a rebuild            |
 
 ## 5. Radius anchors and locality set
 
@@ -61,13 +61,19 @@ Filter chain:
 6. Drop `RA_2021_NAME ∈ {Remote Australia, Outer Regional Australia, ""}`
 7. **Coordinate sanity check** — see §5.1
 
-| Anchor | Coordinates | Radius | Localities |
-|---|---|---|---|
-| Bayswater North VIC 3153 | −37.845116, 145.270141 | 50 km | 622 |
+| Anchor                   | Coordinates            | Radius | Localities |
+| ------------------------ | ---------------------- | ------ | ---------- |
+| Bayswater North VIC 3153 | −37.845116, 145.270141 | 50 km  | 622        |
+
+<!-- APMG confirmed the office move to 1 Turbo Drive, Bayswater North on 2026-08-24. This anchor was already
+     the VIC radius centre; it is now the registered address too. The coordinate above is the suburb
+     centroid and is fine for the radius, but `LocalBusiness.geo` needs the street address geocoded. -->
+
 | Brisbane CBD QLD 4000 | −27.4698, 153.0251 | 40 km | 547 |
 | Southport QLD 4215 | −27.9680, 153.4000 | 40 km | 181 |
 | Maroochydore QLD 4558 | −26.6600, 153.0930 | 40 km | 166 |
-| **Total** | | | **1,516** |
+| **Total (raw, before §5.1 corrections)** | | | **1,509** |
+| **Total (corrected — see §5.3)** | | | **1,527** |
 
 ### 5.1 Known bad data — must be filtered
 
@@ -75,12 +81,12 @@ Filter chain:
 
 Four councils contribute exactly one locality each to the Victorian set. Two are geographically impossible and two are legitimate edge cases:
 
-| Council | Verdict |
-|---|---|
-| Surf Coast | **Impossible.** ~90 km from Bayswater North. Name collision or bad coordinates. Drop. |
-| South Gippsland | **Impossible.** ~90 km away. Drop. |
-| Melton | **Legitimate.** Melton's eastern edge (Hillside) genuinely falls just inside 50 km. Allowlist. |
-| Mitchell | **Legitimate.** Southern tip only. Allowlist. |
+| Council         | Verdict                                                                                        |
+| --------------- | ---------------------------------------------------------------------------------------------- |
+| Surf Coast      | **Impossible.** ~90 km from Bayswater North. Name collision or bad coordinates. Drop.          |
+| South Gippsland | **Impossible.** ~90 km away. Drop.                                                             |
+| Melton          | **Legitimate.** Melton's eastern edge (Hillside) genuinely falls just inside 50 km. Allowlist. |
+| Mitchell        | **Legitimate.** Southern tip only. Allowlist.                                                  |
 
 **Rule:** the generator fails the build if any council contributes ≤ 2 localities and is not on an explicit allowlist. This turns a silent data error into a build error. The allowlist holds `Melton` and `Mitchell`, is reviewed by a human, and is never auto-populated.
 
@@ -88,16 +94,16 @@ Four councils contribute exactly one locality each to the Victorian set. Two are
 
 Several councils inside the radii are farmland with no commercial building stock worth targeting. Counts below are **whole-council totals inside the radius**, not the fringe subset:
 
-| Council | Localities in radius | Anchor | Fringe rule |
-|---|---|---|---|
-| Scenic Rim | 95 | Brisbane + Gold Coast | Entire council |
-| Cardinia | 44 | Bayswater North | Split — see below |
-| Yarra Ranges | 39 | Bayswater North | Split — see below |
-| Nillumbik | 37 | Bayswater North | Entire council |
-| Gympie | 14 | Maroochydore | Entire council |
-| Murrindindi | 8 | Bayswater North | Entire council |
-| Baw Baw | 4 | Bayswater North | Entire council |
-| Somerset | 2 | Maroochydore | Entire council |
+| Council      | Localities in radius | Anchor                | Fringe rule       |
+| ------------ | -------------------- | --------------------- | ----------------- |
+| Scenic Rim   | 95                   | Brisbane + Gold Coast | Entire council    |
+| Cardinia     | 44                   | Bayswater North       | Split — see below |
+| Yarra Ranges | 39                   | Bayswater North       | Split — see below |
+| Nillumbik    | 37                   | Bayswater North       | Entire council    |
+| Gympie       | 14                   | Maroochydore          | Entire council    |
+| Murrindindi  | 8                    | Bayswater North       | Entire council    |
+| Baw Baw      | 4                    | Bayswater North       | Entire council    |
+| Somerset     | 2                    | Maroochydore          | Entire council    |
 
 **Split rule for Cardinia and Yarra Ranges.** Both councils straddle the urban growth boundary — Pakenham and Officer are genuine commercial centres; Gembrook and Powelltown are not. A whole-council flag would be wrong in both directions.
 
@@ -106,7 +112,7 @@ A locality in these two councils is `ruralFringe: false` only if it appears on a
 - **Cardinia urban:** Pakenham, Pakenham Upper, Officer, Officer South, Beaconsfield, Beaconsfield Upper, Bunyip, Koo Wee Rup, Lang Lang, Emerald, Cockatoo
 - **Yarra Ranges urban:** Lilydale, Mooroolbark, Chirnside Park, Montrose, Kilsyth South, Healesville, Yarra Glen, Seville, Wandin North, Woori Yallock, Belgrave, Upwey, Tecoma, Ferny Creek, Olinda
 
-Everything else in those two councils is fringe. Chirnside Park is on the list because it is APMG's own base.
+Everything else in those two councils is fringe. Chirnside Park is on the list on its own merits as an urban Yarra Ranges locality; it was also APMG's base until the August 2026 move to Bayswater North, which is in Maroondah and never needed the allowlist.
 
 Fringe suburbs carry `ruralFringe: true`. They:
 
@@ -154,56 +160,56 @@ Region assignment is **geographic first, council second**. Councils that are sma
 
 **Victoria (8 + 1 hinterland)**
 
-| Region | Councils |
-|---|---|
-| Inner Melbourne | Melbourne, Port Phillip, Yarra |
-| Inner East | Boroondara, Stonnington |
-| Eastern | Whitehorse, Manningham, Maroondah, Knox, Yarra Ranges (urban) |
-| South East | Monash, Greater Dandenong, Casey, Cardinia (urban) |
-| Bayside & Peninsula | Bayside, Glen Eira, Kingston, Frankston, Mornington Peninsula |
-| Northern | Darebin, Banyule, Whittlesea, Moreland |
-| North West | Hume, Moonee Valley, Melton |
-| Western | Brimbank, Maribyrnong, Hobsons Bay, Wyndham |
-| *Yarra Valley & Hinterland* | Yarra Ranges (rural), Nillumbik, Murrindindi, Baw Baw, Cardinia (rural) — `ruralFringe` |
+| Region                      | Councils                                                                                |
+| --------------------------- | --------------------------------------------------------------------------------------- |
+| Inner Melbourne             | Melbourne, Port Phillip, Yarra                                                          |
+| Inner East                  | Boroondara, Stonnington                                                                 |
+| Eastern                     | Whitehorse, Manningham, Maroondah, Knox, Yarra Ranges (urban)                           |
+| South East                  | Monash, Greater Dandenong, Casey, Cardinia (urban)                                      |
+| Bayside & Peninsula         | Bayside, Glen Eira, Kingston, Frankston, Mornington Peninsula                           |
+| Northern                    | Darebin, Banyule, Whittlesea, Moreland                                                  |
+| North West                  | Hume, Moonee Valley, Melton                                                             |
+| Western                     | Brimbank, Maribyrnong, Hobsons Bay, Wyndham                                             |
+| _Yarra Valley & Hinterland_ | Yarra Ranges (rural), Nillumbik, Murrindindi, Baw Baw, Cardinia (rural) — `ruralFringe` |
 
 **Queensland (12 + 1 hinterland)**
 
 Brisbane City Council is 307 localities in one LGA, so it splits geographically into five regions by bearing from the CBD:
 
-| Region | Basis |
-|---|---|
-| Brisbane Inner | Brisbane CC, ≤ 5 km from CBD |
-| Brisbane North | Brisbane CC, bearing 315°–45° |
-| Brisbane East | Brisbane CC, bearing 45°–135° |
-| Brisbane South | Brisbane CC, bearing 135°–225° |
-| Brisbane West | Brisbane CC, bearing 225°–315° |
-| Ipswich | Ipswich |
-| Logan | Logan |
-| Redlands | Redland |
-| Moreton Bay | Moreton Bay |
-| Sunshine Coast | Sunshine Coast |
-| Noosa | Noosa |
-| Gold Coast | Gold Coast |
-| *SEQ Hinterland* | Scenic Rim, Gympie, Somerset — `ruralFringe` |
+| Region           | Basis                                        |
+| ---------------- | -------------------------------------------- |
+| Brisbane Inner   | Brisbane CC, ≤ 5 km from CBD                 |
+| Brisbane North   | Brisbane CC, bearing 315°–45°                |
+| Brisbane East    | Brisbane CC, bearing 45°–135°                |
+| Brisbane South   | Brisbane CC, bearing 135°–225°               |
+| Brisbane West    | Brisbane CC, bearing 225°–315°               |
+| Ipswich          | Ipswich                                      |
+| Logan            | Logan                                        |
+| Redlands         | Redland                                      |
+| Moreton Bay      | Moreton Bay                                  |
+| Sunshine Coast   | Sunshine Coast                               |
+| Noosa            | Noosa                                        |
+| Gold Coast       | Gold Coast                                   |
+| _SEQ Hinterland_ | Scenic Rim, Gympie, Somerset — `ruralFringe` |
 
 Gold Coast at 132 localities is large but geographically coherent and is one region. If its hub page proves unwieldy in build it splits North/Central/South on the same bearing rule; the generator supports this without a schema change.
 
 ## 7. Indexability tiers
 
-This is the mechanism that makes 1,516 pages safe.
+This is the mechanism that makes 1,527 pages safe.
 
-| Tier | Count | In sitemap | `robots` | Content |
-|---|---|---|---|---|
-| Region hub | 22 | ✅ | index,follow | 800–1,200 words, hand-written |
-| Tier 1 suburb | ~50 | ✅ | index,follow | Hand-written, unique |
-| Tier 3 suburb | ~1,466 | ❌ | noindex,follow | Data-differentiated template |
+| Tier          | Count  | In sitemap | `robots`       | Content                       |
+| ------------- | ------ | ---------- | -------------- | ----------------------------- |
+| Region hub    | 22     | ✅         | index,follow   | 800–1,200 words, hand-written |
+| Tier 1 suburb | ~50    | ✅         | index,follow   | Hand-written, unique          |
+| Tier 3 suburb | ~1,462 | ❌         | noindex,follow | Data-differentiated template  |
 
 **Tier 1 criteria** — a suburb qualifies on either:
 
 - APMG has a documented project in it, **or**
 - it is a recognised commercial or industrial precinct with real search demand
 
-Seed Tier 1 list (VIC): Bayswater, Dandenong South, Notting Hill, Port Melbourne, Clayton, Braeside, Tullamarine, Laverton North, Campbellfield, Vermont, Chirnside Park, Ringwood, Box Hill, Richmond, South Melbourne.
+Seed Tier 1 list (VIC): Bayswater North, Bayswater, Dandenong South, Notting Hill, Port Melbourne, Clayton, Braeside, Tullamarine, Laverton North, Campbellfield, Vermont, Chirnside Park, Ringwood, Box Hill, Richmond, South Melbourne. Bayswater North leads the list because it is APMG's own base.
 (QLD): Eagle Farm, Murarrie, Rocklea, Darra, Yatala, Molendinar, Burleigh Heads, Kunda Park, Warana, Northgate, Wacol, Archerfield.
 
 QLD Tier 1 entries are indexable on the strength of **sector and service** content, never on a claim of local presence. See §9.
@@ -212,22 +218,22 @@ QLD Tier 1 entries are indexable on the strength of **sector and service** conte
 
 **Promotion** is a single field change in the generated data, reviewed by a human. No page auto-promotes.
 
-While `NEXT_PUBLIC_SANDBOX` is not `"false"`, all of the above is overridden and every page is `noindex, nofollow`. Tiers govern what happens *at launch*, not what happens now.
+While `NEXT_PUBLIC_SANDBOX` is not `"false"`, all of the above is overridden and every page is `noindex, nofollow`. Tiers govern what happens _at launch_, not what happens now.
 
 ## 8. Per-suburb differentiation
 
 Every suburb page, including Tier 3, carries six facts that are true only of that suburb. No name-swapped template.
 
-| Field | Source |
-|---|---|
-| Council | `lgaregion`, plus a hand-authored permit/heritage note per council |
-| Distance & drive band from base | Computed haversine, bucketed (`<20 min`, `20–40 min`, `40–60 min`, `60 min+`) |
-| Nearest documented APMG project | Computed against project coordinates, with its distance |
-| Dominant commercial building stock | Authored once per council, inherited by its suburbs |
-| Six nearest suburbs | Computed geographically; excludes rural-fringe from non-fringe pages |
-| Postcode(s) | Dataset |
+| Field                              | Source                                                                        |
+| ---------------------------------- | ----------------------------------------------------------------------------- |
+| Council                            | `lgaregion`, plus a hand-authored permit/heritage note per council            |
+| Distance & drive band from base    | Computed haversine, bucketed (`<20 min`, `20–40 min`, `40–60 min`, `60 min+`) |
+| Nearest documented APMG project    | Computed against project coordinates, with its distance                       |
+| Dominant commercial building stock | Authored once per council, inherited by its suburbs                           |
+| Six nearest suburbs                | Computed geographically; excludes rural-fringe from non-fringe pages          |
+| Postcode(s)                        | Dataset                                                                       |
 
-Council-level notes are authored once for **49 councils**, not 1,516 times. That is the leverage that makes real differentiation affordable.
+Council-level notes are authored once for **45 councils**, not 1,527 times. That is the leverage that makes real differentiation affordable.
 
 ### 8.1 Generation pipeline
 
@@ -248,7 +254,7 @@ Hand-authored content lives in separate files keyed by slug (`content/locations.
 
 APMG has no Queensland address, no completed Queensland projects, and no Queensland phone number. Therefore:
 
-- **No second `LocalBusiness` entity.** One `LocalBusiness` for Chirnside Park. QLD is expressed as `areaServed`, nothing more.
+- **No second `LocalBusiness` entity.** One `LocalBusiness` for Bayswater North. QLD is expressed as `areaServed`, nothing more.
 - **No Queensland Google Business Profile.** Cannot be created without an address. QLD map-pack visibility is unavailable and the client brief says so.
 - **Copy discipline.** QLD pages say "we service" and never "we're based in", "our Brisbane team", or "local to the Gold Coast".
 - **All QLD suburb pages are Tier 3** until a project or address exists.
@@ -258,15 +264,15 @@ APMG has no Queensland address, no completed Queensland projects, and no Queensl
 
 ## 10. Structured data
 
-| Schema | Where | Notes |
-|---|---|---|
-| `Organization` | Sitewide | `legalName`, `sameAs`, `foundingDate: 2015` |
-| `LocalBusiness` | Sitewide | Chirnside Park only. `geo` omitted until coordinates confirmed |
-| `areaServed` | `LocalBusiness` | `GeoCircle` for the VIC radius; `AdministrativeArea` entries for the three QLD regions |
-| `Service` | Service + sector pages | `serviceType`, `provider`, `areaServed` |
-| `BreadcrumbList` | All nested pages | Falls out of the URL hierarchy |
-| `FAQPage` | Sector pages | Sector-specific questions only |
-| `AggregateRating` | **Not emitted** | No first-party verified reviews. Emitting a third-party widget's aggregate is a documented route to a manual penalty |
+| Schema            | Where                  | Notes                                                                                                                |
+| ----------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `Organization`    | Sitewide               | `legalName`, `sameAs`, `foundingDate: 2015`                                                                          |
+| `LocalBusiness`   | Sitewide               | Bayswater North only. `geo` omitted until coordinates confirmed                                                      |
+| `areaServed`      | `LocalBusiness`        | `GeoCircle` for the VIC radius; `AdministrativeArea` entries for the three QLD regions                               |
+| `Service`         | Service + sector pages | `serviceType`, `provider`, `areaServed`                                                                              |
+| `BreadcrumbList`  | All nested pages       | Falls out of the URL hierarchy                                                                                       |
+| `FAQPage`         | Sector pages           | Sector-specific questions only                                                                                       |
+| `AggregateRating` | **Not emitted**        | No first-party verified reviews. Emitting a third-party widget's aggregate is a documented route to a manual penalty |
 
 Carried from site 2: nothing is emitted for an unverified accreditation.
 
@@ -291,18 +297,18 @@ A test asserts all four layers are active when `NEXT_PUBLIC_SANDBOX` is unset, a
 
 Site 1's `/robots.txt` and every sitemap endpoint return HTTP 500, so Google currently receives no directives at all.
 
-| Area | Site 1 | This build |
-|---|---|---|
-| robots.txt | HTTP 500 | Valid, AI crawlers named explicitly |
-| Sitemap | HTTP 500 | Valid; indexable URLs only; real `lastModified` |
-| Suburb pages | 68, all thin, 3 defective | 1,516, tiered, differentiated |
-| H1 correctness | "Painters Painters Armadale", "Painting Brighton" | Generated from structured data |
-| Internal linking | Suburb pages orphaned | Suburb → region → state → sector matrix |
-| Structured data | Inconsistent | Typed, evidence-gated |
-| Business name | Rendered 4 ways + one typo ("AMPG") | Single source in `lib/site.ts` |
-| Go-live switch | n/a | All four noindex layers keyed to one value, tested in both states |
-| Service area claim | "throughout Australia" once | Explicit, evidenced |
-| `llms.txt` | Absent | Present, extended to the region model |
+| Area               | Site 1                                            | This build                                                        |
+| ------------------ | ------------------------------------------------- | ----------------------------------------------------------------- |
+| robots.txt         | HTTP 500                                          | Valid, AI crawlers named explicitly                               |
+| Sitemap            | HTTP 500                                          | Valid; indexable URLs only; real `lastModified`                   |
+| Suburb pages       | 68, all thin, 3 defective                         | 1,527, tiered, differentiated                                     |
+| H1 correctness     | "Painters Painters Armadale", "Painting Brighton" | Generated from structured data                                    |
+| Internal linking   | Suburb pages orphaned                             | Suburb → region → state → sector matrix                           |
+| Structured data    | Inconsistent                                      | Typed, evidence-gated                                             |
+| Business name      | Rendered 4 ways + one typo ("AMPG")               | Single source in `lib/site.ts`                                    |
+| Go-live switch     | n/a                                               | All four noindex layers keyed to one value, tested in both states |
+| Service area claim | "throughout Australia" once                       | Explicit, evidenced                                               |
+| `llms.txt`         | Absent                                            | Present, extended to the region model                             |
 
 ## 13. Content inventory
 
@@ -310,31 +316,31 @@ Site 1's `/robots.txt` and every sitemap endpoint return HTTP 500, so Google cur
 
 **Deleted:** `/residential-painting/`, residential nav column, residential FAQs, the Glen Iris residential case study, `audience: 'residential'` throughout, the `Audience` type's `'residential'` member.
 
-**New:** the locality generator and its data, 22 region hubs, 1,516 suburb pages, `content/councils.ts` (49 entries), the QLD state hub, middleware `X-Robots-Tag`, the sanity-check build gate.
+**New:** the locality generator and its data, 22 region hubs, 1,527 suburb pages, `content/councils.ts` (45 entries), the QLD state hub, middleware `X-Robots-Tag`, the sanity-check build gate.
 
 ## 14. Testing
 
-| Level | Coverage |
-|---|---|
-| Unit | Haversine, nearest-anchor assignment, region rules, bearing split, tier assignment, slug generation, neighbour selection |
-| Data | Every locality has exactly one URL; no duplicate slugs; every suburb resolves to a real region; sanity check fires on a seeded bad record |
-| Schema | Valid JSON-LD; no `AggregateRating`; no second `LocalBusiness` while `qldPresence` is false |
+| Level   | Coverage                                                                                                                                     |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Unit    | Haversine, nearest-anchor assignment, region rules, bearing split, tier assignment, slug generation, neighbour selection                     |
+| Data    | Every locality has exactly one URL; no duplicate slugs; every suburb resolves to a real region; sanity check fires on a seeded bad record    |
+| Schema  | Valid JSON-LD; no `AggregateRating`; no second `LocalBusiness` while `qldPresence` is false                                                  |
 | Sandbox | All four lockdown layers active when `NEXT_PUBLIC_SANDBOX` is unset; **all four absent when it is `"false"`**; sitemap excludes noindex URLs |
-| Copy | No QLD page contains "based in", "our Brisbane", "local to" |
-| E2E | Suburb → region → state → sector navigation; enquiry form; 404 |
-| Build | 1,516 static pages generate; build time recorded |
+| Copy    | No QLD page contains "based in", "our Brisbane", "local to"                                                                                  |
+| E2E     | Suburb → region → state → sector navigation; enquiry form; 404                                                                               |
+| Build   | 1,527 static pages generate; build time recorded                                                                                             |
 
 The copy test is unusual but load-bearing: §9 is the constraint most likely to be violated by a later well-meaning edit, and a lint rule catches it where a review would not.
 
 ## 15. Risks
 
-| Risk | Mitigation |
-|---|---|
-| 1,516 pages read as a doorway network | Tier 3 is noindex and absent from the sitemap. Google sees ~72 pages |
-| Build time at 1,516 static pages | Measure early. If unacceptable, Tier 3 moves to on-demand ISR — they are noindex and low-traffic, so this costs nothing |
-| Source dataset is third-party and imperfect | Output committed; sanity check fails the build; corrupt `sa4name` columns unused |
-| QLD honesty erodes over time | Automated copy test, plus a single `qldPresence` flag as the only switch |
-| Tier 3 never gets promoted | Client brief lists exactly what promotes a page. `indexabilityReason` recorded per suburb |
+| Risk                                        | Mitigation                                                                                                              |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| 1,527 pages read as a doorway network       | Tier 3 is noindex and absent from the sitemap. Google sees ~72 pages                                                    |
+| Build time at 1,527 static pages            | Measure early. If unacceptable, Tier 3 moves to on-demand ISR — they are noindex and low-traffic, so this costs nothing |
+| Source dataset is third-party and imperfect | Output committed; sanity check fails the build; corrupt `sa4name` columns unused                                        |
+| QLD honesty erodes over time                | Automated copy test, plus a single `qldPresence` flag as the only switch                                                |
+| Tier 3 never gets promoted                  | Client brief lists exactly what promotes a page. `indexabilityReason` recorded per suburb                               |
 
 ## 16. What APMG must supply
 
@@ -343,7 +349,7 @@ Carried from `docs/CLIENT-BRIEF.md` and extended:
 1. Google Business Profile claimed and maintained — the largest single lever
 2. Reviews with reproduction permission — activates the review section and star ratings
 3. Six accreditation certificates — activates trust indicators sitewide
-4. Chirnside Park coordinates — activates `GeoCircle` in `areaServed`
+4. Bayswater North coordinates — the street address, not the suburb centroid — activates `GeoCircle` in `areaServed`
 5. ABN
 6. Sector photography — 8 sector pages have no image
 7. **Queensland:** an address, a project, or both. Until then QLD cannot rank locally
@@ -352,13 +358,13 @@ Carried from `docs/CLIENT-BRIEF.md` and extended:
 
 ## 17. Phasing
 
-| Phase | Scope |
-|---|---|
-| 1 | Scaffold from site 2, strip residential, `X-Robots-Tag` middleware, sandbox tests |
-| 2 | Locality generator, data, sanity check, 49 council notes |
-| 3 | Location templates: national → state → region → suburb |
-| 4 | Sector and service pages re-pitched at B2B; internal linking matrix |
-| 5 | Tier 1 hand-written content, schema, `llms.txt`, full test suite |
-| 6 | 8 sectors × 22 regions = 176 pages. **Only after 1–5 ship and are reviewed** |
+| Phase | Scope                                                                             |
+| ----- | --------------------------------------------------------------------------------- |
+| 1     | Scaffold from site 2, strip residential, `X-Robots-Tag` middleware, sandbox tests |
+| 2     | Locality generator, data, sanity check, 49 council notes                          |
+| 3     | Location templates: national → state → region → suburb                            |
+| 4     | Sector and service pages re-pitched at B2B; internal linking matrix               |
+| 5     | Tier 1 hand-written content, schema, `llms.txt`, full test suite                  |
+| 6     | 8 sectors × 22 regions = 176 pages. **Only after 1–5 ship and are reviewed**      |
 
 Phase 6 is deliberately last and deliberately optional.

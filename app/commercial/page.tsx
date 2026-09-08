@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { buildMetadata } from '@/lib/seo/metadata';
-import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import {
   ContentBlock,
   CtaBand,
@@ -78,14 +77,11 @@ export default function CommercialPage() {
         primaryCta={{ label: 'Request a site assessment', href: '/contact-us/#commercial' }}
         secondaryCta={{ label: 'See our projects', href: '/projects/' }}
         image={{
-          src: '/images/hero/commercial-hero.webp',
-          alt: 'Commercial building exterior repainted by APMG Painting in Melbourne',
+          src: '/images/work/ewp-tilt-panel-cutting-in.webp',
+          alt: 'An APMG painter working from a boom lift, harnessed, cutting the line between white and green tilt panels on a warehouse elevation',
         }}
+        crumbs={[{ name: 'Commercial painting', path: '/commercial/' }]}
       />
-
-      <Container width="wide">
-        <Breadcrumbs crumbs={[{ name: 'Commercial painting', path: '/commercial/' }]} />
-      </Container>
 
       <TrustBar />
 

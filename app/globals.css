@@ -92,6 +92,74 @@
 
 /*
  * ---------------------------------------------------------------------------
+ * FAQ accordion
+ * ---------------------------------------------------------------------------
+ *
+ * Outside every @layer for the same reason the page transitions below are:
+ * `::details-content` is a browser-generated box rather than an element, so no
+ * utility can reach it and nothing should be able to out-specify it by
+ * accident.
+ *
+ * The problem being solved: `<details>` has no in-between state. The browser
+ * reveals the answer in a single frame, and on a list of questions that reads
+ * as the page jumping rather than as one answer opening — the reader loses
+ * their place, because nothing showed them where the new text came from.
+ *
+ * `::details-content` is the box the browser wraps the non-summary children
+ * in. Animating it to `auto` rather than to a measured pixel height is the
+ * whole point: the answer grows to exactly its own height, at any width and
+ * any font size, with no JS measuring anything and no cached value to go stale
+ * when the text reflows. `interpolate-size` is what permits that.
+ *
+ * `interpolate-size` sits on the accordion rather than on :root deliberately.
+ * It inherits, so switching it on document-wide would quietly change how every
+ * other transition to or from a keyword behaves; this scopes it to the one
+ * component that asked for it.
+ *
+ * `content-visibility` is in the transition list because the browser flips it
+ * to `hidden` on close. `allow-discrete` holds it visible for the duration
+ * instead — without it the answer disappears on the first frame and what
+ * animates shut is an empty box.
+ *
+ * 260ms on the shared decelerating curve: the same pair as `sheet-in` in
+ * tailwind.config.ts, because both are a panel of content opening from an edge
+ * and two different speeds for the same gesture is how a surface stops feeling
+ * like one thing.
+ *
+ * Where `::details-content` is unsupported every rule here is dropped and the
+ * accordion keeps its native instant toggle. Nothing is hidden while waiting
+ * on motion, and there is no JS to fail.
+ */
+.faq-item {
+  interpolate-size: allow-keywords;
+}
+
+.faq-item::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 260ms cubic-bezier(0.16, 1, 0.3, 1),
+    content-visibility 260ms allow-discrete;
+}
+
+.faq-item[open]::details-content {
+  block-size: auto;
+}
+
+/*
+ * The global `0.01ms` override at the top of this file matches elements, and
+ * `::details-content` is not in the tree — the same blind spot the view
+ * transition block below documents. Zeroed explicitly here, which drops the
+ * accordion back to the browser's own instant toggle.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .faq-item::details-content {
+    transition-duration: 0s !important;
+  }
+}
+
+/*
+ * ---------------------------------------------------------------------------
  * Page transitions
  * ---------------------------------------------------------------------------
  *

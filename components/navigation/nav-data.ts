@@ -24,15 +24,6 @@ export const mainNav: readonly NavItem[] = [
         .map((s) => ({ label: s.shortTitle, href: s.legacyPath })),
     ],
   },
-  {
-    label: 'Residential',
-    href: '/residential-painting/',
-    children: [
-      { label: 'House painting', href: '/residential-painting/', description: 'Overview' },
-      { label: 'Interior painting', href: '/residential-painting/#interior' },
-      { label: 'Exterior painting', href: '/residential-painting/#exterior' },
-    ],
-  },
   { label: 'Projects', href: '/projects/' },
   { label: 'Trade services', href: '/trade-services/' },
   { label: 'About', href: '/about-us/' },
@@ -44,12 +35,6 @@ export const footerNav = {
     { label: 'Commercial painting', href: '/commercial/' },
     { label: 'Office painting', href: '/office-painters/' },
     ...sectors.map((s) => ({ label: s.shortTitle, href: s.legacyPath })),
-  ],
-  residential: [
-    { label: 'House painting', href: '/residential-painting/' },
-    { label: 'Interior painting', href: '/residential-painting/#interior' },
-    { label: 'Exterior painting', href: '/residential-painting/#exterior' },
-    { label: 'Trade services', href: '/trade-services/' },
   ],
   company: [
     { label: 'About us', href: '/about-us/' },
