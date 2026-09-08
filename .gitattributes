@@ -1,0 +1,7 @@
+# Checkout with LF everywhere so Prettier (endOfLine: lf) and git agree on Windows.
+* text=auto eol=lf
+*.webp binary
+*.png binary
+*.ico binary
+*.mp4 binary
+*.webm binary

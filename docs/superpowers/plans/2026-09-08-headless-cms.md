@@ -2343,19 +2343,17 @@ export async function saveEntry(_prev: SaveState, formData: FormData): Promise<S
 
   const slug = parsed.data.slug;
   const supabase = await createServerSupabase();
-  const { error } = await supabase
-    .from('content_entries')
-    .upsert(
-      {
-        collection,
-        slug,
-        status,
-        data: parsed.data,
-        updated_by: email,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'collection,slug' },
-    );
+  const { error } = await supabase.from('content_entries').upsert(
+    {
+      collection,
+      slug,
+      status,
+      data: parsed.data,
+      updated_by: email,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'collection,slug' },
+  );
   if (error) return { status: 'error', message: `Could not save: ${error.message}` };
 
   // Drafts never reach the public cache, so only a publish expires it.
