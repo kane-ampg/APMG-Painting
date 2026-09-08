@@ -256,8 +256,8 @@ export default async function ProjectPage({ params }: Props) {
                   <CmsImage
                     image={image}
                     fill
-                    sizes="(min-width: 1024px) 50vw, 100vw"
-                    className="object-cover"
+                    sizes="(min-width: 640px) 45vw, 100vw"
+                    className={`object-cover ${mediaZoom}`}
                   />
                 </li>
               ))}
