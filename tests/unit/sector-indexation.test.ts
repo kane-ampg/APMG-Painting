@@ -38,8 +38,8 @@ describe('sector indexation', () => {
     }
   });
 
-  it('keeps noindex sectors out of the sitemap', () => {
-    const urls = sitemap().map((entry) => entry.url);
+  it('keeps noindex sectors out of the sitemap', async () => {
+    const urls = (await sitemap()).map((entry) => entry.url);
     for (const sector of sectors) {
       const listed = urls.some((url) => url.endsWith(sector.legacyPath));
       expect(listed, sector.slug).toBe(hasEvidence(sector));

@@ -1,8 +1,8 @@
 import { accreditations, formattedAddress, site, siteUrl } from '@/lib/site';
 import { googleAggregate, googleReviews } from '@/content/reviews';
-import { servicePath, services } from '@/content/services';
+import { servicePath } from '@/content/services';
 import { sectors } from '@/content/sectors';
-import { projects } from '@/content/projects';
+import { getProjects, getServices } from '@/lib/content/source';
 import { homeFaqs } from '@/content/faqs';
 import { differentiators } from '@/content/approach';
 import {
@@ -29,7 +29,8 @@ import {
  */
 export const dynamic = 'force-static';
 
-export function GET(): Response {
+export async function GET(): Promise<Response> {
+  const [services, projects] = await Promise.all([getServices(), getProjects()]);
   const verified = accreditations.filter((a) => a.verified);
 
   /*

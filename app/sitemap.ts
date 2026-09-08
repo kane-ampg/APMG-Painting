@@ -1,7 +1,8 @@
 import type { MetadataRoute } from 'next';
 import { siteUrl } from '@/lib/site';
 import { sectors } from '@/content/sectors';
-import { projects, sectorHasDocumentedProject } from '@/content/projects';
+import { sectorHasDocumentedProject } from '@/content/projects';
+import { getProjects } from '@/lib/content/source';
 import { indexableLocalities, REGIONS, stateSlug } from '@/lib/locations';
 
 /**
@@ -14,7 +15,8 @@ import { indexableLocalities, REGIONS, stateSlug } from '@/lib/locations';
  * are excluded, because listing a noindex URL in a sitemap sends Google two
  * contradictory instructions.
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const projects = await getProjects();
   const staticPaths: { path: string; priority: number }[] = [
     { path: '/', priority: 1 },
     { path: '/commercial/', priority: 0.9 },

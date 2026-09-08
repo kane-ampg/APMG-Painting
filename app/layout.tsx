@@ -7,6 +7,7 @@ import { QuoteChatLazy } from '@/components/chat/quote-chat-lazy';
 import { ScrollReveal } from '@/components/motion/scroll-reveal';
 import { JsonLd } from '@/components/seo/json-ld';
 import { localBusinessSchema } from '@/lib/schema';
+import { getServices } from '@/lib/content/source';
 import { site, siteUrl } from '@/lib/site';
 
 /**
@@ -36,7 +37,9 @@ export const metadata: Metadata = {
     'APMG Painting is a Melbourne commercial painting contractor, working across schools, healthcare, aged care, strata, retail and industrial sites.',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const services = await getServices();
+
   return (
     <html lang="en-AU" className={`${sans.variable} ${display.variable}`}>
       <body className="flex min-h-screen flex-col font-sans">
@@ -46,7 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {/* One entity node, not an Organization + LocalBusiness pair —
             lib/schema/index.ts explains the merge. */}
-        <JsonLd data={localBusinessSchema()} />
+        <JsonLd data={localBusinessSchema(services)} />
 
         <Header />
         <main id="main" className="flex-1">

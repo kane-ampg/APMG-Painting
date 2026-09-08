@@ -1,5 +1,8 @@
 import type { NextConfig } from 'next';
 import generated from './content/locations.generated.json';
+import { supabaseHostname } from './lib/supabase/env';
+
+const supabaseHost = supabaseHostname();
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -9,12 +12,24 @@ const nextConfig: NextConfig = {
 
   images: {
     formats: ['image/avif', 'image/webp'],
+    // Source objects are immutable (hashed names, one-year Cache-Control),
+    // so the optimised variants can be cached for the same year.
+    minimumCacheTTL: 31536000,
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'apmgpainting.com.au',
         pathname: '/wp-content/uploads/**',
       },
+      ...(supabaseHost
+        ? [
+            {
+              protocol: 'https' as const,
+              hostname: supabaseHost,
+              pathname: '/storage/v1/object/public/media/**',
+            },
+          ]
+        : []),
     ],
   },
 

@@ -20,10 +20,9 @@ import { faqSchema } from '@/lib/schema';
 import { differentiators } from '@/content/approach';
 import { homeFaqs } from '@/content/faqs';
 import { indexableLocalities } from '@/lib/locations';
-import { featuredProjects } from '@/content/projects';
+import { getFeaturedProjects, getServices } from '@/lib/content/source';
 import { googleAggregate } from '@/content/reviews';
 import { sectors } from '@/content/sectors';
-import { services } from '@/content/services';
 import { site } from '@/lib/site';
 
 /**
@@ -80,8 +79,9 @@ const PROCESS = [
   },
 ] as const;
 
-export default function HomePage() {
+export default async function HomePage() {
   const yearsTrading = new Date().getFullYear() - site.founded;
+  const [services, featuredProjects] = await Promise.all([getServices(), getFeaturedProjects()]);
 
   return (
     <>
