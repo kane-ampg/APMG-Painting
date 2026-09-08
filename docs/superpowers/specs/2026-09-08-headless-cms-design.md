@@ -20,6 +20,7 @@ vars land in the Vercel project automatically.
 ## 2. Scope
 
 **Phase 1 (this spec):**
+
 - Collections editable in the CMS: `projects`, `services`, `posts` (new blog).
 - Two singletons: `settings/site` (business details: phone, email, address and
   move date, opening hours, ABN, map coordinates, social links) and
@@ -185,14 +186,14 @@ disallowed in `robots.ts`.
 
 The editor runs at its own address, separate from the public site:
 
-| | Public site | Editor |
-|---|---|---|
-| Vercel project | `apmg-painting` | `apmg-painting-editor` |
-| Domain | `apmgpainting.com.au` | `edit.apmgpainting.com.au` (or the project's `*.vercel.app` link until DNS is set) |
-| `NEXT_PUBLIC_APP_ROLE` | `site` | `editor` |
-| `NEXT_PUBLIC_SANDBOX` | `false` at go-live | never `false`: the editor is always noindex |
-| Serves | everything except `/admin/*` | only `/admin/*` and `/api/revalidate` is not needed here |
-| Supabase | same project, anon key | same project, anon key |
+|                        | Public site                  | Editor                                                                             |
+| ---------------------- | ---------------------------- | ---------------------------------------------------------------------------------- |
+| Vercel project         | `apmg-painting`              | `apmg-painting-editor`                                                             |
+| Domain                 | `apmgpainting.com.au`        | `edit.apmgpainting.com.au` (or the project's `*.vercel.app` link until DNS is set) |
+| `NEXT_PUBLIC_APP_ROLE` | `site`                       | `editor`                                                                           |
+| `NEXT_PUBLIC_SANDBOX`  | `false` at go-live           | never `false`: the editor is always noindex                                        |
+| Serves                 | everything except `/admin/*` | only `/admin/*` and `/api/revalidate` is not needed here                           |
+| Supabase               | same project, anon key       | same project, anon key                                                             |
 
 Both projects deploy from the same GitHub repo and the same branch, so one
 commit updates both. The role is a build-time env var read in

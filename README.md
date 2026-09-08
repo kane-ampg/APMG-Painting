@@ -15,7 +15,7 @@ Two things about this build are deliberate and easy to mistake for bugs.
 **1. Enquiries are not delivered.** No email or CRM credentials exist for this project yet, and
 where Contact Form 7 submissions currently land on the WordPress site is unknown. Rather than
 pretend, the app ships a transport adapter whose default implementation delivers nothing and says
-so. Submit a form and you get: *"Your details passed validation — but were not sent."* See
+so. Submit a form and you get: _"Your details passed validation — but were not sent."_ See
 [Enquiry delivery](#enquiry-delivery).
 
 **2. The whole site is `noindex`.** `NEXT_PUBLIC_SANDBOX` defaults to `true`, which forces a
@@ -36,17 +36,17 @@ cp .env.example .env.local
 npm run dev
 ```
 
-| Command              | What it does                                                       |
-| -------------------- | ------------------------------------------------------------------ |
-| `npm run dev`        | Development server                                                  |
-| `npm run build`      | Production build                                                    |
-| `npm start`          | Serve the production build                                          |
-| `npm run lint`       | ESLint                                                              |
-| `npm run typecheck`  | `tsc --noEmit`                                                      |
-| `npm run format`     | Prettier, writing changes                                           |
-| `npm test`           | Vitest unit and component tests                                     |
-| `npm run test:e2e`   | Playwright end-to-end tests (builds and serves on port 3100)        |
-| `npm run verify`     | lint → typecheck → format check → unit tests → production build     |
+| Command             | What it does                                                    |
+| ------------------- | --------------------------------------------------------------- |
+| `npm run dev`       | Development server                                              |
+| `npm run build`     | Production build                                                |
+| `npm start`         | Serve the production build                                      |
+| `npm run lint`      | ESLint                                                          |
+| `npm run typecheck` | `tsc --noEmit`                                                  |
+| `npm run format`    | Prettier, writing changes                                       |
+| `npm test`          | Vitest unit and component tests                                 |
+| `npm run test:e2e`  | Playwright end-to-end tests (builds and serves on port 3100)    |
+| `npm run verify`    | lint → typecheck → format check → unit tests → production build |
 
 ---
 
@@ -91,10 +91,10 @@ source for a CMS later is one adapter rather than a rebuild.
 
 `lib/enquiry/transport.ts` defines an `EnquiryTransport` interface with two implementations:
 
-| Adapter   | When it runs                        | Behaviour                                        |
-| --------- | ----------------------------------- | ------------------------------------------------ |
-| `console` | Default                             | Logs that a submission occurred. Delivers nothing. Returns `delivered: false`. |
-| `resend`  | `ENQUIRY_TRANSPORT=resend` + a key  | Sends via Resend.                                 |
+| Adapter   | When it runs                       | Behaviour                                                                      |
+| --------- | ---------------------------------- | ------------------------------------------------------------------------------ |
+| `console` | Default                            | Logs that a submission occurred. Delivers nothing. Returns `delivered: false`. |
+| `resend`  | `ENQUIRY_TRANSPORT=resend` + a key | Sends via Resend.                                                              |
 
 To switch on real delivery, set in `.env.local` (and in Vercel's environment variables):
 
@@ -168,11 +168,11 @@ Held deliberately, and enforced by tests:
 
 Redirects live in `next.config.ts` and currently cover only slug defects:
 
-| From                            | To                            |
-| ------------------------------- | ----------------------------- |
-| `/areas/painters-park-dale/`    | `/areas/painters-parkdale/`   |
-| `/areas/painters-travencore/`   | `/areas/painters-travancore/` |
-| `/areas/painters-garden-vale/`  | `/areas/painters-gardenvale/` |
+| From                           | To                            |
+| ------------------------------ | ----------------------------- |
+| `/areas/painters-park-dale/`   | `/areas/painters-parkdale/`   |
+| `/areas/painters-travencore/`  | `/areas/painters-travancore/` |
+| `/areas/painters-garden-vale/` | `/areas/painters-gardenvale/` |
 
 `/about-us/`, `/contact-us/`, `/office-painters/` and all seven existing sector URLs are unchanged.
 

@@ -29,16 +29,16 @@
 
 ## What editors can change, and where
 
-| On the public site | Edited at | Fields | Task |
-|---|---|---|---|
-| Landing page → Services → "What we paint" cards (photo, title, summary, the four chips) | `/admin/services/<slug>/` | `image`, `title`, `summary`, `includes` (first four chips shown) | 4, 6, 9 |
-| Commercial and trade-services pages' service copy | `/admin/services/<slug>/` | `body`, `includes`, `image` | 4, 9 |
-| Project case studies, incl. hero and gallery photos | `/admin/projects/<slug>/` | all fields; `images` as a list | 4, 6, 9 |
-| Featured projects on the landing page | `/admin/projects/<slug>/` | `isFeatured` | 4, 9 |
-| Blog index and posts | `/admin/posts/` | all fields, Markdown body, AI summary | 10, 11 |
-| Phone, email, address, move date, hours, ABN, socials, map pin (header, footer, contact, about, chat, structured data) | `/admin/settings/site/` | see `SiteSettings` | 12 |
-| Contact page heading, lede, form heading and intro, meta | `/admin/pages/contact-us/` | see `ContactPageCopy` | 12 |
-| Every image's alt text | `/admin/media/` | `alt`, with "Describe with AI" | 8, 10 |
+| On the public site                                                                                                     | Edited at                  | Fields                                                           | Task    |
+| ---------------------------------------------------------------------------------------------------------------------- | -------------------------- | ---------------------------------------------------------------- | ------- |
+| Landing page → Services → "What we paint" cards (photo, title, summary, the four chips)                                | `/admin/services/<slug>/`  | `image`, `title`, `summary`, `includes` (first four chips shown) | 4, 6, 9 |
+| Commercial and trade-services pages' service copy                                                                      | `/admin/services/<slug>/`  | `body`, `includes`, `image`                                      | 4, 9    |
+| Project case studies, incl. hero and gallery photos                                                                    | `/admin/projects/<slug>/`  | all fields; `images` as a list                                   | 4, 6, 9 |
+| Featured projects on the landing page                                                                                  | `/admin/projects/<slug>/`  | `isFeatured`                                                     | 4, 9    |
+| Blog index and posts                                                                                                   | `/admin/posts/`            | all fields, Markdown body, AI summary                            | 10, 11  |
+| Phone, email, address, move date, hours, ABN, socials, map pin (header, footer, contact, about, chat, structured data) | `/admin/settings/site/`    | see `SiteSettings`                                               | 12      |
+| Contact page heading, lede, form heading and intro, meta                                                               | `/admin/pages/contact-us/` | see `ContactPageCopy`                                            | 12      |
+| Every image's alt text                                                                                                 | `/admin/media/`            | `alt`, with "Describe with AI"                                   | 8, 10   |
 
 Not editable in phase 1, by design: the section headings and intro paragraphs on the landing page ("What we paint", "Where we work most"), sector pages, suburb pages, FAQs, reviews, accreditations, company names. Adding a landing-page copy singleton later is the same shape as `pages/contact-us` and is a half-day task.
 
@@ -98,6 +98,7 @@ scripts/seed-cms.mjs               one-off: TS content + public/images → Supab
 ### Task 1: Supabase project, env, clients, migration
 
 **Files:**
+
 - Create: `supabase/migrations/0001_cms.sql`
 - Create: `lib/supabase/env.ts`
 - Create: `lib/supabase/server.ts`
@@ -106,6 +107,7 @@ scripts/seed-cms.mjs               one-off: TS content + public/images → Supab
 - Test: `tests/unit/supabase-env.test.ts`
 
 **Interfaces:**
+
 - Produces: `hasSupabase(): boolean`, `supabaseEnv(): { url: string; anonKey: string }` (throws when unset), `createServerSupabase(): Promise<SupabaseClient>`, `createBrowserSupabase(): SupabaseClient`.
 
 - [ ] **Step 1: Provision Supabase**
@@ -371,11 +373,13 @@ git commit -m "feat(cms): add Supabase clients, env guard and schema migration"
 ### Task 2: Content schemas and the Post type
 
 **Files:**
+
 - Modify: `lib/content/types.ts`
 - Create: `lib/content/schemas.ts`
 - Test: `tests/unit/content-schemas.test.ts`
 
 **Interfaces:**
+
 - Produces: `MediaRef` type, `Post` type, `projectSchema`, `serviceSchema`, `postSchema`, `collectionSchemas`, `type Collection = 'projects' | 'services' | 'posts'`, `type EntryOf<C>`.
 - Consumes: existing `Project`, `Service`, `Testimonial`, `EditorialPlaceholder` types.
 
@@ -426,7 +430,9 @@ describe('content schemas', () => {
 
   it('exposes a schema for each content collection', () => {
     // Task 12 adds 'settings' and 'pages'; this stays true afterwards.
-    expect(Object.keys(collectionSchemas)).toEqual(expect.arrayContaining(['posts', 'projects', 'services']));
+    expect(Object.keys(collectionSchemas)).toEqual(
+      expect.arrayContaining(['posts', 'projects', 'services']),
+    );
   });
 });
 ```
@@ -527,9 +533,7 @@ export const projectSchema = z.object({
   accessAndSafety: z.array(z.string().min(1)).optional(),
   schedulingConstraints: z.array(z.string().min(1)).optional(),
   duration: z.union([z.string(), placeholderSchema]).optional(),
-  images: z.array(
-    mediaRefSchema.extend({ phase: z.enum(['before', 'after']).optional() }),
-  ),
+  images: z.array(mediaRefSchema.extend({ phase: z.enum(['before', 'after']).optional() })),
   outcome: z.array(z.string().min(1)),
   testimonial: z.union([testimonialSchema, placeholderSchema]).optional(),
   relatedServiceSlugs: z.array(slugSchema),
@@ -604,11 +608,13 @@ git commit -m "feat(cms): add Zod content schemas and the Post type"
 ### Task 3: Content source adapter with cache tags and fallback
 
 **Files:**
+
 - Create: `lib/content/tags.ts`
 - Create: `lib/content/source.ts`
 - Test: `tests/unit/content-source.test.ts`
 
 **Interfaces:**
+
 - Produces: `contentTag(c: Collection): string` (returns `content:<c>`); `getProjects(): Promise<Project[]>`, `getProject(slug): Promise<Project | undefined>`, `getFeaturedProjects()`, `getProjectsForSector(sectorSlug)`, `getServices()`, `getService(slug)`, `getPosts()`, `getPost(slug)`, `getEntryForPreview(collection, slug)` (drafts included, uncached). Task 12 extends this file with `getSiteSettings()` and `getPage(slug)` using the same `all()` helper, so keep `seeds` and `all` generic over `Collection`.
 - Consumes: `collectionSchemas`, `hasSupabase`, `createServerSupabase`, TS arrays in `content/*.ts`.
 
@@ -750,7 +756,8 @@ function parseRows<C extends Collection>(collection: C, rows: Row[]): EntryOf<C>
   for (const row of rows) {
     const result = schema.safeParse(row.data);
     if (result.success) out.push(result.data as EntryOf<C>);
-    else console.warn(`[content] ${collection}/${row.slug} failed validation`, result.error.flatten());
+    else
+      console.warn(`[content] ${collection}/${row.slug} failed validation`, result.error.flatten());
   }
   return out;
 }
@@ -863,11 +870,13 @@ git commit -m "feat(cms): add content source adapter with cache tags and TS fall
 ### Task 4: Move pages onto the adapter
 
 **Files:**
+
 - Modify: `app/page.tsx`, `app/commercial/page.tsx`, `app/office-painters/page.tsx`, `app/trade-services/page.tsx`, `app/projects/page.tsx`, `app/projects/[slug]/page.tsx`, `app/[sector]/page.tsx`, `app/areas/[slug]/page.tsx`, `app/sitemap.ts`, `app/llms.txt/route.ts`, `lib/schema/index.ts`
 - Modify: `next.config.ts`
 - Test: existing `tests/unit/schema.test.ts`, `tests/unit/content-integrity.test.ts`, e2e suites
 
 **Interfaces:**
+
 - Consumes: `getProjects`, `getProject`, `getFeaturedProjects`, `getProjectsForSector`, `getServices`, `getService` from Task 3.
 - Leaves untouched: `content/sectors.ts`, `content/locations.ts`, `components/navigation/nav-data.ts` (sectors stay synchronous per spec §2).
 
@@ -967,12 +976,14 @@ git commit -m "refactor: read projects and services through the content adapter"
 ### Task 5: Media processing and the seed script
 
 **Files:**
+
 - Create: `lib/media/process.ts`
 - Create: `lib/media/url.ts`
 - Create: `scripts/seed-cms.mjs`
 - Test: `tests/unit/media-process.test.ts`
 
 **Interfaces:**
+
 - Produces: `processImage(buffer: Buffer, originalName: string, folder: string): Promise<ProcessedImage>` where `ProcessedImage = { storagePath: string; width: number; height: number; blurDataURL: string; mimeType: string; bytes: number }`; `objectName(sha256Hex: string, originalName: string, folder: string): string`; `publicUrlFor(storagePath: string): string`.
 - Consumes: `supabaseEnv`.
 
@@ -1149,7 +1160,11 @@ if (!url || !key) throw new Error('Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SER
 const supabase = createClient(url, key, { auth: { persistSession: false } });
 
 const MIME = { webp: 'image/webp', jpeg: 'image/jpeg', png: 'image/png', avif: 'image/avif' };
-const slugify = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+const slugify = (s) =>
+  s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 
 /** Uploads one local file, returns a MediaRef. Caches by local path. */
 const uploaded = new Map();
@@ -1201,10 +1216,12 @@ async function uploadLocal(localSrc, alt) {
 }
 
 async function upsertEntry(collection, slug, data) {
-  const { error } = await supabase.from('content_entries').upsert(
-    { collection, slug, status: 'published', data, updated_by: 'seed' },
-    { onConflict: 'collection,slug' },
-  );
+  const { error } = await supabase
+    .from('content_entries')
+    .upsert(
+      { collection, slug, status: 'published', data, updated_by: 'seed' },
+      { onConflict: 'collection,slug' },
+    );
   if (error) throw error;
   console.log(collection, slug);
 }
@@ -1249,11 +1266,13 @@ git commit -m "feat(cms): add image processing and the Supabase seed script"
 ### Task 6: CMS image component
 
 **Files:**
+
 - Create: `components/media/cms-image.tsx`
 - Modify: `app/projects/[slug]/page.tsx` (hero and gallery), `components/sections/index.tsx` (wherever a service `image` or project cover renders)
 - Test: `tests/unit/cms-image.test.tsx`
 
 **Interfaces:**
+
 - Produces: `<CmsImage image={MediaRef} sizes priority? fill? className? />`.
 - Consumes: `MediaRef` from Task 2.
 
@@ -1270,7 +1289,13 @@ describe('CmsImage', () => {
   it('passes stored dimensions and blur through to next/image', () => {
     const { container } = render(
       <CmsImage
-        image={{ src: '/images/work/x.webp', alt: 'A wall', width: 1600, height: 900, blurDataURL: 'data:image/webp;base64,AAAA' }}
+        image={{
+          src: '/images/work/x.webp',
+          alt: 'A wall',
+          width: 1600,
+          height: 900,
+          blurDataURL: 'data:image/webp;base64,AAAA',
+        }}
         sizes="100vw"
       />,
     );
@@ -1399,6 +1424,7 @@ git commit -m "feat(cms): render CMS images with stored dimensions and blur"
 ### Task 7: Auth — proxy, login, allowlist
 
 **Files:**
+
 - Create: `proxy.ts`
 - Create: `lib/auth/admin.ts`
 - Create: `app/actions/auth.ts`
@@ -1410,6 +1436,7 @@ git commit -m "feat(cms): render CMS images with stored dimensions and blur"
 - Test: `tests/unit/admin-auth.test.ts`, `tests/e2e/admin-guard.spec.ts`
 
 **Interfaces:**
+
 - Produces: `requireAdmin(): Promise<{ email: string }>` (redirects to `/admin/login/` when not signed in, throws `AdminForbiddenError` when signed in but not allowlisted); `sendMagicLink(formData)`, `signOut()` server actions.
 
 - [ ] **Step 1: Write the failing unit test**
@@ -1430,7 +1457,9 @@ function mockSupabase(user: { email: string } | null, allowlisted: boolean) {
       auth: { getUser: async () => ({ data: { user }, error: null }) },
       from: () => ({
         select: () => ({
-          eq: () => ({ maybeSingle: async () => ({ data: allowlisted ? { email: user?.email } : null }) }),
+          eq: () => ({
+            maybeSingle: async () => ({ data: allowlisted ? { email: user?.email } : null }),
+          }),
         }),
       }),
     }),
@@ -1498,7 +1527,11 @@ export async function requireAdmin(): Promise<{ email: string }> {
   if (!user?.email) redirect('/admin/login/');
 
   const email = user.email.toLowerCase();
-  const { data } = await supabase.from('admin_allowlist').select('email').eq('email', email).maybeSingle();
+  const { data } = await supabase
+    .from('admin_allowlist')
+    .select('email')
+    .eq('email', email)
+    .maybeSingle();
   if (!data) throw new AdminForbiddenError(email);
   return { email };
 }
@@ -1709,7 +1742,10 @@ export default async function AdminHome() {
       <ul className="mt-6 grid gap-3 sm:grid-cols-2">
         {collections.map((c) => (
           <li key={c}>
-            <Link href={`/admin/${c}/`} className="block rounded border border-paper-edge p-4 capitalize">
+            <Link
+              href={`/admin/${c}/`}
+              className="block rounded border border-paper-edge p-4 capitalize"
+            >
               {c}
             </Link>
           </li>
@@ -1771,12 +1807,14 @@ git commit -m "feat(cms): add magic-link admin auth behind proxy and allowlist"
 ### Task 8: Media library — upload action and page
 
 **Files:**
+
 - Create: `app/actions/media.ts`
 - Create: `app/admin/media/page.tsx`
 - Create: `components/admin/media-upload.tsx`
 - Test: `tests/unit/media-actions.test.ts`
 
 **Interfaces:**
+
 - Produces: `uploadMedia(prev, formData): Promise<MediaActionState>`; `updateMediaAlt(id: string, alt: string): Promise<void>`; `listMedia(): Promise<MediaRow[]>` where `MediaRow = { id: string; storage_path: string; public_url: string; width: number; height: number; blur_data_url: string; alt: string; created_at: string }`; `toMediaRef(row: MediaRow): MediaRef`.
 - Consumes: `processImage` (Task 5), `publicUrlFor` (Task 5), `requireAdmin` (Task 7).
 
@@ -1868,22 +1906,30 @@ export async function listMedia(): Promise<MediaRow[]> {
   return (data ?? []) as MediaRow[];
 }
 
-export async function uploadMedia(_prev: MediaActionState, formData: FormData): Promise<MediaActionState> {
+export async function uploadMedia(
+  _prev: MediaActionState,
+  formData: FormData,
+): Promise<MediaActionState> {
   const { email } = await requireAdmin();
   const file = formData.get('file');
   const folder = String(formData.get('folder') ?? 'work');
   const alt = String(formData.get('alt') ?? '').trim();
 
-  if (!(file instanceof File) || file.size === 0) return { status: 'error', message: 'Choose an image.' };
+  if (!(file instanceof File) || file.size === 0)
+    return { status: 'error', message: 'Choose an image.' };
   if (file.size > MAX_BYTES) return { status: 'error', message: 'Images must be under 15 MB.' };
   if (!FOLDERS.has(folder)) return { status: 'error', message: 'Unknown folder.' };
-  if (!alt) return { status: 'error', message: 'Alt text is required. Use "Describe with AI" if stuck.' };
+  if (!alt)
+    return { status: 'error', message: 'Alt text is required. Use "Describe with AI" if stuck.' };
 
   let processed;
   try {
     processed = await processImage(Buffer.from(await file.arrayBuffer()), file.name, folder);
   } catch {
-    return { status: 'error', message: 'That file is not a supported image (webp, jpeg, png, avif).' };
+    return {
+      status: 'error',
+      message: 'That file is not a supported image (webp, jpeg, png, avif).',
+    };
   }
 
   const supabase = await createServerSupabase();
@@ -1913,10 +1959,14 @@ export async function uploadMedia(_prev: MediaActionState, formData: FormData): 
     },
     { onConflict: 'storage_path' },
   );
-  if (rowErr) return { status: 'error', message: `Saved the file but not its record: ${rowErr.message}` };
+  if (rowErr)
+    return { status: 'error', message: `Saved the file but not its record: ${rowErr.message}` };
 
   revalidatePath('/admin/media/');
-  return { status: 'ok', message: `Uploaded ${processed.storagePath} (${processed.width}×${processed.height}).` };
+  return {
+    status: 'ok',
+    message: `Uploaded ${processed.storagePath} (${processed.width}×${processed.height}).`,
+  };
 }
 
 export async function updateMediaAlt(id: string, alt: string): Promise<void> {
@@ -1959,7 +2009,11 @@ export function MediaUpload() {
         Alt text (what the picture shows, for screen readers and Google)
         <textarea name="alt" required rows={2} className="mt-1 w-full rounded border px-2 py-1" />
       </label>
-      <button type="submit" disabled={pending} className="self-start rounded bg-brand-600 px-4 py-2 text-white">
+      <button
+        type="submit"
+        disabled={pending}
+        className="self-start rounded bg-brand-600 px-4 py-2 text-white"
+      >
         {pending ? 'Uploading…' : 'Upload'}
       </button>
       {state.message && (
@@ -2029,6 +2083,7 @@ git commit -m "feat(cms): add media library with immutable uploads"
 ### Task 9: Entry editor — list, form, save, publish, preview
 
 **Files:**
+
 - Create: `app/actions/content.ts`
 - Create: `lib/content/form-fields.ts`
 - Create: `components/admin/entry-form.tsx`
@@ -2040,6 +2095,7 @@ git commit -m "feat(cms): add media library with immutable uploads"
 - Test: `tests/unit/form-fields.test.ts`, `tests/unit/content-actions.test.ts`
 
 **Interfaces:**
+
 - Produces: `saveEntry(prev, formData): Promise<SaveState>` where `formData` carries `collection`, `slug`, `status`, and `data` (JSON string); `deleteEntry(collection, slug)`; `fieldsFor(collection): FieldSpec[]` where `FieldSpec = { name: string; kind: 'text' | 'textarea' | 'lines' | 'boolean' | 'image' | 'json' | 'date'; required: boolean }`.
 - Consumes: `collectionSchemas`, `contentTag`, `requireAdmin`, `listMedia`, `toMediaRef`, `getEntryForPreview`.
 
@@ -2120,7 +2176,12 @@ describe('saveEntry', () => {
     const result = await saveEntry({ status: 'idle' }, form({}));
     expect(result.status).toBe('ok');
     expect(upsert).toHaveBeenCalledWith(
-      expect.objectContaining({ collection: 'services', slug: 'interior-painting', status: 'published', updated_by: 'kaner@simple.biz' }),
+      expect.objectContaining({
+        collection: 'services',
+        slug: 'interior-painting',
+        status: 'published',
+        updated_by: 'kaner@simple.biz',
+      }),
       { onConflict: 'collection,slug' },
     );
     expect(updateTag).toHaveBeenCalledWith('content:services');
@@ -2129,7 +2190,10 @@ describe('saveEntry', () => {
 
   it('returns field errors instead of saving invalid data', async () => {
     const { saveEntry } = await import('@/app/actions/content');
-    const result = await saveEntry({ status: 'idle' }, form({ data: JSON.stringify({ slug: 'Nope' }) }));
+    const result = await saveEntry(
+      { status: 'idle' },
+      form({ data: JSON.stringify({ slug: 'Nope' }) }),
+    );
     expect(result.status).toBe('error');
     expect(result.fieldErrors?.title).toBeDefined();
     expect(upsert).not.toHaveBeenCalled();
@@ -2160,11 +2224,21 @@ export type FieldKind = 'text' | 'textarea' | 'lines' | 'boolean' | 'image' | 'j
 export type FieldSpec = { name: string; kind: FieldKind; required: boolean };
 
 /** Long-form string fields get a textarea; everything else a single line. */
-const TEXTAREA = new Set(['summary', 'challenge', 'initialCondition', 'coatingSystem', 'body', 'excerpt', 'metaDescription']);
+const TEXTAREA = new Set([
+  'summary',
+  'challenge',
+  'initialCondition',
+  'coatingSystem',
+  'body',
+  'excerpt',
+  'metaDescription',
+]);
 
 function unwrap(schema: z.ZodTypeAny): { inner: z.ZodTypeAny; optional: boolean } {
-  if (schema instanceof z.ZodOptional) return { inner: unwrap(schema.unwrap()).inner, optional: true };
-  if (schema instanceof z.ZodDefault) return { inner: unwrap(schema._def.innerType).inner, optional: true };
+  if (schema instanceof z.ZodOptional)
+    return { inner: unwrap(schema.unwrap()).inner, optional: true };
+  if (schema instanceof z.ZodDefault)
+    return { inner: unwrap(schema._def.innerType).inner, optional: true };
   return { inner: schema, optional: false };
 }
 
@@ -2179,7 +2253,12 @@ function kindOf(name: string, schema: z.ZodTypeAny): FieldKind {
   }
   if (schema instanceof z.ZodLiteral) return 'text';
   if (schema instanceof z.ZodArray && schema.element instanceof z.ZodString) return 'lines';
-  if (schema instanceof z.ZodObject && 'src' in schema.shape && 'alt' in schema.shape && !('quote' in schema.shape)) {
+  if (
+    schema instanceof z.ZodObject &&
+    'src' in schema.shape &&
+    'alt' in schema.shape &&
+    !('quote' in schema.shape)
+  ) {
     return 'image';
   }
   return 'json';
@@ -2264,10 +2343,19 @@ export async function saveEntry(_prev: SaveState, formData: FormData): Promise<S
 
   const slug = parsed.data.slug;
   const supabase = await createServerSupabase();
-  const { error } = await supabase.from('content_entries').upsert(
-    { collection, slug, status, data: parsed.data, updated_by: email, updated_at: new Date().toISOString() },
-    { onConflict: 'collection,slug' },
-  );
+  const { error } = await supabase
+    .from('content_entries')
+    .upsert(
+      {
+        collection,
+        slug,
+        status,
+        data: parsed.data,
+        updated_by: email,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'collection,slug' },
+    );
   if (error) return { status: 'error', message: `Could not save: ${error.message}` };
 
   // Drafts never reach the public cache, so only a publish expires it.
@@ -2279,7 +2367,10 @@ export async function saveEntry(_prev: SaveState, formData: FormData): Promise<S
   }
   revalidatePath(`/admin/${collection}/`);
 
-  return { status: 'ok', message: status === 'published' ? 'Published. Live within a few seconds.' : 'Draft saved.' };
+  return {
+    status: 'ok',
+    message: status === 'published' ? 'Published. Live within a few seconds.' : 'Draft saved.',
+  };
 }
 
 export async function deleteEntry(collection: string, slug: string): Promise<void> {
@@ -2328,7 +2419,11 @@ export function MediaPicker({ media, value, onChange }: Props) {
       ) : (
         <p className="text-xs text-ink-soft">No image.</p>
       )}
-      <button type="button" className="self-start text-sm underline" onClick={() => setOpen((o) => !o)}>
+      <button
+        type="button"
+        className="self-start text-sm underline"
+        onClick={() => setOpen((o) => !o)}
+      >
         {open ? 'Close library' : 'Choose from library'}
       </button>
       {open && (
@@ -2343,7 +2438,11 @@ export function MediaPicker({ media, value, onChange }: Props) {
                   setOpen(false);
                 }}
               >
-                <img src={row.public_url} alt={row.alt} className="aspect-[4/3] w-full rounded object-cover" />
+                <img
+                  src={row.public_url}
+                  alt={row.alt}
+                  className="aspect-[4/3] w-full rounded object-cover"
+                />
               </button>
             </li>
           ))}
@@ -2377,7 +2476,9 @@ type Props = {
 
 export function EntryForm({ collection, fields, initial, initialStatus, media }: Props) {
   const [data, setData] = useState<Record<string, unknown>>(initial);
-  const [state, action, pending] = useActionState<SaveState, FormData>(saveEntry, { status: 'idle' });
+  const [state, action, pending] = useActionState<SaveState, FormData>(saveEntry, {
+    status: 'idle',
+  });
   const set = (name: string, value: unknown) => setData((d) => ({ ...d, [name]: value }));
 
   return (
@@ -2399,13 +2500,21 @@ export function EntryForm({ collection, fields, initial, initialStatus, media }:
           <div key={field.name} className="flex flex-col gap-1">
             {field.kind === 'boolean' ? (
               <label className="flex items-center gap-2">
-                <input type="checkbox" checked={Boolean(value)} onChange={(e) => set(field.name, e.target.checked)} />
+                <input
+                  type="checkbox"
+                  checked={Boolean(value)}
+                  onChange={(e) => set(field.name, e.target.checked)}
+                />
                 {label}
               </label>
             ) : field.kind === 'image' ? (
               <>
                 {label}
-                <MediaPicker media={media} value={value as MediaRef | undefined} onChange={(r) => set(field.name, r)} />
+                <MediaPicker
+                  media={media}
+                  value={value as MediaRef | undefined}
+                  onChange={(r) => set(field.name, r)}
+                />
               </>
             ) : field.kind === 'lines' ? (
               <>
@@ -2414,7 +2523,12 @@ export function EntryForm({ collection, fields, initial, initialStatus, media }:
                   rows={6}
                   className="rounded border border-paper-edge px-2 py-1 font-mono text-sm"
                   value={Array.isArray(value) ? (value as string[]).join('\n') : ''}
-                  onChange={(e) => set(field.name, e.target.value.split('\n').filter((l) => l.trim() !== ''))}
+                  onChange={(e) =>
+                    set(
+                      field.name,
+                      e.target.value.split('\n').filter((l) => l.trim() !== ''),
+                    )
+                  }
                 />
                 <span className="text-xs text-ink-soft">One item per line.</span>
               </>
@@ -2475,13 +2589,30 @@ export function EntryForm({ collection, fields, initial, initialStatus, media }:
       })}
 
       <div className="flex items-center gap-3 border-t border-paper-edge pt-4">
-        <button type="submit" name="status" value="draft" disabled={pending} className="rounded border px-4 py-2">
+        <button
+          type="submit"
+          name="status"
+          value="draft"
+          disabled={pending}
+          className="rounded border px-4 py-2"
+        >
           Save draft
         </button>
-        <button type="submit" name="status" value="published" disabled={pending} className="rounded bg-brand-600 px-4 py-2 text-white">
+        <button
+          type="submit"
+          name="status"
+          value="published"
+          disabled={pending}
+          className="rounded bg-brand-600 px-4 py-2 text-white"
+        >
           Publish
         </button>
-        <a href={`/admin/preview/${collection}/${String(data.slug ?? '')}/`} target="_blank" rel="noreferrer" className="text-sm underline">
+        <a
+          href={`/admin/preview/${collection}/${String(data.slug ?? '')}/`}
+          target="_blank"
+          rel="noreferrer"
+          className="text-sm underline"
+        >
           Preview
         </a>
         <span className="text-xs text-ink-soft">Currently: {initialStatus}</span>
@@ -2500,7 +2631,11 @@ export function EntryForm({ collection, fields, initial, initialStatus, media }:
 
 ```tsx
 'use client';
-export function AiButton(_props: { task: string; input: Record<string, string>; onResult: (r: Record<string, string>) => void }) {
+export function AiButton(_props: {
+  task: string;
+  input: Record<string, string>;
+  onResult: (r: Record<string, string>) => void;
+}) {
   return null;
 }
 ```
@@ -2532,7 +2667,10 @@ export default async function CollectionPage({ params }: Props) {
     <>
       <div className="flex items-center justify-between">
         <h1 className="font-display text-3xl capitalize tracking-tight">{collection}</h1>
-        <Link href={`/admin/${collection}/new/`} className="rounded bg-brand-600 px-4 py-2 text-white">
+        <Link
+          href={`/admin/${collection}/new/`}
+          className="rounded bg-brand-600 px-4 py-2 text-white"
+        >
           New
         </Link>
       </div>
@@ -2618,9 +2756,40 @@ import { fieldsFor } from '@/lib/content/form-fields';
 import { isCollection, type Collection } from '@/lib/content/schemas';
 
 const blank: Record<Collection, Record<string, unknown>> = {
-  projects: { slug: '', title: '', clientOrPropertyType: '', location: '', sectorSlug: '', challenge: '', scopeOfWork: [], images: [], outcome: [], relatedServiceSlugs: [], relatedLocationSlugs: [], isFeatured: false },
-  services: { slug: '', title: '', shortTitle: '', audience: 'commercial', summary: '', body: [], includes: [] },
-  posts: { slug: '', title: '', excerpt: '', body: '', publishedAt: new Date().toISOString().slice(0, 10), author: 'APMG Painting', tags: [], metaTitle: '', metaDescription: '' },
+  projects: {
+    slug: '',
+    title: '',
+    clientOrPropertyType: '',
+    location: '',
+    sectorSlug: '',
+    challenge: '',
+    scopeOfWork: [],
+    images: [],
+    outcome: [],
+    relatedServiceSlugs: [],
+    relatedLocationSlugs: [],
+    isFeatured: false,
+  },
+  services: {
+    slug: '',
+    title: '',
+    shortTitle: '',
+    audience: 'commercial',
+    summary: '',
+    body: [],
+    includes: [],
+  },
+  posts: {
+    slug: '',
+    title: '',
+    excerpt: '',
+    body: '',
+    publishedAt: new Date().toISOString().slice(0, 10),
+    author: 'APMG Painting',
+    tags: [],
+    metaTitle: '',
+    metaDescription: '',
+  },
 };
 
 type Props = { params: Promise<{ collection: string }> };
@@ -2634,7 +2803,13 @@ export default async function NewEntryPage({ params }: Props) {
     <>
       <h1 className="font-display text-3xl tracking-tight">New {collection.slice(0, -1)}</h1>
       <div className="mt-6">
-        <EntryForm collection={collection} fields={fieldsFor(collection)} initial={blank[collection]} initialStatus="draft" media={media} />
+        <EntryForm
+          collection={collection}
+          fields={fieldsFor(collection)}
+          initial={blank[collection]}
+          initialStatus="draft"
+          media={media}
+        />
       </div>
     </>
   );
@@ -2669,7 +2844,9 @@ export default async function PreviewPage({ params }: Props) {
         <ProjectArticle project={entry.data} sector={getSector(entry.data.sectorSlug)} />
       )}
       {collection !== 'projects' && (
-        <pre className="mx-auto max-w-3xl overflow-auto p-6 text-xs">{JSON.stringify(entry.data, null, 2)}</pre>
+        <pre className="mx-auto max-w-3xl overflow-auto p-6 text-xs">
+          {JSON.stringify(entry.data, null, 2)}
+        </pre>
       )}
     </>
   );
@@ -2688,7 +2865,9 @@ Also add an e2e check to `tests/e2e/critical-flows.spec.ts` (or a new `tests/e2e
 ```ts
 import { expect, test } from '@playwright/test';
 
-test('landing page "What we paint" renders a card per service with a photo or a plain card', async ({ page }) => {
+test('landing page "What we paint" renders a card per service with a photo or a plain card', async ({
+  page,
+}) => {
   await page.goto('/');
   const cards = page.locator('#services article');
   const count = await cards.count();
@@ -2712,6 +2891,7 @@ git commit -m "feat(cms): add entry editor with draft, publish and preview"
 ### Task 10: AI assist — Claude summaries and alt text
 
 **Files:**
+
 - Create: `lib/ai/claude.ts`
 - Create: `app/actions/ai.ts`
 - Modify: `components/admin/ai-button.tsx` (replace stub)
@@ -2719,6 +2899,7 @@ git commit -m "feat(cms): add entry editor with draft, publish and preview"
 - Test: `tests/unit/ai-prompts.test.ts`
 
 **Interfaces:**
+
 - Produces: `draftPostSummary({ title, body }): Promise<{ excerpt; metaTitle; metaDescription }>`; `describeImage(imageUrl): Promise<{ alt; caption }>`; `summariseProject(project: Project): Promise<{ summary; metaDescription }>`; `hasAi(): boolean`; `HOUSE_RULES` string.
 - Consumes: `requireAdmin`.
 
@@ -2841,7 +3022,11 @@ export async function draftPostSummary(input: { title: string; body: string }) {
 }
 
 const imageSchema = z.object({
-  alt: z.string().describe('Under 125 characters. What a screen reader user needs. Names the surface, action and setting. No "image of".'),
+  alt: z
+    .string()
+    .describe(
+      'Under 125 characters. What a screen reader user needs. Names the surface, action and setting. No "image of".',
+    ),
   caption: z.string().describe('One sentence for a gallery caption.'),
 });
 
@@ -2858,7 +3043,10 @@ export async function describeImage(imageUrl: string) {
         role: 'user',
         content: [
           { type: 'image', source: { type: 'url', url: imageUrl } },
-          { type: 'text', text: 'Write alt text and a caption for this photograph from an APMG Painting job. Describe only what is visible.' },
+          {
+            type: 'text',
+            text: 'Write alt text and a caption for this photograph from an APMG Painting job. Describe only what is visible.',
+          },
         ],
       },
     ],
@@ -2893,7 +3081,9 @@ export async function summariseProject(project: Project) {
     fallbacks: 'default',
     output_config: { effort: 'low', format: zodOutputFormat(projectSummarySchema) },
     system: HOUSE_RULES,
-    messages: [{ role: 'user', content: `Summarise this case study from these facts only:\n\n${facts}` }],
+    messages: [
+      { role: 'user', content: `Summarise this case study from these facts only:\n\n${facts}` },
+    ],
   });
   const parsed = response.parsed_output;
   if (!parsed) throw new Error('The model returned no structured output.');
@@ -2921,11 +3111,15 @@ function unavailable<T>(): AiResult<T> {
 export async function aiPostSummary(input: { title: string; body: string }) {
   await requireAdmin();
   if (!hasAi()) return unavailable<Awaited<ReturnType<typeof draftPostSummary>>>();
-  if (input.body.trim().length < 200) return { ok: false as const, message: 'Write at least a couple of paragraphs first.' };
+  if (input.body.trim().length < 200)
+    return { ok: false as const, message: 'Write at least a couple of paragraphs first.' };
   try {
     return { ok: true as const, data: await draftPostSummary(input) };
   } catch (error) {
-    return { ok: false as const, message: error instanceof Error ? error.message : 'AI request failed.' };
+    return {
+      ok: false as const,
+      message: error instanceof Error ? error.message : 'AI request failed.',
+    };
   }
 }
 
@@ -2938,7 +3132,10 @@ export async function aiDescribeImage(imageUrl: string) {
   try {
     return { ok: true as const, data: await describeImage(imageUrl) };
   } catch (error) {
-    return { ok: false as const, message: error instanceof Error ? error.message : 'AI request failed.' };
+    return {
+      ok: false as const,
+      message: error instanceof Error ? error.message : 'AI request failed.',
+    };
   }
 }
 
@@ -2946,11 +3143,15 @@ export async function aiProjectSummary(raw: unknown) {
   await requireAdmin();
   if (!hasAi()) return unavailable<Awaited<ReturnType<typeof summariseProject>>>();
   const parsed = projectSchema.safeParse(raw);
-  if (!parsed.success) return { ok: false as const, message: 'Fill in the challenge, scope and outcome first.' };
+  if (!parsed.success)
+    return { ok: false as const, message: 'Fill in the challenge, scope and outcome first.' };
   try {
     return { ok: true as const, data: await summariseProject(parsed.data) };
   } catch (error) {
-    return { ok: false as const, message: error instanceof Error ? error.message : 'AI request failed.' };
+    return {
+      ok: false as const,
+      message: error instanceof Error ? error.message : 'AI request failed.',
+    };
   }
 }
 ```
@@ -2964,8 +3165,16 @@ import { useState, useTransition } from 'react';
 import { aiDescribeImage, aiPostSummary } from '@/app/actions/ai';
 
 type Props =
-  | { task: 'post-summary'; input: { title: string; body: string }; onResult: (r: Record<string, string>) => void }
-  | { task: 'describe-image'; input: { imageUrl: string }; onResult: (r: Record<string, string>) => void };
+  | {
+      task: 'post-summary';
+      input: { title: string; body: string };
+      onResult: (r: Record<string, string>) => void;
+    }
+  | {
+      task: 'describe-image';
+      input: { imageUrl: string };
+      onResult: (r: Record<string, string>) => void;
+    };
 
 /**
  * One button, one field group. Fills the form; never saves. The editor
@@ -2993,7 +3202,11 @@ export function AiButton(props: Props) {
   return (
     <span className="flex items-center gap-2 text-xs">
       <button type="button" onClick={run} disabled={pending} className="rounded border px-2 py-1">
-        {pending ? 'Thinking…' : props.task === 'post-summary' ? 'Draft summary with AI' : 'Describe with AI'}
+        {pending
+          ? 'Thinking…'
+          : props.task === 'post-summary'
+            ? 'Draft summary with AI'
+            : 'Describe with AI'}
       </button>
       {message && <span className="text-ink-soft">{message}</span>}
     </span>
@@ -3020,6 +3233,7 @@ git commit -m "feat(cms): add Claude-drafted summaries, meta and alt text"
 ### Task 11: Blog routes, schema, sitemap, nav
 
 **Files:**
+
 - Create: `app/blog/page.tsx`
 - Create: `app/blog/[slug]/page.tsx`
 - Create: `components/pages/post-article.tsx`
@@ -3028,6 +3242,7 @@ git commit -m "feat(cms): add Claude-drafted summaries, meta and alt text"
 - Test: `tests/unit/schema.test.ts` (extend), `tests/e2e/blog.spec.ts`
 
 **Interfaces:**
+
 - Produces: `blogPostingSchema(post: Post): JsonLdValue`; `PostArticle({ post })`.
 - Consumes: `getPosts`, `getPost` (Task 3), `CmsImage` (Task 6), `buildMetadata`.
 
@@ -3123,7 +3338,11 @@ import type { Post } from '@/lib/content/types';
  * editor cannot paste a script tag into a post. GFM gives tables and lists.
  */
 export function PostArticle({ post }: { post: Post }) {
-  const published = new Date(post.publishedAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
+  const published = new Date(post.publishedAt).toLocaleDateString('en-AU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
   return (
     <article>
       <Section tone="sunken" className="py-10">
@@ -3131,7 +3350,9 @@ export function PostArticle({ post }: { post: Post }) {
           <p className="mb-3 text-xs font-semibold uppercase tracking-label text-brand-600">
             <time dateTime={post.publishedAt}>{published}</time>
           </p>
-          <h1 className="max-w-4xl font-display text-4xl leading-tight tracking-tight sm:text-5xl">{post.title}</h1>
+          <h1 className="max-w-4xl font-display text-4xl leading-tight tracking-tight sm:text-5xl">
+            {post.title}
+          </h1>
           <p className="mt-4 max-w-prose text-lg text-ink-soft">{post.excerpt}</p>
         </Container>
       </Section>
@@ -3167,7 +3388,8 @@ import { getPosts } from '@/lib/content/source';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Notes from the job | APMG Painting',
-  description: 'Practical notes on commercial painting in Melbourne: sequencing occupied buildings, coating systems, access and compliance.',
+  description:
+    'Practical notes on commercial painting in Melbourne: sequencing occupied buildings, coating systems, access and compliance.',
   path: '/blog/',
 });
 
@@ -3190,16 +3412,31 @@ export default async function BlogIndexPage() {
               {posts.map((post) => (
                 <li key={post.slug} className="flex flex-col gap-3">
                   {post.cover && (
-                    <Link href={`/blog/${post.slug}/`} className="relative block aspect-[16/9] overflow-hidden rounded bg-paper-sunken">
-                      <CmsImage image={post.cover} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
+                    <Link
+                      href={`/blog/${post.slug}/`}
+                      className="relative block aspect-[16/9] overflow-hidden rounded bg-paper-sunken"
+                    >
+                      <CmsImage
+                        image={post.cover}
+                        fill
+                        sizes="(min-width: 768px) 50vw, 100vw"
+                        className="object-cover"
+                      />
                     </Link>
                   )}
                   <h2 className="font-display text-2xl tracking-tight">
                     <Link href={`/blog/${post.slug}/`}>{post.title}</Link>
                   </h2>
                   <p className="text-ink-soft">{post.excerpt}</p>
-                  <time dateTime={post.publishedAt} className="text-xs uppercase tracking-label text-ink-soft">
-                    {new Date(post.publishedAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  <time
+                    dateTime={post.publishedAt}
+                    className="text-xs uppercase tracking-label text-ink-soft"
+                  >
+                    {new Date(post.publishedAt).toLocaleDateString('en-AU', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })}
                   </time>
                 </li>
               ))}
@@ -3313,6 +3550,7 @@ git commit -m "feat(blog): add CMS-backed blog with BlogPosting schema and sitem
 ### Task 12: Business details and the contact page
 
 **Files:**
+
 - Modify: `lib/content/types.ts` (add `SiteSettings`, `ContactPageCopy`)
 - Modify: `lib/content/schemas.ts` (add `siteSettingsSchema`, `contactPageSchema`, `isSingleton`, `singletonSlug`)
 - Modify: `lib/content/source.ts` (add `getSiteSettings`, `getPage`)
@@ -3324,6 +3562,7 @@ git commit -m "feat(blog): add CMS-backed blog with BlogPosting schema and sitem
 - Test: `tests/unit/site-settings.test.ts`, extend `tests/unit/schema.test.ts`, `tests/e2e/contact.spec.ts`
 
 **Interfaces:**
+
 - Produces: `SiteSettings` and `ContactPageCopy` types; `siteSettingsSchema`, `contactPageSchema`; `isSingleton(c): boolean`; `singletonSlug: { settings: 'site'; pages: 'contact-us' }`; `getSiteSettings(): Promise<SiteSettings>`; `getPage(slug: 'contact-us'): Promise<ContactPageCopy>`; `formatAddress(a: SiteSettings['address']): string`; `addressNote(s: SiteSettings, now?: Date): string | null`; `phoneHref(display: string): string`; `SiteSettingsProvider`, `useSiteSettings()`.
 - Consumes: `all()` and `seeds` from Task 3; `EntryForm`, `fieldsFor`, `saveEntry` from Task 9; `localBusinessSchema(services)` signature from Task 4.
 
@@ -3333,7 +3572,12 @@ git commit -m "feat(blog): add CMS-backed blog with BlogPosting schema and sitem
 
 ```ts
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { contactPageSchema, siteSettingsSchema, isSingleton, singletonSlug } from '@/lib/content/schemas';
+import {
+  contactPageSchema,
+  siteSettingsSchema,
+  isSingleton,
+  singletonSlug,
+} from '@/lib/content/schemas';
 import { defaultSiteSettings, addressNote, formatAddress, phoneHref } from '@/lib/site';
 
 describe('site settings', () => {
@@ -3353,13 +3597,19 @@ describe('site settings', () => {
   });
 
   it('rejects an ABN that is not eleven digits', () => {
-    expect(siteSettingsSchema.safeParse({ ...defaultSiteSettings, abn: '1234' }).success).toBe(false);
-    expect(siteSettingsSchema.safeParse({ ...defaultSiteSettings, abn: '12 345 678 901' }).success).toBe(true);
+    expect(siteSettingsSchema.safeParse({ ...defaultSiteSettings, abn: '1234' }).success).toBe(
+      false,
+    );
+    expect(
+      siteSettingsSchema.safeParse({ ...defaultSiteSettings, abn: '12 345 678 901' }).success,
+    ).toBe(true);
     expect(siteSettingsSchema.safeParse({ ...defaultSiteSettings, abn: null }).success).toBe(true);
   });
 
   it('formats the address on one line', () => {
-    expect(formatAddress(defaultSiteSettings.address)).toBe('1 Turbo Drive, Bayswater North VIC 3153');
+    expect(formatAddress(defaultSiteSettings.address)).toBe(
+      '1 Turbo Drive, Bayswater North VIC 3153',
+    );
   });
 
   it('shows the move note before the effective date and drops it after', () => {
@@ -3417,7 +3667,11 @@ import { defaultSiteSettings } from '@/lib/site';
 import { services } from '@/content/services';
 
 it('LocalBusiness reflects the settings it is given, not the file', () => {
-  const changed = { ...defaultSiteSettings, phone: '1300 00 00 00', email: 'hello@apmgpainting.com.au' };
+  const changed = {
+    ...defaultSiteSettings,
+    phone: '1300 00 00 00',
+    email: 'hello@apmgpainting.com.au',
+  };
   const data = localBusinessSchema(services, changed);
   expect(data.telephone).toBe('1300 00 00 00');
   expect(data.email).toBe('hello@apmgpainting.com.au');
@@ -3480,7 +3734,10 @@ Add to `lib/content/schemas.ts` (after `postSchema`, before `collectionSchemas`)
 const auPhone = z
   .string()
   .trim()
-  .regex(/^(\(0\d\)\s?\d{4}\s?\d{4}|0\d(\s?\d{4}){2}|1[38]00(\s?\d{2}){3}|13\s?\d{2}\s?\d{2}|04\d{2}(\s?\d{3}){2})$/, 'Australian landline, 1300/1800 or mobile number');
+  .regex(
+    /^(\(0\d\)\s?\d{4}\s?\d{4}|0\d(\s?\d{4}){2}|1[38]00(\s?\d{2}){3}|13\s?\d{2}\s?\d{2}|04\d{2}(\s?\d{3}){2})$/,
+    'Australian landline, 1300/1800 or mobile number',
+  );
 
 const abn = z
   .string()
@@ -3503,11 +3760,17 @@ export const siteSettingsSchema = z.object({
   }),
   previousAddress: z.string().nullable(),
   abn,
-  coords: z.object({ latitude: z.number().min(-44).max(-10), longitude: z.number().min(112).max(154) }).nullable(),
+  coords: z
+    .object({ latitude: z.number().min(-44).max(-10), longitude: z.number().min(112).max(154) })
+    .nullable(),
   openingHours: z
     .array(
       z.object({
-        days: z.array(z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'])).min(1),
+        days: z
+          .array(
+            z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']),
+          )
+          .min(1),
         opens: timeHHMM,
         closes: timeHHMM,
       }),
@@ -3584,7 +3847,11 @@ export const defaultSiteSettings: SiteSettings = {
   coords: site.coords,
   openingHours: site.openingHours,
   serviceAreaPrimary: site.serviceArea.primary,
-  social: { instagram: site.social.instagram, facebook: site.social.facebook, google: site.social.google },
+  social: {
+    instagram: site.social.instagram,
+    facebook: site.social.facebook,
+    google: site.social.google,
+  },
 };
 
 export function phoneHref(display: string): string {
@@ -3671,7 +3938,13 @@ import type { SiteSettings } from '@/lib/content/types';
 
 const SiteSettingsContext = createContext<SiteSettings | null>(null);
 
-export function SiteSettingsProvider({ value, children }: { value: SiteSettings; children: React.ReactNode }) {
+export function SiteSettingsProvider({
+  value,
+  children,
+}: {
+  value: SiteSettings;
+  children: React.ReactNode;
+}) {
   return <SiteSettingsContext.Provider value={value}>{children}</SiteSettingsContext.Provider>;
 }
 
@@ -3708,7 +3981,11 @@ import { addressNote, formatAddress, phoneHref } from '@/lib/site';
 
 export async function generateMetadata(): Promise<Metadata> {
   const copy = await getPage('contact-us');
-  return buildMetadata({ title: copy.metaTitle, description: copy.metaDescription, path: '/contact-us/' });
+  return buildMetadata({
+    title: copy.metaTitle,
+    description: copy.metaDescription,
+    path: '/contact-us/',
+  });
 }
 
 export default async function ContactPage() {
@@ -3725,15 +4002,22 @@ export default async function ContactPage() {
 
           <dl className="mt-8 grid gap-6 sm:grid-cols-3">
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-label text-ink-muted">Phone</dt>
+              <dt className="text-xs font-semibold uppercase tracking-label text-ink-muted">
+                Phone
+              </dt>
               <dd className="mt-1">
-                <a href={phoneHref(settings.phone)} className="font-display text-xl font-semibold text-brand-700 hover:underline">
+                <a
+                  href={phoneHref(settings.phone)}
+                  className="font-display text-xl font-semibold text-brand-700 hover:underline"
+                >
                   {settings.phone}
                 </a>
               </dd>
             </div>
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-label text-ink-muted">Email</dt>
+              <dt className="text-xs font-semibold uppercase tracking-label text-ink-muted">
+                Email
+              </dt>
               <dd className="mt-1">
                 <a href={`mailto:${settings.email}`} className="text-ink hover:underline">
                   {settings.email}
@@ -3741,7 +4025,9 @@ export default async function ContactPage() {
               </dd>
             </div>
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-label text-ink-muted">Address</dt>
+              <dt className="text-xs font-semibold uppercase tracking-label text-ink-muted">
+                Address
+              </dt>
               <dd className="mt-1 text-ink">
                 {formatAddress(settings.address)}
                 {note && <span className="mt-1 block text-sm text-ink-soft">{note}</span>}
@@ -3749,11 +4035,16 @@ export default async function ContactPage() {
             </div>
             {settings.openingHours && settings.openingHours.length > 0 && (
               <div>
-                <dt className="text-xs font-semibold uppercase tracking-label text-ink-muted">Hours</dt>
+                <dt className="text-xs font-semibold uppercase tracking-label text-ink-muted">
+                  Hours
+                </dt>
                 <dd className="mt-1 text-ink">
                   {settings.openingHours.map((h) => (
                     <span key={h.days.join()} className="block">
-                      {h.days.length > 2 ? `${h.days[0]}–${h.days[h.days.length - 1]}` : h.days.join(', ')} {h.opens}–{h.closes}
+                      {h.days.length > 2
+                        ? `${h.days[0]}–${h.days[h.days.length - 1]}`
+                        : h.days.join(', ')}{' '}
+                      {h.opens}–{h.closes}
                     </span>
                   ))}
                 </dd>
@@ -3766,7 +4057,9 @@ export default async function ContactPage() {
       <div id="quote" className="scroll-mt-16 sm:scroll-mt-20">
         <Section tone="paper" id="commercial">
           <Container width="narrow">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-label text-brand-600">For organisations</p>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-label text-brand-600">
+              For organisations
+            </p>
             <SectionHeading className="mb-3">{copy.formHeading}</SectionHeading>
             <p className="mb-8 text-ink-soft">{copy.formIntro}</p>
             <CommercialEnquiryForm />
@@ -3810,7 +4103,7 @@ Extend `pathsFor`:
 and after the existing `updateTag` line, add:
 
 ```ts
-    if (collection === 'settings') revalidatePath('/', 'layout');
+if (collection === 'settings') revalidatePath('/', 'layout');
 ```
 
 In `deleteEntry`, add `if (isSingleton(collection)) throw new Error('Singletons cannot be deleted');` after the collection check.
@@ -3848,7 +4141,11 @@ import { expect, test } from '@playwright/test';
 test('contact page shows one phone number, and it matches the header', async ({ page }) => {
   await page.goto('/contact-us/');
   const headerPhone = await page.locator('header a[href^="tel:"]').first().textContent();
-  const contactPhone = await page.getByRole('definition').locator('a[href^="tel:"]').first().textContent();
+  const contactPhone = await page
+    .getByRole('definition')
+    .locator('a[href^="tel:"]')
+    .first()
+    .textContent();
   expect(contactPhone?.trim()).toBe(headerPhone?.trim());
 });
 
@@ -3878,6 +4175,7 @@ git commit -m "feat(cms): make business details and the contact page editable"
 ### Task 13: Separate editor deployment and cross-site revalidation
 
 **Files:**
+
 - Create: `lib/app-role.ts`
 - Create: `lib/revalidate/notify.ts`
 - Create: `app/api/revalidate/route.ts`
@@ -3885,6 +4183,7 @@ git commit -m "feat(cms): make business details and the contact page editable"
 - Test: `tests/unit/app-role.test.ts`, `tests/unit/revalidate-route.test.ts`, `tests/unit/revalidate-notify.test.ts`
 
 **Interfaces:**
+
 - Produces: `appRole(): 'site' | 'editor'`; `isEditor(): boolean`; `notifyPublicSite(payload: { tags: string[]; paths: string[] }): Promise<{ ok: boolean; message?: string }>`; `POST /api/revalidate` accepting `{ tags: string[]; paths: string[] }` with `Authorization: Bearer <REVALIDATE_SECRET>`.
 - Consumes: `saveEntry`/`deleteEntry` and `pathsFor` from Task 9, `contentTag` from Task 3.
 
@@ -3950,7 +4249,9 @@ describe('POST /api/revalidate', () => {
     vi.stubEnv('REVALIDATE_SECRET', 's3cret');
     const { POST } = await import('@/app/api/revalidate/route');
     expect((await POST(request({ tags: ['content:posts'], paths: [] }))).status).toBe(401);
-    expect((await POST(request({ tags: ['content:posts'], paths: [] }, 'Bearer nope'))).status).toBe(401);
+    expect(
+      (await POST(request({ tags: ['content:posts'], paths: [] }, 'Bearer nope'))).status,
+    ).toBe(401);
     expect(revalidateTag).not.toHaveBeenCalled();
   });
 
@@ -3995,7 +4296,9 @@ describe('notifyPublicSite', () => {
     const fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
     const { notifyPublicSite } = await import('@/lib/revalidate/notify');
-    expect(await notifyPublicSite({ tags: ['content:posts'], paths: ['/blog/'] })).toEqual({ ok: true });
+    expect(await notifyPublicSite({ tags: ['content:posts'], paths: ['/blog/'] })).toEqual({
+      ok: true,
+    });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
@@ -4022,7 +4325,10 @@ describe('notifyPublicSite', () => {
     vi.stubEnv('NEXT_PUBLIC_APP_ROLE', 'editor');
     vi.stubEnv('PUBLIC_SITE_ORIGIN', 'https://apmgpainting.com.au');
     vi.stubEnv('REVALIDATE_SECRET', 's3cret');
-    vi.stubGlobal('fetch', vi.fn(async () => new Response('no', { status: 500 })));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('no', { status: 500 })),
+    );
     const { notifyPublicSite } = await import('@/lib/revalidate/notify');
     const result = await notifyPublicSite({ tags: [], paths: ['/'] });
     expect(result.ok).toBe(false);
@@ -4078,7 +4384,8 @@ export async function POST(request: Request) {
   if (!secret) return NextResponse.json({ error: 'not configured' }, { status: 503 });
 
   const auth = request.headers.get('authorization') ?? '';
-  if (auth !== `Bearer ${secret}`) return NextResponse.json({ error: 'unauthorised' }, { status: 401 });
+  if (auth !== `Bearer ${secret}`)
+    return NextResponse.json({ error: 'unauthorised' }, { status: 401 });
 
   let body: { tags?: unknown; paths?: unknown };
   try {
@@ -4087,9 +4394,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'invalid json' }, { status: 400 });
   }
 
-  const tags = Array.isArray(body.tags) ? body.tags.filter((t): t is string => typeof t === 'string' && TAG.test(t)) : [];
+  const tags = Array.isArray(body.tags)
+    ? body.tags.filter((t): t is string => typeof t === 'string' && TAG.test(t))
+    : [];
   const paths = Array.isArray(body.paths)
-    ? body.paths.filter((p): p is string => typeof p === 'string' && PATH.test(p) && !p.includes('..'))
+    ? body.paths.filter(
+        (p): p is string => typeof p === 'string' && PATH.test(p) && !p.includes('..'),
+      )
     : [];
 
   for (const tag of tags) revalidateTag(tag, 'max');
@@ -4112,13 +4423,19 @@ export type RevalidatePayload = { tags: string[]; paths: string[] };
  * public site itself this is a no-op because updateTag already ran locally.
  * Never throws: a failed refresh is reported to the editor, not hidden.
  */
-export async function notifyPublicSite(payload: RevalidatePayload): Promise<{ ok: boolean; message?: string }> {
+export async function notifyPublicSite(
+  payload: RevalidatePayload,
+): Promise<{ ok: boolean; message?: string }> {
   if (!isEditor()) return { ok: true };
 
   const origin = process.env.PUBLIC_SITE_ORIGIN;
   const secret = process.env.REVALIDATE_SECRET;
   if (!origin || !secret) {
-    return { ok: false, message: 'Saved, but the live site did not refresh: PUBLIC_SITE_ORIGIN or REVALIDATE_SECRET is not set on the editor.' };
+    return {
+      ok: false,
+      message:
+        'Saved, but the live site did not refresh: PUBLIC_SITE_ORIGIN or REVALIDATE_SECRET is not set on the editor.',
+    };
   }
 
   try {
@@ -4128,10 +4445,17 @@ export async function notifyPublicSite(payload: RevalidatePayload): Promise<{ ok
       body: JSON.stringify(payload),
       cache: 'no-store',
     });
-    if (!res.ok) return { ok: false, message: `Saved, but the live site did not refresh (HTTP ${res.status}). Try Publish again.` };
+    if (!res.ok)
+      return {
+        ok: false,
+        message: `Saved, but the live site did not refresh (HTTP ${res.status}). Try Publish again.`,
+      };
     return { ok: true };
   } catch {
-    return { ok: false, message: 'Saved, but the live site did not refresh (network error). Try Publish again.' };
+    return {
+      ok: false,
+      message: 'Saved, but the live site did not refresh (network error). Try Publish again.',
+    };
   }
 }
 ```
@@ -4141,19 +4465,19 @@ export async function notifyPublicSite(payload: RevalidatePayload): Promise<{ ok
 In `app/actions/content.ts`, `saveEntry`'s publish branch becomes:
 
 ```ts
-  if (status === 'published') {
-    const paths = [...pathsFor(collection, slug), '/sitemap.xml', '/llms.txt'];
-    updateTag(contentTag(collection));
-    for (const path of paths) revalidatePath(path);
-    if (collection === 'settings') revalidatePath('/', 'layout');
+if (status === 'published') {
+  const paths = [...pathsFor(collection, slug), '/sitemap.xml', '/llms.txt'];
+  updateTag(contentTag(collection));
+  for (const path of paths) revalidatePath(path);
+  if (collection === 'settings') revalidatePath('/', 'layout');
 
-    const remote = await notifyPublicSite({
-      tags: [contentTag(collection)],
-      paths: collection === 'settings' ? [...paths, '/'] : paths,
-    });
-    revalidatePath(`/admin/${collection}/`);
-    if (!remote.ok) return { status: 'error', message: remote.message };
-  }
+  const remote = await notifyPublicSite({
+    tags: [contentTag(collection)],
+    paths: collection === 'settings' ? [...paths, '/'] : paths,
+  });
+  revalidatePath(`/admin/${collection}/`);
+  if (!remote.ok) return { status: 'error', message: remote.message };
+}
 ```
 
 A settings change on the public site needs every page. `revalidatePath('/', 'layout')` cannot be expressed through the endpoint's path list, so on `settings` the endpoint receives the tag (`content:settings`, which every page's `getSiteSettings()` read carries) plus the key paths; the tag is what actually refreshes every page.
@@ -4239,6 +4563,7 @@ Run: `npx vitest run tests/unit/app-role.test.ts tests/unit/revalidate-route.tes
 Expected: PASS with `NEXT_PUBLIC_APP_ROLE` unset. Then `NEXT_PUBLIC_APP_ROLE=editor npm run build` also passes.
 
 Deploy both projects. Manually:
+
 - Visit the editor origin `/`: lands on `/admin/login/`. Visit `/projects/` there: redirected to `/admin/`.
 - Visit the site origin `/admin/`: redirected to the editor origin.
 - In the editor, change a service summary and Publish. Reload the public site's `/`: the card shows the new text within seconds. Check the editor shows "Published." and not the refresh warning.
@@ -4257,6 +4582,7 @@ git commit -m "feat(cms): split editor into its own deployment with cross-site r
 ### Task 14: Performance check and go-live notes
 
 **Files:**
+
 - Modify: `README.md` (CMS section)
 - Modify: `docs/CLIENT-BRIEF.md` (editor onboarding paragraph)
 
