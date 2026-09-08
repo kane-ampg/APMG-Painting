@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
+import { CmsImage } from '@/components/media/cms-image';
 import { CtaBand, RelatedLinks, TestimonialBlock } from '@/components/sections';
 import { Container, mediaZoom, Placeholder, Section, SectionHeading } from '@/components/ui';
 import { JsonLd } from '@/components/seo/json-ld';
@@ -87,9 +87,8 @@ export default async function ProjectPage({ params }: Props) {
 
       {cover && (
         <div className="group relative aspect-[16/9] w-full overflow-hidden bg-paper-sunken sm:aspect-[21/9]">
-          <Image
-            src={cover.src}
-            alt={cover.alt}
+          <CmsImage
+            image={cover}
             fill
             priority
             sizes="100vw"
@@ -206,13 +205,11 @@ export default async function ProjectPage({ params }: Props) {
                   key={image.src}
                   className="group relative aspect-[4/3] overflow-hidden rounded-lg"
                 >
-                  <Image
-                    src={image.src}
-                    alt={image.alt}
+                  <CmsImage
+                    image={image}
                     fill
-                    loading="lazy"
-                    sizes="(min-width: 640px) 45vw, 100vw"
-                    className={`object-cover ${mediaZoom}`}
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    className="object-cover"
                   />
                 </li>
               ))}

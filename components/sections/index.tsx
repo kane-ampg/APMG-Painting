@@ -3,6 +3,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { ApproachIcon, type ApproachIconName } from '@/components/icons/approach-icons';
 import { SectorIcon } from '@/components/icons/sector-icons';
+import { CmsImage } from '@/components/media/cms-image';
 import { HeroReel } from '@/components/media/hero-reel';
 import { Breadcrumbs, type Crumb } from '@/components/navigation/breadcrumbs';
 import {
@@ -397,11 +398,9 @@ export function ServiceGrid({ services }: { services: readonly Service[] }) {
           <article className="group relative flex h-full flex-col overflow-hidden rounded-lg border border-paper-edge bg-white">
             {service.image && (
               <div className="relative aspect-[16/9] overflow-hidden bg-ink">
-                <Image
-                  src={service.image.src}
-                  alt={service.image.alt}
+                <CmsImage
+                  image={service.image}
                   fill
-                  loading="lazy"
                   sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 100vw"
                   className={`object-cover ${mediaZoom}`}
                 />
