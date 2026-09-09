@@ -29,7 +29,13 @@ const { publicUrlFor } = await tsImport('../lib/media/url.ts', import.meta.url);
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-if (!url || !key) throw new Error('Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY');
+// The anon key is checked here too, not because this script authenticates
+// with it, but because `publicUrlFor` goes through `supabaseEnv()`, which
+// demands both. Failing now beats failing after the first upload.
+if (!url || !key || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+  throw new Error(
+    'Set NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY and SUPABASE_SERVICE_ROLE_KEY',
+  );
 const supabase = createClient(url, key, { auth: { persistSession: false } });
 
 /** Uploads one local file, returns a MediaRef. Caches by local path. */

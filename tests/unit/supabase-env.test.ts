@@ -25,4 +25,22 @@ describe('supabase env', () => {
     const { supabaseEnv } = await import('@/lib/supabase/env');
     expect(() => supabaseEnv()).toThrow(/NEXT_PUBLIC_SUPABASE_URL/);
   });
+
+  it('reads the storage hostname out of the URL', async () => {
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://abc.supabase.co');
+    const { supabaseHostname } = await import('@/lib/supabase/env');
+    expect(supabaseHostname()).toBe('abc.supabase.co');
+  });
+
+  it('returns null for a malformed URL rather than throwing', async () => {
+    // next.config.ts calls this at module scope. A typo'd env var must not
+    // take down `next dev`, `next build` and `next lint` with a URL parser
+    // stack trace.
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'abc.supabase.co');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const { supabaseHostname } = await import('@/lib/supabase/env');
+    expect(supabaseHostname()).toBeNull();
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+  });
 });

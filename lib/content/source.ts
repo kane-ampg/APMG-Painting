@@ -49,8 +49,13 @@ function parseRows<C extends Collection>(collection: C, rows: Row[]): EntryOf<C>
 }
 
 async function fetchPublished<C extends Collection>(collection: C): Promise<EntryOf<C>[]> {
-  const { createServerSupabase } = await import('@/lib/supabase/server');
-  const supabase = await createServerSupabase();
+  // The session-less client, deliberately. This runs inside `unstable_cache`
+  // below, and `createServerSupabase()` awaits `cookies()` — a dynamic API,
+  // which Next 16 rejects inside a cache scope (E846). Published rows are
+  // world-readable under RLS, so the anon key is all this read needs, and a
+  // cached value must not vary by visitor anyway.
+  const { createPublicSupabase } = await import('@/lib/supabase/public');
+  const supabase = createPublicSupabase();
   const { data, error } = await supabase
     .from('content_entries')
     .select('slug, status, data')

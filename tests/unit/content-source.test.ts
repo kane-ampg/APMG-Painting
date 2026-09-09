@@ -42,7 +42,8 @@ describe('content source with Supabase', () => {
   afterEach(() => {
     vi.unstubAllEnvs();
     vi.resetModules();
-    vi.doUnmock('@/lib/supabase/server');
+    vi.doUnmock('@/lib/supabase/public');
+    vi.doUnmock('next/headers');
     unstableCache.mockClear();
   });
 
@@ -67,8 +68,8 @@ describe('content source with Supabase', () => {
       },
       { slug: 'broken', status: 'published', data: { slug: 'broken' } },
     ];
-    vi.doMock('@/lib/supabase/server', () => ({
-      createServerSupabase: async () => ({
+    vi.doMock('@/lib/supabase/public', () => ({
+      createPublicSupabase: () => ({
         from: () => ({
           select: () => ({
             eq: () => ({
@@ -92,8 +93,8 @@ describe('content source with Supabase', () => {
     // enquiry, so these two getters catch where the others deliberately do not.
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://abc.supabase.co');
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon');
-    vi.doMock('@/lib/supabase/server', () => ({
-      createServerSupabase: async () => ({
+    vi.doMock('@/lib/supabase/public', () => ({
+      createPublicSupabase: () => ({
         from: () => ({
           select: () => ({
             eq: () => ({
@@ -122,8 +123,8 @@ describe('content source with Supabase', () => {
     // error, because only they have something safe to fall back to.
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://abc.supabase.co');
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon');
-    vi.doMock('@/lib/supabase/server', () => ({
-      createServerSupabase: async () => ({
+    vi.doMock('@/lib/supabase/public', () => ({
+      createPublicSupabase: () => ({
         from: () => ({
           select: () => ({
             eq: () => ({
@@ -140,8 +141,8 @@ describe('content source with Supabase', () => {
   it('tags the posts cache and never expires it on a timer', async () => {
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://abc.supabase.co');
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon');
-    vi.doMock('@/lib/supabase/server', () => ({
-      createServerSupabase: async () => ({
+    vi.doMock('@/lib/supabase/public', () => ({
+      createPublicSupabase: () => ({
         from: () => ({
           select: () => ({
             eq: () => ({
@@ -158,5 +159,54 @@ describe('content source with Supabase', () => {
       expect.arrayContaining(['posts']),
       { tags: ['content:posts'], revalidate: false },
     );
+  });
+
+  it('reads through the session-less client, not the cookie-bound one', async () => {
+    // The read the cache wraps must not touch the session. Mocking only
+    // `@/lib/supabase/public` proves which module the path resolves: were it
+    // still `@/lib/supabase/server`, the real module would load and the
+    // query below would never return these rows.
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://abc.supabase.co');
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon');
+    const createPublicSupabase = vi.fn(() => ({
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            eq: () => ({ order: async () => ({ data: [], error: null }) }),
+          }),
+        }),
+      }),
+    }));
+    vi.doMock('@/lib/supabase/public', () => ({ createPublicSupabase }));
+    const { getProjects } = await import('@/lib/content/source');
+    await expect(getProjects()).resolves.toEqual([]);
+    expect(createPublicSupabase).toHaveBeenCalledTimes(1);
+  });
+
+  it('never reaches cookies() from the cached read path', async () => {
+    // Next 16 throws E846 for any dynamic API used inside a cache scope, so
+    // a `cookies()` call anywhere under `fetchPublished` would fail every
+    // Supabase-configured build. Making the import itself explode is the
+    // only way to catch that from a unit test.
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://abc.supabase.co');
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon');
+    vi.doMock('next/headers', () => {
+      throw new Error('cookies() must not be reached from the cached read path');
+    });
+    vi.doMock('@/lib/supabase/public', () => ({
+      createPublicSupabase: () => ({
+        from: () => ({
+          select: () => ({
+            eq: () => ({
+              eq: () => ({ order: async () => ({ data: [], error: null }) }),
+            }),
+          }),
+        }),
+      }),
+    }));
+    const { getProjects, getServices, getPosts } = await import('@/lib/content/source');
+    await expect(getProjects()).resolves.toEqual([]);
+    await expect(getServices()).resolves.toEqual([]);
+    await expect(getPosts()).resolves.toEqual([]);
   });
 });
