@@ -11,6 +11,7 @@ import {
 } from '@/components/sections/locality';
 import { Container, Eyebrow, Lede, Prose, Section } from '@/components/ui';
 import { sectors } from '@/content/sectors';
+import { getSiteSettings } from '@/lib/content/source';
 import { allLocalities, displayName, getLocality, getRegion, stateSlug } from '@/lib/locations';
 
 /**
@@ -62,6 +63,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function SuburbPage({ params }: Props) {
+  const settings = await getSiteSettings();
   const { state, region, suburb } = await params;
   const locality = getLocality(state, region, suburb);
   if (!locality) notFound();
@@ -163,6 +165,7 @@ export default async function SuburbPage({ params }: Props) {
             : 'Tell us about the site and we will tell you how we would approach it.'
         }
         cta={{ label: 'Get in touch', href: '/contact-us/' }}
+        phone={settings.phone}
       />
     </>
   );

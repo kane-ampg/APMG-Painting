@@ -3,7 +3,7 @@ import { PostArticle } from '@/components/pages/post-article';
 import { ProjectArticle } from '@/components/pages/project-article';
 import { requireAdmin } from '@/lib/auth/admin';
 import { isCollection } from '@/lib/content/schemas';
-import { getEntryForPreview, getService } from '@/lib/content/source';
+import { getEntryForPreview, getService, getSiteSettings } from '@/lib/content/source';
 import { getSector } from '@/content/sectors';
 import type { Post, Project } from '@/lib/content/types';
 
@@ -27,9 +27,12 @@ export default async function PreviewPage({ params }: Props) {
   // because collection is checked first.
   if (collection === 'projects') {
     const project = entry.data as Project;
-    const relatedServices = (
-      await Promise.all(project.relatedServiceSlugs.map((serviceSlug) => getService(serviceSlug)))
-    ).filter((service) => service !== undefined);
+    const [relatedServices, settings] = await Promise.all([
+      Promise.all(project.relatedServiceSlugs.map((serviceSlug) => getService(serviceSlug))).then(
+        (all) => all.filter((service) => service !== undefined),
+      ),
+      getSiteSettings(),
+    ]);
     return (
       <>
         {banner}
@@ -37,6 +40,7 @@ export default async function PreviewPage({ params }: Props) {
           project={project}
           sector={getSector(project.sectorSlug)}
           relatedServices={relatedServices}
+          settings={settings}
         />
       </>
     );

@@ -5,6 +5,7 @@ import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import { CtaBand } from '@/components/sections';
 import { Card, Container, Eyebrow, Lede, Prose, Section, SectionHeading } from '@/components/ui';
 import { allLocalities, localitiesInRegion, regionsInState, type StateKey } from '@/lib/locations';
+import { getSiteSettings } from '@/lib/content/source';
 
 /**
  * The national hub.
@@ -44,8 +45,9 @@ const STATES: readonly {
   },
 ];
 
-export default function AreasPage() {
+export default async function AreasPage() {
   const localities = allLocalities();
+  const settings = await getSiteSettings();
 
   return (
     <>
@@ -132,6 +134,7 @@ export default function AreasPage() {
         heading="Not sure if you are in range?"
         body="Call and ask — it is a faster answer than a form."
         cta={{ label: 'Get in touch', href: '/contact-us/' }}
+        phone={settings.phone}
       />
     </>
   );

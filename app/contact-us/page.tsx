@@ -7,95 +7,114 @@ import { CommercialEnquiryForm } from '@/components/forms/enquiry-forms';
 import { GoogleMark } from '@/components/sections/review-parts';
 import { ButtonLink, Container, microLabel, Section, SectionHeading } from '@/components/ui';
 import { googleAggregate } from '@/content/reviews';
-import { accreditationLogos, directionsUrl, formattedAddress, site } from '@/lib/site';
+import { getPage, getSiteSettings } from '@/lib/content/source';
+import { accreditationLogos, directionsUrl, formatAddress, phoneHref, site } from '@/lib/site';
+import type { SiteSettings } from '@/lib/content/types';
 import { cn } from '@/lib/utils';
 
-export const metadata: Metadata = buildMetadata({
-  title: 'Contact APMG Painting | Melbourne Painters',
-  description:
-    'Contact APMG Painting. Tell us about the site and the scope, or call 1300 97 97 40 for a commercial site assessment.',
-  path: '/contact-us/',
-});
-
 /**
- * Contact.
+ * Contact page.
  *
- * The one page on the site where the visitor has already decided. Everything
- * here is arranged around that: the three ways to reach APMG sit above the
- * form rather than under it, because a facilities manager with a phone in
- * their hand should never have to scroll past a fourteen-field form to find a
- * number — and the form itself is given a column of reassurance beside it
- * instead of standing alone in a narrow measure, which is what it did before.
- *
- * The masthead is the only dark full-bleed opening outside the homepage fold,
- * and it is earned: the photograph is the signed depot with the whole fleet in
- * front of it, which answers "are these people real" faster than any sentence
- * on the page could.
- *
- * Nothing here states an hours or response-time commitment. `site.openingHours`
- * is still null and APMG has never published one — a "we reply within 2 hours"
- * line would be the single easiest claim to write on this page and the single
- * easiest one to break.
+ * The copy is a CMS singleton (`pages/contact-us`) and the contact facts are
+ * the `settings/site` singleton; the form itself stays in code because it is
+ * validation and a Server Action, not copy.
  */
+export async function generateMetadata(): Promise<Metadata> {
+  const copy = await getPage('contact-us');
+  return buildMetadata({
+    title: copy.metaTitle,
+    description: copy.metaDescription,
+    path: '/contact-us/',
+  });
+}
 
-/**
- * The three ways in, in the order they are actually used.
- *
- * Not a card grid. Three cells on one rule, the phone given the display size
- * because for a trade business it carries more traffic than the other two put
- * together, and the office given a directions link because an address without
- * one is a fact rather than an action.
- */
-const CHANNELS = [
-  {
-    label: 'Call',
-    value: site.phone.display,
-    href: site.phone.href,
-    note: 'One number for every site.',
-    lead: true,
-  },
-  {
-    label: 'Email',
-    value: site.email,
-    href: `mailto:${site.email}`,
-    note: 'Drawings, scopes and tender packs.',
-    lead: false,
-  },
-  {
-    label: 'Office',
-    value: formattedAddress,
-    href: directionsUrl,
-    note: 'Get directions',
-    lead: false,
-    external: true,
-  },
-] as const;
+export default async function ContactPage() {
+  const [copy, settings] = await Promise.all([getPage('contact-us'), getSiteSettings()]);
 
-/**
- * What the enquiry actually sets off.
- *
- * Every line is the same commitment made elsewhere on the site — the homepage
- * process rail and the form's own site-assessment hint — restated at the point
- * where somebody is deciding whether to fill the thing in. Numbered because
- * the order is the content: the site visit happens before the number, and that
- * sequencing is the whole argument.
- */
-const NEXT_STEPS = [
-  {
-    heading: 'We come back with questions',
-    body: 'Access, hours and scope, mostly. Those are quicker to settle before anyone attends than to discover on site.',
-  },
-  {
-    heading: 'We attend before we quote',
-    body: 'Preparation is the largest variable in any painting job, and it cannot be judged from a photograph or a floor area.',
-  },
-  {
-    heading: 'You get an itemised scope',
-    body: 'Labour, materials and scheduling broken out — and broken down per location where the work spans several sites.',
-  },
-] as const;
+  /**
+   * Contact.
+   *
+   * The one page on the site where the visitor has already decided. Everything
+   * here is arranged around that: the three ways to reach APMG sit above the
+   * form rather than under it, because a facilities manager with a phone in
+   * their hand should never have to scroll past a fourteen-field form to find a
+   * number — and the form itself is given a column of reassurance beside it
+   * instead of standing alone in a narrow measure, which is what it did before.
+   *
+   * The masthead is the only dark full-bleed opening outside the homepage fold,
+   * and it is earned: the photograph is the signed depot with the whole fleet in
+   * front of it, which answers "are these people real" faster than any sentence
+   * on the page could.
+   *
+   * Nothing here states an hours or response-time commitment. `settings.openingHours`
+   * is still null and APMG has never published one — a "we reply within 2 hours"
+   * line would be the single easiest claim to write on this page and the single
+   * easiest one to break.
+   */
 
-export default function ContactPage() {
+  /**
+   * The three ways in, in the order they are actually used.
+   *
+   * Not a card grid. Three cells on one rule, the phone given the display size
+   * because for a trade business it carries more traffic than the other two put
+   * together, and the office given a directions link because an address without
+   * one is a fact rather than an action.
+   */
+  function channelsFor(settings: SiteSettings) {
+    return [
+      {
+        label: 'Call',
+        value: settings.phone,
+        href: phoneHref(settings.phone),
+        note: 'One number for every site.',
+        lead: true,
+        external: false,
+      },
+      {
+        label: 'Email',
+        value: settings.email,
+        href: `mailto:${settings.email}`,
+        note: 'Drawings, scopes and tender packs.',
+        lead: false,
+        external: false,
+      },
+      {
+        label: 'Office',
+        value: formatAddress(settings.address),
+        href: directionsUrl(settings.address),
+        note: 'Get directions',
+        lead: false,
+        external: true,
+      },
+    ] as const;
+  }
+
+  /**
+   * What the enquiry actually sets off.
+   *
+   * Every line is the same commitment made elsewhere on the site — the homepage
+   * process rail and the form's own site-assessment hint — restated at the point
+   * where somebody is deciding whether to fill the thing in. Numbered because
+   * the order is the content: the site visit happens before the number, and that
+   * sequencing is the whole argument.
+   */
+  const NEXT_STEPS = [
+    {
+      heading: 'We come back with questions',
+      body: 'Access, hours and scope, mostly. Those are quicker to settle before anyone attends than to discover on site.',
+    },
+    {
+      heading: 'We attend before we quote',
+      body: 'Preparation is the largest variable in any painting job, and it cannot be judged from a photograph or a floor area.',
+    },
+    {
+      heading: 'You get an itemised scope',
+      body: 'Labour, materials and scheduling broken out — and broken down per location where the work spans several sites.',
+    },
+  ] as const;
+
+  const channels = channelsFor(settings);
+
   return (
     <>
       {/*
@@ -117,19 +136,15 @@ export default function ContactPage() {
           <div className="flex flex-col justify-center px-5 py-12 sm:px-8 lg:py-24 lg:pl-[max(2rem,calc((100vw-80rem)/2+2rem))] lg:pr-16">
             <Breadcrumbs crumbs={[{ name: 'Contact', path: '/contact-us/' }]} tone="ink" />
             <h1 className="mt-2 text-balance font-display text-4xl leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
-              Talk to us about the site
+              {copy.title}
             </h1>
-            <p className="mt-6 max-w-prose text-lg leading-relaxed text-white/75">
-              Tell us the building, the areas involved and when we are allowed on site. Those three
-              answers are what decide whether a site assessment can be scheduled — the rest follows
-              from them.
-            </p>
+            <p className="mt-6 max-w-prose text-lg leading-relaxed text-white/75">{copy.lede}</p>
             <div className="mt-9 flex flex-wrap gap-3">
               <ButtonLink href="#quote" variant="accent">
                 Send an enquiry
               </ButtonLink>
-              <ButtonLink href={site.phone.href} variant="ghostLight">
-                {site.phone.display}
+              <ButtonLink href={phoneHref(settings.phone)} variant="ghostLight">
+                {settings.phone}
               </ButtonLink>
             </div>
           </div>
@@ -166,7 +181,7 @@ export default function ContactPage() {
                 the cells collide; stacked rows at those widths cost nothing but
                 height. */}
           <ul className="grid divide-y divide-paper-edge lg:grid-cols-3 lg:divide-x lg:divide-y-0">
-            {CHANNELS.map((channel) => (
+            {channels.map((channel) => (
               <li key={channel.label} className="min-w-0 lg:first:-ml-6 lg:last:-mr-6">
                 <a
                   href={channel.href}
@@ -206,12 +221,8 @@ export default function ContactPage() {
           <Container width="wide">
             <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
               <div className="lg:col-span-7">
-                <SectionHeading className="mb-3">Request a site assessment</SectionHeading>
-                <p className="mb-8 max-w-prose text-ink-soft">
-                  For schools, clinics, aged care, strata, retail, hospitality, offices and
-                  industrial sites. The operating-hours question matters more than any other — tell
-                  us when we are allowed on site.
-                </p>
+                <SectionHeading className="mb-3">{copy.formHeading}</SectionHeading>
+                <p className="mb-8 max-w-prose text-ink-soft">{copy.formIntro}</p>
                 <div className="border border-paper-edge bg-white p-5 sm:p-8 lg:p-10">
                   <CommercialEnquiryForm />
                 </div>
@@ -299,10 +310,10 @@ export default function ContactPage() {
                     <p className="mt-8 text-sm text-ink-soft">
                       Prefer to talk it through?{' '}
                       <a
-                        href={site.phone.href}
+                        href={phoneHref(settings.phone)}
                         className="font-semibold text-brand-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
                       >
-                        Call {site.phone.display}
+                        Call {settings.phone}
                       </a>
                       .
                     </p>
@@ -317,7 +328,7 @@ export default function ContactPage() {
       {/*
        * Where we work from.
        *
-       * Typographic rather than mapped. `site.coords` is still null, so there
+       * Typographic rather than mapped. `settings.coords` is still null, so there
        * is no honest point to drop a pin on, and the directions link resolves
        * the street address through Maps itself rather than through the Google
        * profile — which still points at the previous premises.
@@ -329,27 +340,31 @@ export default function ContactPage() {
               <SectionHeading className="mb-6">Where we work from</SectionHeading>
               <address className="not-italic">
                 <p className="font-display text-2xl leading-snug tracking-tight text-ink sm:text-3xl">
-                  {site.address.street}
+                  {settings.address.street}
                   <br />
-                  {site.address.suburb} {site.address.state} {site.address.postcode}
+                  {settings.address.suburb} {settings.address.state} {settings.address.postcode}
                 </p>
               </address>
               <div className="mt-8 flex flex-wrap gap-3">
-                <ButtonLink href={directionsUrl} variant="outline" target="_blank">
+                <ButtonLink
+                  href={directionsUrl(settings.address)}
+                  variant="outline"
+                  target="_blank"
+                >
                   Get directions
                 </ButtonLink>
-                <ButtonLink href={site.phone.href} variant="primary">
-                  {site.phone.display}
+                <ButtonLink href={phoneHref(settings.phone)} variant="primary">
+                  {settings.phone}
                 </ButtonLink>
               </div>
             </div>
 
             <div className="lg:col-span-6 lg:pt-16">
               <p className="max-w-prose text-lg leading-relaxed text-ink-soft">
-                Work is carried out across {site.serviceArea.primary}, within roughly{' '}
-                {site.serviceArea.radiusKm} km of the {site.address.suburb} base — the eastern and
-                south-eastern corridors most of all, and the rest of the metro area on programmes
-                that justify the travel.
+                Work is carried out across {settings.serviceAreaPrimary}, within roughly{' '}
+                {site.serviceArea.radiusKm} km of the {settings.address.suburb} base — the eastern
+                and south-eastern corridors most of all, and the rest of the metro area on
+                programmes that justify the travel.
               </p>
               <p className="mt-5">
                 <Link

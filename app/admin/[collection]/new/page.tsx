@@ -4,6 +4,7 @@ import { EntryForm } from '@/components/admin/entry-form';
 import { requireAdmin } from '@/lib/auth/admin';
 import { fieldsFor } from '@/lib/content/form-fields';
 import { isCollection, type Collection } from '@/lib/content/schemas';
+import { defaultContactPage, defaultSiteSettings } from '@/lib/site';
 
 const blank: Record<Collection, Record<string, unknown>> = {
   projects: {
@@ -40,6 +41,10 @@ const blank: Record<Collection, Record<string, unknown>> = {
     metaTitle: '',
     metaDescription: '',
   },
+  // Neither is ever reached — the "New" link is hidden for singletons — but
+  // the Record<Collection, ...> type demands an entry for every collection.
+  settings: defaultSiteSettings as unknown as Record<string, unknown>,
+  pages: defaultContactPage as unknown as Record<string, unknown>,
 };
 
 type Props = { params: Promise<{ collection: string }> };

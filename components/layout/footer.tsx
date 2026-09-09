@@ -2,7 +2,15 @@ import Image from 'next/image';
 import { Container, microLabel, Placeholder } from '@/components/ui';
 import { footerNav } from '@/components/navigation/nav-data';
 import { FooterNavList } from '@/components/navigation/footer-nav-list';
-import { accreditationLogos, accreditations, formattedAddress, site } from '@/lib/site';
+import {
+  accreditationLogos,
+  accreditations,
+  addressEffectiveMonth,
+  formatAddress,
+  phoneHref,
+  site,
+} from '@/lib/site';
+import type { SiteSettings } from '@/lib/content/types';
 import { googleAggregate } from '@/content/reviews';
 import { sectors } from '@/content/sectors';
 import { cn } from '@/lib/utils';
@@ -217,9 +225,10 @@ function FooterAccreditations() {
   );
 }
 
-export function Footer() {
+export function Footer({ settings }: { settings: SiteSettings }) {
   // Generated, not hard-coded. The live site's footer still reads "© 2025".
   const year = new Date().getFullYear();
+  const movingFrom = addressEffectiveMonth(settings);
 
   return (
     <footer className="border-t-4 border-brand-600 bg-ink text-white">
@@ -238,20 +247,22 @@ export function Footer() {
               className="mb-5 h-16 w-auto"
             />
             <address className="text-sm not-italic leading-relaxed text-white/85">
-              {formattedAddress}
+              {formatAddress(settings.address)}
+              {/* Self-expiring: see settings.address.effectiveFrom. */}
+              {movingFrom && <span className="block text-white/60">from {movingFrom}</span>}
               <br />
               <a
-                href={site.phone.href}
+                href={phoneHref(settings.phone)}
                 className="mt-3 inline-block rounded font-semibold text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
               >
-                {site.phone.display}
+                {settings.phone}
               </a>
               <br />
               <a
-                href={`mailto:${site.email}`}
+                href={`mailto:${settings.email}`}
                 className="rounded text-white/85 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
               >
-                {site.email}
+                {settings.email}
               </a>
             </address>
           </div>
@@ -264,9 +275,9 @@ export function Footer() {
         <div className="flex flex-col gap-3 border-t border-white/15 py-6 text-xs text-white/60 sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {year} {site.legalName}
-            {site.abn ? ` · ABN ${site.abn}` : ''}
+            {settings.abn ? ` · ABN ${settings.abn}` : ''}
           </p>
-          <p>Servicing {site.serviceArea.primary}</p>
+          <p>Servicing {settings.serviceAreaPrimary}</p>
         </div>
       </Container>
     </footer>

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { buildMetadata, metaDescription } from '@/lib/seo/metadata';
 import { site } from '@/lib/site';
 import { ProjectArticle } from '@/components/pages/project-article';
-import { getProject, getProjects, getService } from '@/lib/content/source';
+import { getProject, getProjects, getService, getSiteSettings } from '@/lib/content/source';
 import { getSector } from '@/content/sectors';
 
 export async function generateStaticParams() {
@@ -39,9 +39,19 @@ export default async function ProjectPage({ params }: Props) {
   if (!project) notFound();
 
   const sector = getSector(project.sectorSlug);
-  const relatedServices = (
-    await Promise.all(project.relatedServiceSlugs.map((serviceSlug) => getService(serviceSlug)))
-  ).filter((service) => service !== undefined);
+  const [relatedServices, settings] = await Promise.all([
+    Promise.all(project.relatedServiceSlugs.map((serviceSlug) => getService(serviceSlug))).then(
+      (all) => all.filter((service) => service !== undefined),
+    ),
+    getSiteSettings(),
+  ]);
 
-  return <ProjectArticle project={project} sector={sector} relatedServices={relatedServices} />;
+  return (
+    <ProjectArticle
+      project={project}
+      sector={sector}
+      relatedServices={relatedServices}
+      settings={settings}
+    />
+  );
 }

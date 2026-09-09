@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og';
 import { site } from '@/lib/site';
+import { getSiteSettings } from '@/lib/content/source';
 
 /**
  * Default social share card.
@@ -17,7 +18,9 @@ export const alt = `${site.name} — commercial painters, Melbourne`;
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
-export default function OpengraphImage() {
+export default async function OpengraphImage() {
+  const settings = await getSiteSettings();
+
   return new ImageResponse(
     <div
       style={{
@@ -82,8 +85,8 @@ export default function OpengraphImage() {
           color: 'rgba(255,255,255,0.7)',
         }}
       >
-        <span>Commercial painting · {site.serviceArea.primary}</span>
-        <span style={{ color: '#E24356', fontWeight: 600 }}>{site.phone.display}</span>
+        <span>Commercial painting · {settings.serviceAreaPrimary}</span>
+        <span style={{ color: '#E24356', fontWeight: 600 }}>{settings.phone}</span>
       </div>
     </div>,
     size,

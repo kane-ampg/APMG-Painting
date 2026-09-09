@@ -20,7 +20,7 @@ import { faqSchema } from '@/lib/schema';
 import { differentiators } from '@/content/approach';
 import { homeFaqs } from '@/content/faqs';
 import { indexableLocalities } from '@/lib/locations';
-import { getFeaturedProjects, getServices } from '@/lib/content/source';
+import { getFeaturedProjects, getServices, getSiteSettings } from '@/lib/content/source';
 import { googleAggregate } from '@/content/reviews';
 import { sectors } from '@/content/sectors';
 import { site } from '@/lib/site';
@@ -81,7 +81,11 @@ const PROCESS = [
 
 export default async function HomePage() {
   const yearsTrading = new Date().getFullYear() - site.founded;
-  const [services, featuredProjects] = await Promise.all([getServices(), getFeaturedProjects()]);
+  const [services, featuredProjects, settings] = await Promise.all([
+    getServices(),
+    getFeaturedProjects(),
+    getSiteSettings(),
+  ]);
 
   return (
     <>
@@ -107,6 +111,7 @@ export default async function HomePage() {
           alt: 'Melbourne from the air over Docklands, looking across the Yarra to the CBD skyline',
         }}
         scrollTo={{ label: 'What we paint', href: '#services' }}
+        phone={settings.phone}
       />
 
       <ContentBlock eyebrow="Services" heading="What we paint" id="services" width="wide">
@@ -179,7 +184,7 @@ export default async function HomePage() {
       <GoogleReviewWall />
 
       <ContentBlock eyebrow="Areas" heading="Where we work across Melbourne">
-        <ServiceAreas locations={indexableLocalities()} />
+        <ServiceAreas locations={indexableLocalities()} baseSuburb={settings.address.suburb} />
       </ContentBlock>
 
       <ContentBlock tone="sunken" heading="About APMG Painting">
@@ -222,6 +227,7 @@ export default async function HomePage() {
         heading="Tell us what needs painting"
         body="Commercial enquiries get a site assessment before a number."
         cta={{ label: 'Request a quote', href: '/contact-us/' }}
+        phone={settings.phone}
       />
     </>
   );

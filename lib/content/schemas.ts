@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { Post, Project, Service } from './types';
+import type { ContactPageCopy, Post, Project, Service, SiteSettings } from './types';
 
 /**
  * Validation at the CMS boundary. Every row read from Supabase and every
@@ -78,17 +78,89 @@ export const postSchema = z.object({
   metaDescription: z.string().min(1).max(160),
 });
 
+/**
+ * Business details. Everything an editor is allowed to change about the
+ * company's contact facts; the trading and legal names stay in lib/site.ts
+ * because "one company name" is a code rule, not editable copy.
+ */
+const auPhone = z
+  .string()
+  .trim()
+  .regex(
+    /^(\(0\d\)\s?\d{4}\s?\d{4}|0\d(\s?\d{4}){2}|1[38]00(\s?\d{2}){3}|13\s?\d{2}\s?\d{2}|04\d{2}(\s?\d{3}){2})$/,
+    'Australian landline, 1300/1800 or mobile number',
+  );
+
+const abn = z
+  .string()
+  .trim()
+  .regex(/^\d{2}\s?\d{3}\s?\d{3}\s?\d{3}$/, 'ABN is eleven digits')
+  .nullable();
+
+const timeHHMM = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'HH:MM');
+
+export const siteSettingsSchema = z.object({
+  phone: auPhone,
+  email: z.string().email(),
+  address: z.object({
+    street: z.string().min(1),
+    suburb: z.string().min(1),
+    state: z.enum(['VIC', 'NSW', 'QLD', 'SA', 'WA', 'TAS', 'ACT', 'NT']),
+    postcode: z.string().regex(/^\d{4}$/),
+    country: z.literal('AU'),
+    effectiveFrom: isoDate.nullable(),
+  }),
+  previousAddress: z.string().nullable(),
+  abn,
+  coords: z
+    .object({ latitude: z.number().min(-44).max(-10), longitude: z.number().min(112).max(154) })
+    .nullable(),
+  openingHours: z
+    .array(
+      z.object({
+        days: z
+          .array(
+            z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']),
+          )
+          .min(1),
+        opens: timeHHMM,
+        closes: timeHHMM,
+      }),
+    )
+    .nullable(),
+  serviceAreaPrimary: z.string().min(1),
+  social: z.object({
+    instagram: z.string().url().nullable(),
+    facebook: z.string().url().nullable(),
+    google: z.string().url().nullable(),
+  }),
+});
+
+export const contactPageSchema = z.object({
+  slug: z.literal('contact-us'),
+  title: z.string().min(1).max(60),
+  lede: z.string().min(1).max(300),
+  formHeading: z.string().min(1).max(80),
+  formIntro: z.string().min(1).max(400),
+  metaTitle: z.string().min(1).max(70),
+  metaDescription: z.string().min(1).max(160),
+});
+
 // Compile-time drift guards. If a type gains a field the schema lacks, or
 // vice versa, one of these lines stops compiling.
 type Mutable<T> = { -readonly [K in keyof T]: T[K] extends readonly (infer U)[] ? U[] : T[K] };
 ({}) as z.infer<typeof projectSchema> satisfies Mutable<Project>;
 ({}) as z.infer<typeof serviceSchema> satisfies Mutable<Service>;
 ({}) as z.infer<typeof postSchema> satisfies Mutable<Post>;
+({}) as z.infer<typeof siteSettingsSchema> satisfies Mutable<SiteSettings>;
+({}) as z.infer<typeof contactPageSchema> satisfies Mutable<ContactPageCopy>;
 
 export const collectionSchemas = {
   projects: projectSchema,
   services: serviceSchema,
   posts: postSchema,
+  settings: siteSettingsSchema,
+  pages: contactPageSchema,
 } as const;
 
 export type Collection = keyof typeof collectionSchemas;
@@ -98,4 +170,11 @@ export const collections = Object.keys(collectionSchemas) as Collection[];
 
 export function isCollection(value: string): value is Collection {
   return value in collectionSchemas;
+}
+
+/** Collections with exactly one entry and a fixed slug. No "New", no delete. */
+export const singletonSlug = { settings: 'site', pages: 'contact-us' } as const;
+
+export function isSingleton(collection: Collection): collection is keyof typeof singletonSlug {
+  return collection in singletonSlug;
 }

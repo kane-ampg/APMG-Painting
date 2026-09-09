@@ -6,6 +6,7 @@ import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import { CtaBand, RelatedLinks } from '@/components/sections';
 import { Card, Container, Eyebrow, Lede, Prose, Section, SectionHeading } from '@/components/ui';
 import { sectors } from '@/content/sectors';
+import { getSiteSettings } from '@/lib/content/source';
 import {
   allLocalities,
   localitiesInRegion,
@@ -54,6 +55,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function StatePage({ params }: Props) {
+  const settings = await getSiteSettings();
   const { state } = await params;
   const key = stateFromSlug(state);
   if (!key) notFound();
@@ -167,6 +169,7 @@ export default async function StatePage({ params }: Props) {
             : 'Tell us about the site and we will tell you how we would approach it.'
         }
         cta={{ label: 'Get in touch', href: '/contact-us/' }}
+        phone={settings.phone}
       />
     </>
   );

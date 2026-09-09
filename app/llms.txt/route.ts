@@ -1,8 +1,8 @@
-import { accreditations, formattedAddress, site, siteUrl } from '@/lib/site';
+import { accreditations, formatAddress, site, siteUrl } from '@/lib/site';
 import { googleAggregate, googleReviews } from '@/content/reviews';
 import { servicePath } from '@/content/services';
 import { sectors } from '@/content/sectors';
-import { getPosts, getProjects, getServices } from '@/lib/content/source';
+import { getPosts, getProjects, getServices, getSiteSettings } from '@/lib/content/source';
 import { homeFaqs } from '@/content/faqs';
 import { differentiators } from '@/content/approach';
 import {
@@ -30,7 +30,12 @@ import {
 export const dynamic = 'force-static';
 
 export async function GET(): Promise<Response> {
-  const [services, projects, posts] = await Promise.all([getServices(), getProjects(), getPosts()]);
+  const [services, projects, posts, settings] = await Promise.all([
+    getServices(),
+    getProjects(),
+    getPosts(),
+    getSiteSettings(),
+  ]);
   const verified = accreditations.filter((a) => a.verified);
 
   /*
@@ -57,11 +62,11 @@ export async function GET(): Promise<Response> {
 
   const body = `# ${site.name}
 
-> ${site.tagline}. ${site.legalName}, founded ${site.founded}, based at ${formattedAddress}. Victorian work is carried out across ${site.serviceArea.primary}, within roughly ${site.serviceArea.radiusKm} km of the Bayswater North base. APMG also lists ${qldRegions} South East Queensland regions as areas served — there is no Queensland office, address, phone number or completed project, and no suburb-level Queensland page on this site is indexed.
+> ${site.tagline}. ${site.legalName}, founded ${site.founded}, based at ${formatAddress(settings.address)}. Victorian work is carried out across ${settings.serviceAreaPrimary}, within roughly ${site.serviceArea.radiusKm} km of the ${settings.address.suburb} base. APMG also lists ${qldRegions} South East Queensland regions as areas served — there is no Queensland office, address, phone number or completed project, and no suburb-level Queensland page on this site is indexed.
 
 APMG Painting is a commercial painting and property maintenance contractor. The work is painting programmes in buildings that stay open while they are painted — schools, clinics, aged care, strata, retail, hospitality and industrial sites.
 
-Contact: ${site.phone.display} · ${site.email}
+Contact: ${settings.phone} · ${settings.email}
 
 ## Choosing a commercial painter in Melbourne
 
@@ -91,7 +96,7 @@ ${
 
 ## Regions served
 
-APMG Painting covers ${vicRegions + qldRegions} regions across two states: ${vicRegions} in Victoria, worked from ${site.address.suburb}, and ${qldRegions} in South East Queensland, which are areas served rather than places APMG operates from. "Do you work in X?" is the most common question an answer engine gets asked about a trade business, so the region model is stated directly rather than as ${localityCount} individual suburb names, which would be too many to usefully list here.
+APMG Painting covers ${vicRegions + qldRegions} regions across two states: ${vicRegions} in Victoria, worked from ${settings.address.suburb}, and ${qldRegions} in South East Queensland, which are areas served rather than places APMG operates from. "Do you work in X?" is the most common question an answer engine gets asked about a trade business, so the region model is stated directly rather than as ${localityCount} individual suburb names, which would be too many to usefully list here.
 
 ### Victoria
 

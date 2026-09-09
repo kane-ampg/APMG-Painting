@@ -13,8 +13,10 @@ import { services } from '@/content/services';
 import {
   accreditationLogos,
   accreditations,
+  addressNote,
+  defaultSiteSettings,
   directionsUrl,
-  formattedAddress,
+  formatAddress,
   site,
 } from '@/lib/site';
 
@@ -47,7 +49,7 @@ describe('Google reviews stay out of review markup', () => {
   });
 
   it('emits no aggregateRating or review block on the business', () => {
-    const schema = localBusinessSchema(services);
+    const schema = localBusinessSchema(services, defaultSiteSettings);
 
     expect(schema.aggregateRating).toBeUndefined();
     expect(schema.review).toBeUndefined();
@@ -134,7 +136,9 @@ describe('the office address', () => {
     expect(site.address.street).toBe('1 Turbo Drive');
     expect(site.address.suburb).toBe('Bayswater North');
     expect(site.address.postcode).toBe('3153');
-    expect(formattedAddress).toBe('1 Turbo Drive, Bayswater North VIC 3153');
+    expect(formatAddress(defaultSiteSettings.address)).toBe(
+      '1 Turbo Drive, Bayswater North VIC 3153',
+    );
   });
 
   it('carries no move-in qualifier anywhere in the address surface', () => {
@@ -147,7 +151,23 @@ describe('the office address', () => {
   it('routes directions by street address, not by the stale place ID', () => {
     // The Google Business Profile is still registered to Chirnside Park, so a
     // place-ID deep link would navigate a visitor to the previous premises.
-    expect(directionsUrl).toContain(encodeURIComponent('1 Turbo Drive'));
-    expect(directionsUrl).not.toContain('place_id');
+    const url = directionsUrl(defaultSiteSettings.address);
+    expect(url).toContain(encodeURIComponent('1 Turbo Drive'));
+    expect(url).not.toContain('place_id');
+  });
+
+  it('qualifies the address only while a move date is set, then expires', () => {
+    // The failure mode this exists for is a "we're moving in October" line
+    // outliving the move. There is no move to describe today — the defaults
+    // carry no date — but the note an editor can set has to expire on its own.
+    expect(addressNote(defaultSiteSettings)).toBeNull();
+
+    const moving = {
+      ...defaultSiteSettings,
+      address: { ...defaultSiteSettings.address, effectiveFrom: '2026-10-01' },
+      previousAddress: 'Factory 15/30 Ramset Dr, Chirnside Park VIC 3116',
+    };
+    expect(addressNote(moving, new Date('2026-09-01T00:00:00Z'))).toContain('October 2026');
+    expect(addressNote(moving, new Date('2026-10-01T00:00:00Z'))).toBeNull();
   });
 });

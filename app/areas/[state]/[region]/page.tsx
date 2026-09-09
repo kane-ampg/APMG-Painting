@@ -6,6 +6,7 @@ import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import { CtaBand, RelatedLinks } from '@/components/sections';
 import { Container, Eyebrow, Lede, Prose, Section, SectionHeading } from '@/components/ui';
 import { sectors } from '@/content/sectors';
+import { getSiteSettings } from '@/lib/content/source';
 import { getCouncil } from '@/content/councils';
 import {
   displayName,
@@ -90,6 +91,7 @@ function byCouncil(localities: readonly Locality[]): [string, Locality[]][] {
 }
 
 export default async function RegionPage({ params }: Props) {
+  const settings = await getSiteSettings();
   const { state, region } = await params;
   const regionDef = resolve(state, region);
   if (!regionDef) notFound();
@@ -188,6 +190,7 @@ export default async function RegionPage({ params }: Props) {
             : 'Tell us about the site and we will tell you how we would approach it.'
         }
         cta={{ label: 'Get in touch', href: '/contact-us/' }}
+        phone={settings.phone}
       />
     </>
   );

@@ -25,7 +25,8 @@ import {
 import { QUICK_ANSWERS } from '@/lib/enquiry/chat-faqs';
 import { initialEnquiryState } from '@/lib/enquiry/state';
 import { microLabel } from '@/components/ui';
-import { site } from '@/lib/site';
+import { phoneHref } from '@/lib/site';
+import { useSiteSettings } from '@/components/providers/site-settings';
 import { cn } from '@/lib/utils';
 
 /**
@@ -53,6 +54,7 @@ type Turn = { role: 'bot' | 'user'; text: string };
 
 export function QuoteChat() {
   const pathname = usePathname();
+  const settings = useSiteSettings();
 
   const [open, setOpen] = useState(false);
   /**
@@ -519,10 +521,10 @@ export function QuoteChat() {
           <footer className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-paper-edge bg-paper-sunken px-4 py-2.5 text-xs text-ink-muted">
             <span>Prefer not to chat?</span>
             <a
-              href={site.phone.href}
+              href={phoneHref(settings.phone)}
               className="font-semibold text-brand-700 underline decoration-brand-600/40 underline-offset-2 hover:decoration-brand-600"
             >
-              {site.phone.display}
+              {settings.phone}
             </a>
             <Link
               href={`${QUOTE_PATH}${QUOTE_HASH}`}

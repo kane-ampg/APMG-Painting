@@ -1,5 +1,13 @@
 /**
- * Canonical business facts — the single source of truth.
+ * Canonical business facts, and the seed for the ones an editor may change.
+ *
+ * The trading and legal names, the founding year, the tagline and the
+ * accreditations are code and stay here: the one-company-name rule below is
+ * not editable copy. The contact facts — phone, email, address, ABN, coords,
+ * hours, socials — now live in the CMS `settings/site` singleton, and this
+ * file supplies `defaultSiteSettings`, which seeds that row and answers when
+ * there is no database. Read them through `getSiteSettings()`, never from
+ * `site.*`.
  *
  * The live WordPress site renders the company name four different ways
  * ("APMG Painting", "APMG Painting Services", "APMG Services",
@@ -10,6 +18,8 @@
  * Anything marked NEEDS-CLIENT-CONFIRMATION is not rendered publicly until
  * APMG supplies it. Nothing here is invented.
  */
+
+import type { ContactPageCopy, SiteSettings } from '@/lib/content/types';
 
 export const CONTACT_UNVERIFIED = 'NEEDS-CLIENT-CONFIRMATION' as const;
 
@@ -300,11 +310,37 @@ export const verifiedAccreditations = accreditations.filter((a) => a.verified);
  */
 export const accreditationLogos = verifiedAccreditations.filter((a) => a.logo !== undefined);
 
-/** Formatted one-line address for the footer and contact page. */
-export const formattedAddress = [
-  site.address.street,
-  `${site.address.suburb} ${site.address.state} ${site.address.postcode}`,
-].join(', ');
+/**
+ * Seed and fallback for the CMS `settings/site` entry. Once seeded, the
+ * database wins; this object only answers when there is no database.
+ * Values are the ones that were hard-coded here before the CMS existed, so
+ * nothing is retyped and the two cannot drift.
+ */
+export const defaultSiteSettings: SiteSettings = {
+  phone: site.phone.display,
+  email: site.email,
+  address: {
+    street: site.address.street,
+    suburb: site.address.suburb,
+    state: site.address.state,
+    postcode: site.address.postcode,
+    country: site.address.country,
+    // No transition to describe: 1 Turbo Drive is the address APMG occupies,
+    // not a future one. The field stays because an editor may set a move date
+    // in /admin later, at which point the note appears on its own.
+    effectiveFrom: null,
+  },
+  previousAddress: null,
+  abn: site.abn,
+  coords: site.coords,
+  openingHours: site.openingHours,
+  serviceAreaPrimary: site.serviceArea.primary,
+  social: {
+    instagram: site.social.instagram,
+    facebook: site.social.facebook,
+    google: site.social.google,
+  },
+};
 
 /**
  * Directions to the office, as Google's documented `dir` deep link.
@@ -314,10 +350,119 @@ export const formattedAddress = [
  * route a visitor to the previous premises — the one navigation error on this
  * page that actually costs somebody a morning. A plain address query is
  * resolved by Maps itself and cannot go stale behind us.
+ *
+ * Takes the address rather than reading it, so an editor who moves the office
+ * in /admin moves the deep link with it.
  */
-export const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-  `${formattedAddress}, Australia`,
-)}`;
+export function directionsUrl(address: SiteSettings['address']): string {
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+    `${formatAddress(address)}, Australia`,
+  )}`;
+}
+
+/**
+ * Seed and fallback for the CMS `pages/contact-us` entry. The copy is the
+ * copy /contact-us/ carried before it became editable.
+ */
+export const defaultContactPage: ContactPageCopy = {
+  slug: 'contact-us',
+  title: 'Talk to us about the site',
+  lede: 'Tell us the building, the areas involved and when we are allowed on site. Those three answers are what decide whether a site assessment can be scheduled — the rest follows from them.',
+  formHeading: 'Request a site assessment',
+  formIntro:
+    'For schools, clinics, aged care, strata, retail, hospitality, offices and industrial sites. The operating-hours question matters more than any other — tell us when we are allowed on site.',
+  metaTitle: 'Contact APMG Painting | Melbourne Painters',
+  metaDescription:
+    'Contact APMG Painting. Tell us about the site and the scope, or call 1300 97 97 40 for a commercial site assessment.',
+};
+
+/**
+ * The tel: link, derived from the display number rather than stored beside
+ * it — two fields that have to agree are two fields that eventually do not.
+ * Pure, so client components may import it; this module has no `server-only`.
+ */
+export function phoneHref(display: string): string {
+  return `tel:${display.replace(/\D/g, '')}`;
+}
+
+/**
+ * The display number in country-coded form, for structured data.
+ *
+ * Google's LocalBusiness guidance asks for the number with its country code
+ * while prose and the header keep the local display format. Derived rather
+ * than stored beside the display number for the same reason `phoneHref` is:
+ * two fields that have to agree eventually do not, and the editable one is
+ * the one an editor types.
+ */
+export function internationalPhone(display: string): string {
+  const digits = display.replace(/\D/g, '');
+  const national = digits.startsWith('0') ? digits.slice(1) : digits;
+
+  // 1300/1800 service numbers group 4-3-3; mobiles (leading 4) group 3-3-3;
+  // landlines carry a one-digit area code and group 4-4.
+  const grouped = /^1[38]00/.test(national)
+    ? [national.slice(0, 4), national.slice(4, 7), national.slice(7)]
+    : national.startsWith('4')
+      ? [national.slice(0, 3), national.slice(3, 6), national.slice(6)]
+      : [national.slice(0, 1), national.slice(1, 5), national.slice(5)];
+
+  return `+61 ${grouped.filter(Boolean).join(' ')}`;
+}
+
+/** Formatted one-line address for the footer and contact page. */
+export function formatAddress(address: SiteSettings['address']): string {
+  return [address.street, `${address.suburb} ${address.state} ${address.postcode}`].join(', ');
+}
+
+const MONTHS = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+] as const;
+
+/**
+ * "October 2026", or null once the move date has passed. The terse form of
+ * `addressNote` for surfaces with no room for the sentence — the footer.
+ */
+export function addressEffectiveMonth(
+  settings: SiteSettings,
+  now: Date = new Date(),
+): string | null {
+  if (!settings.address.effectiveFrom) return null;
+
+  const effective = new Date(`${settings.address.effectiveFrom}T00:00:00Z`);
+  if (Number.isNaN(effective.getTime()) || now >= effective) return null;
+
+  return `${MONTHS[effective.getUTCMonth()]} ${effective.getUTCFullYear()}`;
+}
+
+/**
+ * The qualifier that runs beside the address until the move completes, or null
+ * once it has.
+ *
+ * Formatted by hand rather than through `toLocaleDateString`, because month
+ * names from ICU differ between the build container and a developer's machine
+ * and this string is baked into static HTML.
+ *
+ * Takes the settings rather than reading the file, so an editor who changes
+ * the address in /admin moves the note with it. `now` is injectable so the
+ * expiry is testable without touching the clock.
+ */
+export function addressNote(settings: SiteSettings, now: Date = new Date()): string | null {
+  const month = addressEffectiveMonth(settings, now);
+  if (!month || !settings.previousAddress) return null;
+
+  return `Our office from ${month}. Until then we work from ${settings.previousAddress}.`;
+}
 
 /**
  * Canonical origin, resolved in priority order.

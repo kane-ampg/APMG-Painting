@@ -5,9 +5,10 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { QuoteChatLazy } from '@/components/chat/quote-chat-lazy';
 import { ScrollReveal } from '@/components/motion/scroll-reveal';
+import { SiteSettingsProvider } from '@/components/providers/site-settings';
 import { JsonLd } from '@/components/seo/json-ld';
 import { localBusinessSchema } from '@/lib/schema';
-import { getServices } from '@/lib/content/source';
+import { getServices, getSiteSettings } from '@/lib/content/source';
 import { site, siteUrl } from '@/lib/site';
 
 /**
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const services = await getServices();
+  const [services, settings] = await Promise.all([getServices(), getSiteSettings()]);
 
   return (
     <html lang="en-AU" className={`${sans.variable} ${display.variable}`}>
@@ -49,20 +50,25 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
         {/* One entity node, not an Organization + LocalBusiness pair —
             lib/schema/index.ts explains the merge. */}
-        <JsonLd data={localBusinessSchema(services)} />
+        <JsonLd data={localBusinessSchema(services, settings)} />
 
-        <Header />
-        <main id="main" className="flex-1">
-          {children}
-        </main>
-        <Footer />
+        {/* Wraps everything, because the header, the mobile menu, the chat and
+            the enquiry forms are all client components that state the phone
+            number and must all state the same one. */}
+        <SiteSettingsProvider value={settings}>
+          <Header settings={settings} />
+          <main id="main" className="flex-1">
+            {children}
+          </main>
+          <Footer settings={settings} />
 
-        {/*
-          Outside <main> and last in the DOM: an assistive-technology user
-          reaches the page's own content first, and the panel is additive — the
-          full forms on /contact-us/ remain the primary, no-JavaScript route.
-        */}
-        <QuoteChatLazy />
+          {/*
+            Outside <main> and last in the DOM: an assistive-technology user
+            reaches the page's own content first, and the panel is additive — the
+            full forms on /contact-us/ remain the primary, no-JavaScript route.
+          */}
+          <QuoteChatLazy />
+        </SiteSettingsProvider>
 
         <ScrollReveal />
       </body>

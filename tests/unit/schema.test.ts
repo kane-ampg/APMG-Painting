@@ -8,7 +8,7 @@ import {
 } from '@/lib/schema';
 import { getProject } from '@/content/projects';
 import { qldPresence } from '@/content/locations.overrides';
-import { site } from '@/lib/site';
+import { site, defaultSiteSettings } from '@/lib/site';
 import { services } from '@/content/services';
 
 describe('structured data', () => {
@@ -16,7 +16,7 @@ describe('structured data', () => {
     // The live site shows "5.0, based on 70 reviews" from a third-party widget.
     // Review markup must describe reviews the site itself hosts and can
     // evidence, so none is emitted.
-    const payloads = [localBusinessSchema(services)];
+    const payloads = [localBusinessSchema(services, defaultSiteSettings)];
     for (const payload of payloads) {
       expect(JSON.stringify(payload)).not.toMatch(/aggregateRating|reviewCount|ratingValue/);
     }
@@ -26,7 +26,7 @@ describe('structured data', () => {
     // Google's LocalBusiness guidance asks for a country-coded number, and
     // this must still be the canonical business line — never a CallRail
     // tracking number.
-    expect(localBusinessSchema(services).telephone).toBe('+61 1300 979 740');
+    expect(localBusinessSchema(services, defaultSiteSettings).telephone).toBe('+61 1300 979 740');
   });
 
   it('is one entity, not two: a single node carrying the #organization id', () => {
@@ -34,19 +34,34 @@ describe('structured data', () => {
     // nodes describing the same business with no link between them, leaving
     // Google to reconcile two candidate entities. One node, one @id — and the
     // Organization-only facts (foundingDate, knowsAbout) ride along on it.
-    const schema = localBusinessSchema(services);
+    const schema = localBusinessSchema(services, defaultSiteSettings);
     expect(schema['@id']).toMatch(/#organization$/);
     expect(schema.foundingDate).toBe(String(site.founded));
     expect(Array.isArray(schema.knowsAbout)).toBe(true);
   });
 
   it('states one legal entity name', () => {
-    expect(localBusinessSchema(services).legalName).toBe('APMG Painting Services Pty Ltd');
+    expect(localBusinessSchema(services, defaultSiteSettings).legalName).toBe(
+      'APMG Painting Services Pty Ltd',
+    );
+  });
+
+  it('reflects the settings it is given, not the file', () => {
+    const changed = {
+      ...defaultSiteSettings,
+      phone: '1300 00 00 00',
+      email: 'hello@apmgpainting.com.au',
+    };
+    const data = localBusinessSchema(services, changed);
+    expect(data.telephone).toBe('+61 1300 000 000');
+    expect(data.email).toBe('hello@apmgpainting.com.au');
   });
 
   it('scopes the service area to Melbourne', () => {
-    expect(JSON.stringify(localBusinessSchema(services))).toContain('Melbourne');
-    expect(JSON.stringify(localBusinessSchema(services))).not.toMatch(
+    expect(JSON.stringify(localBusinessSchema(services, defaultSiteSettings))).toContain(
+      'Melbourne',
+    );
+    expect(JSON.stringify(localBusinessSchema(services, defaultSiteSettings))).not.toMatch(
       /Australia[- ]wide|nationwide/i,
     );
   });
@@ -54,7 +69,7 @@ describe('structured data', () => {
   it('declares the specific trade, not just the parent category', () => {
     // "HomeAndConstructionBusiness" also covers plumbers and roofers. The
     // painting-specific type is what makes the entity unambiguous.
-    expect(localBusinessSchema(services)['@type']).toContain('HousePainter');
+    expect(localBusinessSchema(services, defaultSiteSettings)['@type']).toContain('HousePainter');
   });
 
   it('omits geo and hours until they are confirmed', () => {
@@ -62,10 +77,10 @@ describe('structured data', () => {
     // is dangerous: a wrong latitude moves the business, and invented hours
     // tell people to call an empty office. Structure ships now, values ship
     // when APMG supplies them.
-    const schema = localBusinessSchema(services);
+    const schema = localBusinessSchema(services, defaultSiteSettings);
 
-    expect(site.coords).toBeNull();
-    expect(site.openingHours).toBeNull();
+    expect(defaultSiteSettings.coords).toBeNull();
+    expect(defaultSiteSettings.openingHours).toBeNull();
 
     expect(schema.geo).toBeUndefined();
     expect(schema.openingHoursSpecification).toBeUndefined();
@@ -78,10 +93,10 @@ describe('structured data', () => {
     // told that this entity and that profile are the same business. Resolved
     // from the review widget on apmgpainting.com.au, so it is APMG's own
     // profile rather than a guessed one.
-    const schema = localBusinessSchema(services);
+    const schema = localBusinessSchema(services, defaultSiteSettings);
 
-    expect(site.social.google).toContain('place_id:');
-    expect(schema.sameAs).toContain(site.social.google);
+    expect(defaultSiteSettings.social.google).toContain('place_id:');
+    expect(schema.sameAs).toContain(defaultSiteSettings.social.google);
   });
 
   it('offers the same service area on a service as on the business', () => {
@@ -91,9 +106,10 @@ describe('structured data', () => {
       name: 'Interior painting',
       description: 'Interior work in occupied spaces.',
       path: '/commercial/',
+      settings: defaultSiteSettings,
     });
     expect(JSON.stringify(service.areaServed)).toEqual(
-      JSON.stringify(localBusinessSchema(services).areaServed),
+      JSON.stringify(localBusinessSchema(services, defaultSiteSettings).areaServed),
     );
   });
 
@@ -120,7 +136,7 @@ describe('structured data', () => {
 });
 
 describe('areaServed after the VIC + QLD expansion', () => {
-  const business = localBusinessSchema(services) as Record<string, unknown>;
+  const business = localBusinessSchema(services, defaultSiteSettings) as Record<string, unknown>;
   const areas = business.areaServed as Record<string, unknown>[];
 
   it('does not enumerate 1,387 suburbs into sitewide JSON-LD', () => {

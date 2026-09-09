@@ -241,3 +241,40 @@ export type Post = {
   metaTitle: string;
   metaDescription: string;
 };
+
+/**
+ * Business details an editor may change. The trading and legal names are
+ * not here on purpose: the one-company-name rule is code, not copy.
+ */
+export type SiteSettings = {
+  /** Display form, e.g. "1300 97 97 40". The tel: link is derived. */
+  phone: string;
+  email: string;
+  address: {
+    street: string;
+    suburb: string;
+    state: string;
+    postcode: string;
+    country: string;
+    /** ISO date the business occupies this address, or null if already there. */
+    effectiveFrom: string | null;
+  };
+  /** Shown alongside the move note until effectiveFrom passes. */
+  previousAddress: string | null;
+  abn: string | null;
+  coords: { latitude: number; longitude: number } | null;
+  openingHours: readonly { days: readonly string[]; opens: string; closes: string }[] | null;
+  serviceAreaPrimary: string;
+  social: { instagram: string | null; facebook: string | null; google: string | null };
+};
+
+/** Editable copy on /contact-us/. The form itself is code. */
+export type ContactPageCopy = {
+  slug: 'contact-us';
+  title: string;
+  lede: string;
+  formHeading: string;
+  formIntro: string;
+  metaTitle: string;
+  metaDescription: string;
+};

@@ -1,6 +1,6 @@
-import { formattedAddress, site, siteUrl, verifiedAccreditations } from '@/lib/site';
+import { internationalPhone, site, siteUrl, verifiedAccreditations } from '@/lib/site';
 import { averageRating, firstPartyReviews } from '@/content/reviews';
-import type { Post, Project, Service } from '@/lib/content/types';
+import type { Post, Project, Service, SiteSettings } from '@/lib/content/types';
 
 /** The APMG mark, dark-on-transparent — the header variant. */
 export const brandLogoPath = '/images/brand/apmg-logo-ink.webp';
@@ -23,6 +23,28 @@ export const brandLogoPath = '/images/brand/apmg-logo-ink.webp';
 
 type JsonLdValue = Record<string, unknown>;
 
+/** The one PostalAddress node the business node emits. */
+function postalAddress(settings: SiteSettings): JsonLdValue {
+  return {
+    '@type': 'PostalAddress',
+    streetAddress: settings.address.street,
+    addressLocality: settings.address.suburb,
+    addressRegion: settings.address.state,
+    postalCode: settings.address.postcode,
+    addressCountry: settings.address.country,
+  };
+}
+
+/**
+ * The profile links, nulls dropped. Same three on both nodes, so Google is
+ * pointed at one entity rather than two half-described ones.
+ */
+function sameAsFragment(settings: SiteSettings): string[] {
+  return [settings.social.instagram, settings.social.facebook, settings.social.google].filter(
+    (url): url is string => Boolean(url),
+  );
+}
+
 /**
  * Where APMG works, as structured data.
  *
@@ -37,15 +59,15 @@ type JsonLdValue = Record<string, unknown>;
  * AdministrativeArea per Queensland service region. Suburb-level coverage is
  * expressed by the pages themselves, which is what Google reads them for.
  */
-function areaServedFragment(): JsonLdValue[] {
-  const circle = site.coords
+function areaServedFragment(settings: SiteSettings): JsonLdValue[] {
+  const circle = settings.coords
     ? [
         {
           '@type': 'GeoCircle',
           geoMidpoint: {
             '@type': 'GeoCoordinates',
-            latitude: site.coords.latitude,
-            longitude: site.coords.longitude,
+            latitude: settings.coords.latitude,
+            longitude: settings.coords.longitude,
           },
           geoRadius: site.serviceArea.radiusKm * 1000,
         },
@@ -65,11 +87,11 @@ function areaServedFragment(): JsonLdValue[] {
 }
 
 /** Opening hours, only once APMG has confirmed them. */
-function openingHoursFragment(): JsonLdValue {
-  if (!site.openingHours) return {};
+function openingHoursFragment(settings: SiteSettings): JsonLdValue {
+  if (!settings.openingHours) return {};
 
   return {
-    openingHoursSpecification: site.openingHours.map((entry) => ({
+    openingHoursSpecification: settings.openingHours.map((entry) => ({
       '@type': 'OpeningHoursSpecification',
       dayOfWeek: entry.days,
       opens: entry.opens,
@@ -115,7 +137,10 @@ function offerCatalogFragment(services: readonly Service[]): JsonLdValue {
  * `#organization` id because that is what serviceSchema and projectSchema
  * reference as provider/author/publisher.
  */
-export function localBusinessSchema(services: readonly Service[]): JsonLdValue {
+export function localBusinessSchema(
+  services: readonly Service[],
+  settings: SiteSettings,
+): JsonLdValue {
   const knowsAbout = verifiedAccreditations.map((a) => a.label);
 
   return {
@@ -134,37 +159,31 @@ export function localBusinessSchema(services: readonly Service[]): JsonLdValue {
     image: `${siteUrl}${brandLogoPath}`,
     foundingDate: String(site.founded),
     // Country-coded per Google's LocalBusiness guidance; prose keeps the
-    // local display format.
-    telephone: site.phone.international,
-    email: site.email,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: site.address.street,
-      addressLocality: site.address.suburb,
-      addressRegion: site.address.state,
-      postalCode: site.address.postcode,
-      addressCountry: site.address.country,
-    },
-    ...(site.coords
+    // local display format. Derived from the editable display number so the
+    // two cannot disagree.
+    telephone: internationalPhone(settings.phone),
+    email: settings.email,
+    address: postalAddress(settings),
+    ...(settings.coords
       ? {
           geo: {
             '@type': 'GeoCoordinates',
-            latitude: site.coords.latitude,
-            longitude: site.coords.longitude,
+            latitude: settings.coords.latitude,
+            longitude: settings.coords.longitude,
           },
         }
       : {}),
-    areaServed: areaServedFragment(),
+    areaServed: areaServedFragment(settings),
     // The Google Business Profile is the entity link that matters most for the
     // map pack. Resolved from the review widget on the live site.
-    sameAs: [site.social.instagram, site.social.facebook, site.social.google].filter(Boolean),
+    sameAs: sameAsFragment(settings),
     // The description states the same footprint areaServed declares — it
     // used to say Melbourne only while areaServed listed three Queensland
     // regions, a contradiction inside a single node.
-    description: `${site.name} is a commercial painting contractor based in ${site.address.suburb}, serving metropolitan Melbourne and South East Queensland.`,
+    description: `${site.name} is a commercial painting contractor based in ${settings.address.suburb}, serving metropolitan Melbourne and South East Queensland.`,
     ...(knowsAbout.length > 0 ? { knowsAbout } : {}),
     ...offerCatalogFragment(services),
-    ...openingHoursFragment(),
+    ...openingHoursFragment(settings),
     // Spreads to nothing while content/reviews.ts holds no first-party entries.
     // priceRange stays absent until APMG supplies a defensible band.
     ...aggregateRatingFragment(),
@@ -219,6 +238,8 @@ export function serviceSchema(args: {
   name: string;
   description: string;
   path: string;
+  /** Needed for `areaServed`, which must match the business node exactly. */
+  settings: SiteSettings;
 }): JsonLdValue {
   return {
     '@context': 'https://schema.org',
@@ -230,7 +251,7 @@ export function serviceSchema(args: {
     // Same three-level area as the business itself. A service page that claims
     // a narrower area than the business does is a contradiction Google has to
     // resolve, and it resolves it against you.
-    areaServed: areaServedFragment(),
+    areaServed: areaServedFragment(args.settings),
     url: `${siteUrl}${args.path}`,
   };
 }
@@ -293,6 +314,3 @@ export function faqSchema(items: readonly { question: string; answer: string }[]
     })),
   };
 }
-
-/** Address string reused by components that display rather than mark up. */
-export { formattedAddress };

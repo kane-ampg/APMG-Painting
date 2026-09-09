@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ButtonLink, Container, Section } from '@/components/ui';
-import { site } from '@/lib/site';
+import { phoneHref } from '@/lib/site';
+import { getSiteSettings } from '@/lib/content/source';
 
 // Without its own title this page inherits the layout default — the site's
 // money-keyword title on an HTTP 404. The template appends the brand.
@@ -19,7 +20,8 @@ export const metadata: Metadata = {
  * never be dropped from the index. This returns a real 404 and offers a route
  * onward rather than a dead end.
  */
-export default function NotFound() {
+export default async function NotFound() {
+  const settings = await getSiteSettings();
   const destinations = [
     {
       label: 'Commercial painting',
@@ -63,8 +65,11 @@ export default function NotFound() {
 
         <div className="mt-8 flex flex-wrap items-center gap-4">
           <ButtonLink href="/">Back to the homepage</ButtonLink>
-          <a href={site.phone.href} className="font-semibold text-brand-700 hover:underline">
-            Or call {site.phone.display}
+          <a
+            href={phoneHref(settings.phone)}
+            className="font-semibold text-brand-700 hover:underline"
+          >
+            Or call {settings.phone}
           </a>
         </div>
       </Container>

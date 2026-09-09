@@ -3,7 +3,8 @@ import { buildMetadata } from '@/lib/seo/metadata';
 import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import { ContentBlock, CtaBand, Hero } from '@/components/sections';
 import { Container, Prose, Section, SectionHeading } from '@/components/ui';
-import { accreditations, directionsUrl, formattedAddress, site } from '@/lib/site';
+import { accreditations, directionsUrl, formatAddress, site } from '@/lib/site';
+import { getSiteSettings } from '@/lib/content/source';
 
 export const metadata: Metadata = buildMetadata({
   title: 'About APMG Painting | Melbourne Painting Contractor',
@@ -12,13 +13,15 @@ export const metadata: Metadata = buildMetadata({
   path: '/about-us/',
 });
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const settings = await getSiteSettings();
+
   return (
     <>
       <Hero
         eyebrow="About"
         heading="A painting contractor built around how sites actually run"
-        lede={`Founded in ${site.founded} and based in ${site.address.suburb}, APMG Painting works across commercial and industrial projects throughout metropolitan Melbourne.`}
+        lede={`Founded in ${site.founded} and based in ${settings.address.suburb}, APMG Painting works across commercial and industrial projects throughout metropolitan Melbourne.`}
         primaryCta={{ label: 'See our projects', href: '/projects/' }}
         secondaryCta={{ label: 'Get in touch', href: '/contact-us/' }}
         image={{
@@ -82,9 +85,9 @@ export default function AboutPage() {
       <ContentBlock heading="Where we are">
         <Prose>
           <p>
-            {formattedAddress}. We work across metropolitan Melbourne from there —{' '}
+            {formatAddress(settings.address)}. We work across metropolitan Melbourne from there —{' '}
             <a
-              href={directionsUrl}
+              href={directionsUrl(settings.address)}
               target="_blank"
               rel="noopener noreferrer"
               className="font-semibold text-brand-700 hover:underline"
@@ -95,7 +98,7 @@ export default function AboutPage() {
           </p>
           {/* Omitted while unsupplied, like the footer legal line — an
               internal to-do is not visitor copy. */}
-          {site.abn && <p>ABN {site.abn}.</p>}
+          {settings.abn && <p>ABN {settings.abn}.</p>}
         </Prose>
       </ContentBlock>
 
@@ -103,6 +106,7 @@ export default function AboutPage() {
         heading="Work with us"
         body="Every enquiry starts the same way — tell us what needs painting, where it is, and when we are allowed on site."
         cta={{ label: 'Get in touch', href: '/contact-us/' }}
+        phone={settings.phone}
       />
     </>
   );
