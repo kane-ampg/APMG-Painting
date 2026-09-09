@@ -130,14 +130,13 @@ From that we produce a per-URL recommendation — keep, consolidate, redirect or
 
 ## 7. Go-live configuration
 
-For whoever deploys the site. Two environment variables, and the site is indexable.
+For whoever deploys the site. One environment variable, and the site is indexable.
 
 ```
 NEXT_PUBLIC_SITE_URL="https://apmgpainting.com.au"
-NEXT_PUBLIC_SANDBOX="false"
 ```
 
-Until `NEXT_PUBLIC_SANDBOX` is `false`, every page is marked `noindex` and robots.txt blocks all crawling. This is intentional — a preview build must never be indexed alongside the live site — but it does mean **nothing can rank until it is flipped**.
+The sandbox lockdown that used to mark every page `noindex` has been released. It now applies to one deployment only — the editor at `edit.apmgpainting.com.au`, which serves the admin and must never be indexed beside the live site. The build fails rather than falling back to a localhost origin, so a missing `NEXT_PUBLIC_SITE_URL` cannot ship silently.
 
 Also needed at go-live:
 

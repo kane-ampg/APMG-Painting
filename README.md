@@ -18,13 +18,12 @@ pretend, the app ships a transport adapter whose default implementation delivers
 so. Submit a form and you get: _"Your details passed validation — but were not sent."_ See
 [Enquiry delivery](#enquiry-delivery).
 
-**2. The whole site is `noindex`.** `NEXT_PUBLIC_SANDBOX` defaults to `true`, which forces a
-`noindex, nofollow` robots directive on every page, an `X-Robots-Tag` response header, and a
-`Disallow: /` robots.txt. A preview must never be crawled alongside the live site. This is flipped
-at go-live, not before.
-
-There is also an orange banner across the top of every page saying the same thing. It is removed by
-setting `NEXT_PUBLIC_SANDBOX="false"`.
+**2. The editor deployment is `noindex`, the public site is not.** The sandbox lockdown was
+released at go-live. It survives on one deployment only: with `NEXT_PUBLIC_APP_ROLE="editor"`,
+`noindexAll` in `lib/site.ts` forces all four layers back on — a `noindex, nofollow` robots
+directive on every page, an `X-Robots-Tag` response header, a `Disallow: /` robots.txt and a 404
+on `/llms.txt`. The editor serves only `/admin/*` and must never be indexed beside the live site,
+so that is keyed to the build-time role rather than to a flag an operator can switch off.
 
 ---
 
@@ -247,7 +246,8 @@ URLs.
 3. Business facts and accreditation certificates from APMG.
 4. Enquiry delivery configuration.
 5. Lighthouse and axe baselines captured against the live site, so "after" numbers mean something.
-6. `NEXT_PUBLIC_SANDBOX="false"` and `NEXT_PUBLIC_SITE_URL` set to the real origin.
+6. `NEXT_PUBLIC_SITE_URL` set to the real origin. The build fails rather than shipping localhost
+   canonicals without it.
 
 ### CMS go-live
 
@@ -264,7 +264,6 @@ Nothing in the repository applies the migration or provisions the Supabase proje
    | ------------------------------- | ---------------------------------- | --------------------------------------------- |
    | `NEXT_PUBLIC_APP_ROLE`          | `site`                             | `editor`                                      |
    | `NEXT_PUBLIC_SITE_URL`          | `https://apmgpainting.com.au`      | same (canonical, not the editor's own origin) |
-   | `NEXT_PUBLIC_SANDBOX`           | `false` at go-live                 | leave `true` — never indexable                |
    | `NEXT_PUBLIC_SUPABASE_URL`      | required                           | required                                      |
    | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | required                           | required                                      |
    | `REVALIDATE_SECRET`             | required, identical both sides     | required, identical both sides                |

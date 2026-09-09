@@ -37,7 +37,11 @@ test.describe('current page marking', () => {
     const nav = mainNav(page);
 
     // Commercial is styled as the section but must not claim to be the page.
-    await expect(nav.locator('[aria-current="page"]')).toHaveCount(0);
+    // `:visible`, because the dropdown panel is always in the DOM and only
+    // `hidden` when closed — deliberately, so the second level is in the
+    // server HTML for crawlers. A display:none subtree is out of the
+    // accessibility tree, so nothing announces itself as the page here.
+    await expect(nav.locator('[aria-current="page"]:visible')).toHaveCount(0);
 
     await nav.getByRole('button', { name: /^Commercial/ }).click();
     await expect(nav.locator('[aria-current="page"]')).toHaveText(/Office painting/);
