@@ -9,6 +9,12 @@ describe('media processing', () => {
     );
   });
 
+  it('sanitises a non-alphanumeric extension instead of smuggling a path', () => {
+    const result = objectName('abcdef0123', 'x.png/../evil', 'work');
+    expect(result).toBe('work/abcdef-x-png.bin');
+    expect(result.split('/')).toHaveLength(2);
+  });
+
   it('reads dimensions and produces a small blur data URI', async () => {
     const png = await sharp({
       create: { width: 640, height: 360, channels: 3, background: '#336699' },
