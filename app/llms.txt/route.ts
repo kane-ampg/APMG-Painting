@@ -2,7 +2,7 @@ import { accreditations, formattedAddress, site, siteUrl } from '@/lib/site';
 import { googleAggregate, googleReviews } from '@/content/reviews';
 import { servicePath } from '@/content/services';
 import { sectors } from '@/content/sectors';
-import { getProjects, getServices } from '@/lib/content/source';
+import { getPosts, getProjects, getServices } from '@/lib/content/source';
 import { homeFaqs } from '@/content/faqs';
 import { differentiators } from '@/content/approach';
 import {
@@ -30,7 +30,7 @@ import {
 export const dynamic = 'force-static';
 
 export async function GET(): Promise<Response> {
-  const [services, projects] = await Promise.all([getServices(), getProjects()]);
+  const [services, projects, posts] = await Promise.all([getServices(), getProjects(), getPosts()]);
   const verified = accreditations.filter((a) => a.verified);
 
   /*
@@ -80,6 +80,14 @@ ${sectors.map((s) => `- [${s.shortTitle}](${siteUrl}${s.legacyPath}): ${s.intro}
 ## Documented projects
 
 ${projects.map((p) => `- [${p.title}](${siteUrl}/projects/${p.slug}/): ${p.location}. ${p.challenge}`).join('\n')}
+
+## Notes
+
+${
+  posts.length > 0
+    ? posts.map((p) => `- [${p.title}](${siteUrl}/blog/${p.slug}/): ${p.excerpt}`).join('\n')
+    : 'Nothing published yet.'
+}
 
 ## Regions served
 

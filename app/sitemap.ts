@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { siteUrl } from '@/lib/site';
 import { sectors } from '@/content/sectors';
 import { sectorHasDocumentedProject } from '@/content/projects';
-import { getProjects } from '@/lib/content/source';
+import { getPosts, getProjects } from '@/lib/content/source';
 import { indexableLocalities, REGIONS, stateSlug } from '@/lib/locations';
 
 /**
@@ -16,7 +16,7 @@ import { indexableLocalities, REGIONS, stateSlug } from '@/lib/locations';
  * contradictory instructions.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const projects = await getProjects();
+  const [projects, posts] = await Promise.all([getProjects(), getPosts()]);
   const staticPaths: { path: string; priority: number }[] = [
     { path: '/', priority: 1 },
     { path: '/commercial/', priority: 0.9 },
@@ -34,6 +34,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/areas/', priority: 0.8 },
     { path: '/areas/victoria/', priority: 0.7 },
     { path: '/areas/queensland/', priority: 0.7 },
+    { path: '/blog/', priority: 0.6 },
   ];
 
   /*
@@ -96,6 +97,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${siteUrl}${location.href}`,
       changeFrequency: 'monthly' as const,
       priority: 0.8,
+    })),
+    // Posts carry a real lastmod: a post that has never been edited keeps its
+    // publish date, and an edited one recrawls from the date it actually
+    // changed rather than from the build's timestamp.
+    ...posts.map((post) => ({
+      url: `${siteUrl}/blog/${post.slug}/`,
+      lastModified: new Date(post.updatedAt ?? post.publishedAt),
+      changeFrequency: 'monthly' as const,
+      priority: 0.5,
     })),
   ];
 }

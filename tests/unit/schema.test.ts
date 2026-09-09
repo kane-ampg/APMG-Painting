@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { breadcrumbSchema, localBusinessSchema, projectSchema, serviceSchema } from '@/lib/schema';
+import {
+  blogPostingSchema,
+  breadcrumbSchema,
+  localBusinessSchema,
+  projectSchema,
+  serviceSchema,
+} from '@/lib/schema';
 import { getProject } from '@/content/projects';
 import { qldPresence } from '@/content/locations.overrides';
 import { site } from '@/lib/site';
@@ -149,5 +155,33 @@ describe('areaServed after the VIC + QLD expansion', () => {
   it('omits GeoCircle until APMG confirms the base coordinates', () => {
     expect(site.coords).toBeNull();
     expect(areas.some((a) => a['@type'] === 'GeoCircle')).toBe(false);
+  });
+});
+
+describe('blog posting schema', () => {
+  const post = {
+    slug: 'sequencing-an-occupied-office',
+    title: 'Sequencing a repaint in an occupied office',
+    excerpt: 'How zones are handed back.',
+    body: '# Heading\n\nText.',
+    publishedAt: '2026-09-01',
+    updatedAt: '2026-09-08',
+    author: 'APMG Painting',
+    tags: ['office'],
+    metaTitle: 'Sequencing an occupied office repaint | APMG Painting',
+    metaDescription: 'How zones are handed back.',
+  };
+
+  it('is a BlogPosting authored by the organisation with both dates', () => {
+    const data = blogPostingSchema(post);
+    expect(data['@type']).toBe('BlogPosting');
+    expect(data.datePublished).toBe('2026-09-01');
+    expect(data.dateModified).toBe('2026-09-08');
+    expect(JSON.stringify(data.author)).toContain('#organization');
+    expect(String(data.url)).toMatch(/\/blog\/sequencing-an-occupied-office\/$/);
+  });
+
+  it('never emits an aggregateRating', () => {
+    expect(JSON.stringify(blogPostingSchema(post))).not.toMatch(/aggregateRating/);
   });
 });

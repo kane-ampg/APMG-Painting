@@ -1,10 +1,11 @@
 import { notFound } from 'next/navigation';
+import { PostArticle } from '@/components/pages/post-article';
 import { ProjectArticle } from '@/components/pages/project-article';
 import { requireAdmin } from '@/lib/auth/admin';
 import { isCollection } from '@/lib/content/schemas';
 import { getEntryForPreview, getService } from '@/lib/content/source';
 import { getSector } from '@/content/sectors';
-import type { Project } from '@/lib/content/types';
+import type { Post, Project } from '@/lib/content/types';
 
 type Props = { params: Promise<{ collection: string; slug: string }> };
 
@@ -41,7 +42,15 @@ export default async function PreviewPage({ params }: Props) {
     );
   }
 
-  // Task 11 replaces this with PostArticle for the posts collection.
+  if (collection === 'posts') {
+    return (
+      <>
+        {banner}
+        <PostArticle post={entry.data as Post} />
+      </>
+    );
+  }
+
   return (
     <>
       {banner}
