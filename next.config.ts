@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import { appRole } from './lib/app-role';
 import { supabaseHostname } from './lib/supabase/env';
 
 /**
@@ -9,6 +10,11 @@ import { supabaseHostname } from './lib/supabase/env';
  */
 
 const supabaseHost = supabaseHostname();
+
+// Which deployment this build is (spec §8a). Read once at build time so the
+// role-based redirects below cost the public site nothing at request time.
+const role = appRole();
+const editorOrigin = process.env.EDITOR_ORIGIN ?? '';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -69,6 +75,31 @@ const nextConfig: NextConfig = {
       },
       // No other route renames. /about-us/ and /contact-us/ keep their URLs —
       // they are indexed and a rebuild is not a reason to move them.
+      ...(role === 'editor'
+        ? [
+            // The editor deployment serves nothing public. Every other path
+            // lands on the admin.
+            { source: '/', destination: '/admin/', permanent: false },
+            {
+              source:
+                '/:path((?!admin|api|_next|favicon\\.ico|icon\\.png|apple-icon\\.png|images).*)',
+              destination: '/admin/',
+              permanent: false,
+            },
+          ]
+        : editorOrigin
+          ? [
+              // The public site sends anyone who types /admin to the editor.
+              {
+                source: '/admin/:path*',
+                destination: `${editorOrigin}/admin/:path*`,
+                permanent: false,
+              },
+            ]
+          : [
+              // No editor configured yet: /admin does not exist on the site.
+              { source: '/admin/:path*', destination: '/', permanent: false },
+            ]),
     ];
   },
 };

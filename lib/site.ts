@@ -425,5 +425,12 @@ export const siteUrl =
   ) ??
   'http://localhost:3000';
 
-/** Sandbox guard — defaults to ON so the mock-up cannot be indexed. */
-export const isSandbox = process.env.NEXT_PUBLIC_SANDBOX !== 'false';
+/**
+ * Sandbox guard — defaults to ON so the mock-up cannot be indexed.
+ *
+ * The editor deployment (spec §8a) is ORed in here so an operator cannot
+ * accidentally switch it off there: the editor serves only `/admin/*` and
+ * must never be indexable, regardless of `NEXT_PUBLIC_SANDBOX`.
+ */
+export const isSandbox =
+  process.env.NEXT_PUBLIC_SANDBOX !== 'false' || process.env.NEXT_PUBLIC_APP_ROLE === 'editor';

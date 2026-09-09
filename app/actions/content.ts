@@ -10,6 +10,7 @@ import {
   slugSchema,
 } from '@/lib/content/schemas';
 import { contentTag } from '@/lib/content/tags';
+import { notifyPublicSite } from '@/lib/revalidate/notify';
 import { createServerSupabase } from '@/lib/supabase/server';
 
 export type SaveState = {
@@ -140,16 +141,27 @@ export async function saveEntry(_prev: SaveState, formData: FormData): Promise<S
     // details and all live in the root layout, so a settings change has to
     // expire every page, not just the ones that name the address in prose.
     if (collection === 'settings') revalidatePath('/', 'layout');
-    for (const path of pathsFor(collection, slug)) revalidatePath(path);
+    const paths = [...pathsFor(collection, slug)];
     if (isRename) {
       // The old slug's page (and anything else keyed off it) must come down
       // too, or the rename leaves a stranded copy live.
-      for (const path of pathsFor(collection, originalSlug as string)) revalidatePath(path);
+      paths.push(...pathsFor(collection, originalSlug as string));
     }
-    revalidatePath('/sitemap.xml');
-    revalidatePath('/llms.txt');
+    paths.push('/sitemap.xml', '/llms.txt');
+    for (const path of paths) revalidatePath(path);
+
+    // The editor deployment has no local cache to speak of — its readers are
+    // the site's, not the editor's — so tell the public site what to expire
+    // too. On the site role this is a no-op; updateTag already ran above.
+    const remote = await notifyPublicSite({
+      tags: [contentTag(collection)],
+      paths: collection === 'settings' ? [...paths, '/'] : paths,
+    });
+    revalidatePath(`/admin/${collection}/`);
+    if (!remote.ok) return { status: 'error', message: remote.message };
+  } else {
+    revalidatePath(`/admin/${collection}/`);
   }
-  revalidatePath(`/admin/${collection}/`);
 
   return {
     status: 'ok',
@@ -168,8 +180,10 @@ export async function deleteEntry(collection: string, slug: string): Promise<voi
   const { error } = await supabase.from('content_entries').delete().match({ collection, slug });
   if (error) throw new Error(error.message);
   updateTag(contentTag(collection));
-  for (const path of pathsFor(collection, slug)) revalidatePath(path);
-  revalidatePath('/sitemap.xml');
-  revalidatePath('/llms.txt');
+  const paths = [...pathsFor(collection, slug), '/sitemap.xml', '/llms.txt'];
+  for (const path of paths) revalidatePath(path);
+
+  const remote = await notifyPublicSite({ tags: [contentTag(collection)], paths });
   revalidatePath(`/admin/${collection}/`);
+  if (!remote.ok) throw new Error(remote.message);
 }
