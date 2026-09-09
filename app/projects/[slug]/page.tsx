@@ -1,20 +1,10 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { buildMetadata, metaDescription } from '@/lib/seo/metadata';
 import { site } from '@/lib/site';
-import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
-import { CmsImage } from '@/components/media/cms-image';
-import { CtaBand, RelatedLinks, TestimonialBlock } from '@/components/sections';
-import { Container, mediaZoom, Placeholder, Section, SectionHeading } from '@/components/ui';
-import { JsonLd } from '@/components/seo/json-ld';
-import { projectSchema } from '@/lib/schema';
+import { ProjectArticle } from '@/components/pages/project-article';
 import { getProject, getProjects, getService } from '@/lib/content/source';
 import { getSector } from '@/content/sectors';
-import { servicePath } from '@/content/services';
-import { displayName, getLocalityByHref, hrefForVicSlug } from '@/lib/locations';
-import { isPlaceholder } from '@/lib/content/types';
-import type { Service } from '@/lib/content/types';
 
 export async function generateStaticParams() {
   return (await getProjects()).map((project) => ({ slug: project.slug }));
@@ -43,234 +33,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-/**
- * `relatedLocationSlugs` predates the two-state dataset and stores bare,
- * un-prefixed slugs. Every documented APMG project is Victorian, so Victoria
- * is the only correct scope for resolving one — see `hrefForVicSlug`.
- */
-function vicLocality(slug: string) {
-  const href = hrefForVicSlug(slug);
-  return href ? getLocalityByHref(href) : undefined;
-}
-
-/**
- * Service chips used to hard-code href '/commercial/', which rendered several
- * same-page links to one URL under mismatched anchors — including an "Office"
- * chip pointing at /commercial/ while /office-painters/ exists. servicePath()
- * is the shared mapping to each service's real page, and services that share
- * a page collapse into one chip so the sidebar never repeats a destination.
- */
-const SERVICE_PAGE_LABELS: Record<string, string> = {
-  '/office-painters/': 'Office painting',
-  '/trade-services/': 'Trade services',
-  '/commercial/': 'Commercial painting',
-};
-
-function relatedServiceLinks(services: readonly Service[]) {
-  const seen = new Set<string>();
-  return services
-    .map((service) => {
-      const href = servicePath(service.slug);
-      return { label: SERVICE_PAGE_LABELS[href] ?? service.shortTitle, href };
-    })
-    .filter((link) => (seen.has(link.href) ? false : (seen.add(link.href), true)));
-}
-
-function DetailList({ heading, items }: { heading: string; items?: readonly string[] }) {
-  if (!items || items.length === 0) return null;
-  return (
-    <div>
-      <h2 className="mb-3 font-display text-xl tracking-tight">{heading}</h2>
-      <ul className="flex flex-col gap-2 text-ink-soft">
-        {items.map((item) => (
-          <li key={item} className="flex gap-3">
-            <span aria-hidden="true" className="mt-2 h-1 w-1 shrink-0 rounded-full bg-brand-600" />
-            <span>{item}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 export default async function ProjectPage({ params }: Props) {
   const { slug } = await params;
   const project = await getProject(slug);
   if (!project) notFound();
 
   const sector = getSector(project.sectorSlug);
-  const cover = project.images[0];
-  const gallery = project.images.slice(1);
   const relatedServices = (
     await Promise.all(project.relatedServiceSlugs.map((serviceSlug) => getService(serviceSlug)))
   ).filter((service) => service !== undefined);
 
-  return (
-    <>
-      <JsonLd data={projectSchema(project)} />
-
-      <Section tone="sunken" className="py-10">
-        <Container width="wide">
-          <Breadcrumbs
-            crumbs={[
-              { name: 'Projects', path: '/projects/' },
-              { name: project.title, path: `/projects/${project.slug}/` },
-            ]}
-          />
-          <p className="mb-3 text-xs font-semibold uppercase tracking-label text-brand-600">
-            {project.location}
-          </p>
-          <h1 className="max-w-4xl font-display text-4xl leading-tight tracking-tight sm:text-5xl">
-            {project.title}
-          </h1>
-        </Container>
-      </Section>
-
-      {cover && (
-        <div className="group relative aspect-[16/9] w-full overflow-hidden bg-paper-sunken sm:aspect-[21/9]">
-          <CmsImage
-            image={cover}
-            fill
-            priority
-            sizes="100vw"
-            className={`object-cover ${mediaZoom}`}
-          />
-        </div>
-      )}
-
-      <Section tone="paper">
-        <Container>
-          <div className="grid gap-12 lg:grid-cols-[1fr_17rem]">
-            <div className="flex flex-col gap-10">
-              <div>
-                <h2 className="mb-3 font-display text-xl tracking-tight">The challenge</h2>
-                <p className="max-w-prose text-ink-soft">{project.challenge}</p>
-              </div>
-
-              {project.initialCondition && (
-                <div>
-                  <h2 className="mb-3 font-display text-xl tracking-tight">Initial condition</h2>
-                  <p className="max-w-prose text-ink-soft">{project.initialCondition}</p>
-                </div>
-              )}
-
-              <DetailList heading="Scope of work" items={project.scopeOfWork} />
-              <DetailList heading="Preparation" items={project.preparation} />
-
-              {project.coatingSystem && (
-                <div>
-                  <h2 className="mb-3 font-display text-xl tracking-tight">Coating system</h2>
-                  <p className="max-w-prose text-ink-soft">{project.coatingSystem}</p>
-                </div>
-              )}
-
-              <DetailList heading="Access and safety" items={project.accessAndSafety} />
-              <DetailList heading="Site constraints" items={project.schedulingConstraints} />
-              <DetailList heading="Outcome" items={project.outcome} />
-
-              {project.testimonial &&
-                (isPlaceholder(project.testimonial) ? (
-                  <Placeholder note={project.testimonial.note} />
-                ) : (
-                  <TestimonialBlock
-                    quote={project.testimonial.quote}
-                    attribution={project.testimonial.attribution}
-                    organisation={project.testimonial.organisation}
-                  />
-                ))}
-            </div>
-
-            <aside className="flex flex-col gap-6 lg:border-l lg:border-paper-edge lg:pl-8">
-              <div>
-                <h2 className="mb-4 text-xs font-semibold uppercase tracking-label text-ink-muted">
-                  Project summary
-                </h2>
-                <dl className="flex flex-col gap-3 text-sm">
-                  <div>
-                    <dt className="text-ink-muted">Client or property</dt>
-                    <dd className="font-medium">{project.clientOrPropertyType}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-ink-muted">Location</dt>
-                    <dd className="font-medium">{project.location}</dd>
-                  </div>
-                  {sector && (
-                    <div>
-                      <dt className="text-ink-muted">Sector</dt>
-                      {/* A link, not a label: sector pages link their case
-                          studies via ProjectGrid, and without this the
-                          relationship was one-way. */}
-                      <dd className="font-medium">
-                        <Link
-                          href={sector.legacyPath}
-                          className="text-brand-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
-                        >
-                          {sector.shortTitle}
-                        </Link>
-                      </dd>
-                    </div>
-                  )}
-                  <div>
-                    <dt className="text-ink-muted">Duration</dt>
-                    <dd className="font-medium">
-                      {project.duration && isPlaceholder(project.duration) ? (
-                        <span className="font-normal text-ink-muted">Not recorded</span>
-                      ) : (
-                        String(project.duration ?? 'Not recorded')
-                      )}
-                    </dd>
-                  </div>
-                </dl>
-              </div>
-
-              <RelatedLinks
-                heading="Related services"
-                links={relatedServiceLinks(relatedServices)}
-              />
-
-              <RelatedLinks
-                heading="Nearby"
-                links={project.relatedLocationSlugs
-                  .map((locationSlug) => vicLocality(locationSlug))
-                  .filter((location) => location !== undefined)
-                  .map((location) => ({
-                    label: displayName(location.name),
-                    href: location.href,
-                  }))}
-              />
-            </aside>
-          </div>
-        </Container>
-      </Section>
-
-      {gallery.length > 0 && (
-        <Section tone="sunken">
-          <Container>
-            <SectionHeading className="mb-6">Gallery</SectionHeading>
-            <ul className="grid gap-4 sm:grid-cols-2">
-              {gallery.map((image) => (
-                <li
-                  key={image.src}
-                  className="group relative aspect-[4/3] overflow-hidden rounded-lg"
-                >
-                  <CmsImage
-                    image={image}
-                    fill
-                    sizes="(min-width: 640px) 45vw, 100vw"
-                    className={`object-cover ${mediaZoom}`}
-                  />
-                </li>
-              ))}
-            </ul>
-          </Container>
-        </Section>
-      )}
-
-      <CtaBand
-        heading="Similar site, similar constraints?"
-        body="Tell us what needs painting and when we are allowed on site."
-        cta={{ label: 'Request a site assessment', href: '/contact-us/#commercial' }}
-      />
-    </>
-  );
+  return <ProjectArticle project={project} sector={sector} relatedServices={relatedServices} />;
 }
