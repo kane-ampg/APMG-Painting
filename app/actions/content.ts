@@ -155,7 +155,12 @@ export async function saveEntry(_prev: SaveState, formData: FormData): Promise<S
     // too. On the site role this is a no-op; updateTag already ran above.
     const remote = await notifyPublicSite({
       tags: [contentTag(collection)],
-      paths: collection === 'settings' ? [...paths, '/'] : paths,
+      paths,
+      // The remote endpoint has to be told the depth as well as the path:
+      // `revalidatePath('/')` alone expires the homepage, not every page
+      // whose header and footer state the business details. Without this a
+      // settings publish was stale-while-revalidate on the live site.
+      ...(collection === 'settings' ? { layoutPaths: ['/'] } : {}),
     });
     revalidatePath(`/admin/${collection}/`);
     if (!remote.ok) return { status: 'error', message: remote.message };
@@ -183,6 +188,9 @@ export async function deleteEntry(collection: string, slug: string): Promise<voi
   const paths = [...pathsFor(collection, slug), '/sitemap.xml', '/llms.txt'];
   for (const path of paths) revalidatePath(path);
 
+  // No `layoutPaths` here: `isSingleton` above has already refused, so by
+  // this line TypeScript knows `collection` cannot be `settings` — the only
+  // collection whose content lives in a layout.
   const remote = await notifyPublicSite({ tags: [contentTag(collection)], paths });
   revalidatePath(`/admin/${collection}/`);
   if (!remote.ok) throw new Error(remote.message);

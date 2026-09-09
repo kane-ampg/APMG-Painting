@@ -10,6 +10,11 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 const TAG = /^content:[a-z]+$/;
 const PATH = /^\/(?!\.\.)[A-Za-z0-9\-._~/]*$/;
 
+/** A site-relative path and nothing else — no origin, no traversal. */
+function isSafePath(p: unknown): p is string {
+  return typeof p === 'string' && PATH.test(p) && !p.includes('..');
+}
+
 /**
  * Constant-time comparison so a wrong bearer cannot be brute-forced by
  * timing the response. Buffers of different lengths are rejected outright —
@@ -40,18 +45,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'invalid json' }, { status: 400 });
   }
 
-  const { tags: rawTags, paths: rawPaths } = body as { tags?: unknown; paths?: unknown };
+  const {
+    tags: rawTags,
+    paths: rawPaths,
+    layoutPaths: rawLayoutPaths,
+  } = body as { tags?: unknown; paths?: unknown; layoutPaths?: unknown };
   const tags = Array.isArray(rawTags)
     ? rawTags.filter((t): t is string => typeof t === 'string' && TAG.test(t))
     : [];
-  const paths = Array.isArray(rawPaths)
-    ? rawPaths.filter(
-        (p): p is string => typeof p === 'string' && PATH.test(p) && !p.includes('..'),
-      )
-    : [];
+  const paths = Array.isArray(rawPaths) ? rawPaths.filter(isSafePath) : [];
+  // Same validation, different depth. `revalidatePath(p, 'layout')` is the
+  // only thing that expires a page whose content lives in a layout, and the
+  // editor deployment cannot express it any other way from here.
+  const layoutPaths = Array.isArray(rawLayoutPaths) ? rawLayoutPaths.filter(isSafePath) : [];
 
   for (const tag of tags) revalidateTag(tag, 'max');
   for (const path of paths) revalidatePath(path);
+  for (const path of layoutPaths) revalidatePath(path, 'layout');
 
-  return NextResponse.json({ revalidated: { tags, paths } });
+  return NextResponse.json({ revalidated: { tags, paths, layoutPaths } });
 }

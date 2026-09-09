@@ -37,6 +37,30 @@ describe('notifyPublicSite', () => {
     );
   });
 
+  it('forwards layoutPaths so a settings publish expires every page', async () => {
+    vi.stubEnv('NEXT_PUBLIC_APP_ROLE', 'editor');
+    vi.stubEnv('PUBLIC_SITE_ORIGIN', 'https://apmgpainting.com.au');
+    vi.stubEnv('REVALIDATE_SECRET', 's3cret');
+    const fetchMock = vi.fn(async () => new Response('{}', { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+    const { notifyPublicSite } = await import('@/lib/revalidate/notify');
+    await notifyPublicSite({
+      tags: ['content:settings'],
+      paths: ['/contact-us/'],
+      layoutPaths: ['/'],
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://apmgpainting.com.au/api/revalidate',
+      expect.objectContaining({
+        body: JSON.stringify({
+          tags: ['content:settings'],
+          paths: ['/contact-us/'],
+          layoutPaths: ['/'],
+        }),
+      }),
+    );
+  });
+
   it('reports failure without throwing', async () => {
     vi.stubEnv('NEXT_PUBLIC_APP_ROLE', 'editor');
     vi.stubEnv('PUBLIC_SITE_ORIGIN', 'https://apmgpainting.com.au');
