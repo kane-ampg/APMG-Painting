@@ -3,16 +3,19 @@
 import { revalidatePath } from 'next/cache';
 import { requireAdmin } from '@/lib/auth/admin';
 import { processImage } from '@/lib/media/process';
-import { toMediaRef, type MediaRow } from '@/lib/media/to-media-ref';
+import type { MediaRow } from '@/lib/media/to-media-ref';
 import { publicUrlFor } from '@/lib/media/url';
 import { createServerSupabase } from '@/lib/supabase/server';
 
-// Re-exported so existing callers (the media page, the test) can keep
-// importing the row type and the pure mapper from the actions module. The
-// mapper itself lives in lib/media/to-media-ref.ts because a "use server"
-// file's exports must all be async Server Functions.
+// The pure MediaRow -> MediaRef mapper lives in lib/media/to-media-ref.ts —
+// import it from there, never from this file. Next's
+// next-flight-server-reference-proxy-loader rewrites every export of a
+// "use server" module into a createServerReference(...) network-RPC proxy
+// when the module is referenced from a client bundle, so a client component
+// importing toMediaRef from here would get a Promise-returning proxy instead
+// of the mapper. Only the type is safe to re-export (types are erased before
+// that transform runs).
 export type { MediaRow };
-export { toMediaRef };
 
 export type MediaActionState = { status: 'idle' | 'ok' | 'error'; message?: string };
 

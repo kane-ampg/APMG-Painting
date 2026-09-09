@@ -36,7 +36,11 @@ function slugify(name: string): string {
 export function objectName(sha256Hex: string, originalName: string, folder: string): string {
   const dot = originalName.lastIndexOf('.');
   const base = dot > 0 ? originalName.slice(0, dot) : originalName;
-  const ext = dot > 0 ? originalName.slice(dot + 1).toLowerCase() : 'bin';
+  let ext = dot > 0 ? originalName.slice(dot + 1).toLowerCase() : 'bin';
+  // A name with a path segment after the last dot (e.g. "x.png/../evil")
+  // would otherwise smuggle a "/" into the extension. Anything that isn't
+  // plain alphanumerics falls back to a harmless "bin".
+  if (!/^[a-z0-9]+$/.test(ext)) ext = 'bin';
   return `${folder}/${sha256Hex.slice(0, 6)}-${slugify(base)}.${ext}`;
 }
 

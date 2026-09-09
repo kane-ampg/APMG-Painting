@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { toMediaRef } from '@/app/actions/media';
+import { toMediaRef } from '@/lib/media/to-media-ref';
 
 describe('toMediaRef', () => {
   it('maps a media row onto the MediaRef the pages consume', () => {
