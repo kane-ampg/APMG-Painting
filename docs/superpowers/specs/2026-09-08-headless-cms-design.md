@@ -121,8 +121,11 @@ served from a CDN edge with a one-year cache.
    result at the edge. `images.minimumCacheTTL` is set to one year because
    the source never changes under a URL. After the first visitor to a given
    size, every visitor gets an edge hit.
-5. **Hero images are `priority`** with an explicit `sizes`. Next emits a
-   `<link rel=preload>` with `fetchpriority=high` for them.
+5. **Hero images are `priority`** with an explicit `sizes`. `CmsImage` keeps
+   that prop name for callers but maps it to next/image's `preload` plus an
+   explicit `fetchPriority` — next/image's own `priority` prop is deprecated
+   in Next 16 and no longer sets fetch priority. Next emits a
+   `<link rel=preload>` and the image carries `fetchpriority=high`.
 
 **Alternative kept in reserve:** Supabase Image Transformations
 (`/storage/v1/render/image/...`, Pro plan) via a custom `next/image` loader.

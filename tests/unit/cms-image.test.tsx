@@ -35,6 +35,19 @@ describe('CmsImage', () => {
     expect(img.style.backgroundSize).toBe('cover');
   });
 
+  it('marks a priority image fetchpriority=high, and leaves the rest alone', () => {
+    // next/image's `priority` prop is deprecated in Next 16 and no longer
+    // emits `fetchpriority`, so the hero would have quietly lost its place
+    // at the front of the request queue. `preload` is what inserts the
+    // <link rel=preload>; this attribute is the other half.
+    const image = { src: '/images/work/x.webp', alt: 'A wall', width: 1600, height: 900 };
+    const { container: withPriority } = render(<CmsImage image={image} sizes="100vw" priority />);
+    expect(withPriority.querySelector('img')!.getAttribute('fetchpriority')).toBe('high');
+
+    const { container: without } = render(<CmsImage image={image} sizes="100vw" />);
+    expect(without.querySelector('img')!.getAttribute('fetchpriority')).toBeNull();
+  });
+
   it('falls back to fill layout when dimensions are unknown', () => {
     const { container } = render(
       <div style={{ position: 'relative', width: 100, height: 100 }}>
