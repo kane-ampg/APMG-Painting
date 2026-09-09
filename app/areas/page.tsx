@@ -16,12 +16,15 @@ import { getSiteSettings } from '@/lib/content/source';
  * representative subset pending real data — is gone, because the coverage is
  * no longer a subset.
  */
-export const metadata: Metadata = buildMetadata({
-  title: 'Areas We Service | Commercial Painters | APMG Painting',
-  description:
-    'APMG Painting works across metropolitan Melbourne from Bayswater North and services south-east Queensland. Every region and suburb, with the council notes that shape the work.',
-  path: '/areas/',
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+
+  return buildMetadata({
+    title: 'Areas We Service | Commercial Painters | APMG Painting',
+    description: `APMG Painting works across metropolitan Melbourne from ${settings.address.suburb} and services south-east Queensland. Every region and suburb, with the council notes that shape the work.`,
+    path: '/areas/',
+  });
+}
 
 const STATES: readonly {
   key: StateKey;

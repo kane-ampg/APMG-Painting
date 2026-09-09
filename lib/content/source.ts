@@ -148,16 +148,32 @@ export async function getEntryForPreview<C extends Collection>(
 // --- Singletons ------------------------------------------------------------
 
 /**
- * Always resolves: a missing or invalid row falls back to the code defaults.
+ * Always resolves — including when the read itself fails.
+ *
  * `parseRows` already drops an invalid row with a warning, so a half-saved
- * settings row can never take the phone number off the site.
+ * settings row cannot take the phone number off the site. `fetchPublished`
+ * throwing is the other half of that promise: a network blip or an RLS
+ * misconfiguration must not be able to fail a page render or, worse, a
+ * visitor's enquiry. These two catch and fall back where the project and
+ * service getters deliberately do not — a missing project should fail a
+ * build loudly, but the business's phone number always has an answer.
  */
 export async function getSiteSettings(): Promise<SiteSettings> {
-  const rows = await all('settings');
-  return rows[0] ?? defaultSiteSettings;
+  try {
+    const rows = await all('settings');
+    return rows[0] ?? defaultSiteSettings;
+  } catch (error) {
+    console.warn('[content] settings read failed, using defaults', error);
+    return defaultSiteSettings;
+  }
 }
 
 export async function getPage(slug: 'contact-us'): Promise<ContactPageCopy> {
-  const rows = await all('pages');
-  return rows.find((p) => p.slug === slug) ?? defaultContactPage;
+  try {
+    const rows = await all('pages');
+    return rows.find((p) => p.slug === slug) ?? defaultContactPage;
+  } catch (error) {
+    console.warn(`[content] page ${slug} read failed, using defaults`, error);
+    return defaultContactPage;
+  }
 }
