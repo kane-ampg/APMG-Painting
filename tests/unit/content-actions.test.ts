@@ -6,8 +6,10 @@ vi.mock('next/cache', () => ({ updateTag, revalidatePath }));
 vi.mock('@/lib/auth/admin', () => ({ requireAdmin: async () => ({ email: 'kaner@simple.biz' }) }));
 
 const upsert = vi.fn(async () => ({ error: null }));
+const match = vi.fn(async () => ({ error: null }));
+const update = vi.fn(() => ({ match }));
 vi.mock('@/lib/supabase/server', () => ({
-  createServerSupabase: async () => ({ from: () => ({ upsert }) }),
+  createServerSupabase: async () => ({ from: () => ({ upsert, update }) }),
 }));
 
 describe('saveEntry', () => {
@@ -66,5 +68,65 @@ describe('saveEntry', () => {
     const { saveEntry } = await import('@/app/actions/content');
     const result = await saveEntry({ status: 'idle' }, form({ collection: 'sectors' }));
     expect(result.status).toBe('error');
+  });
+
+  it('renames the row in place when the slug changes, keyed on originalSlug', async () => {
+    const { saveEntry } = await import('@/app/actions/content');
+    const fd = new FormData();
+    fd.set('collection', 'projects');
+    fd.set('status', 'published');
+    fd.set('previousStatus', 'published');
+    fd.set('originalSlug', 'interior-painting');
+    fd.set(
+      'data',
+      JSON.stringify({
+        slug: 'interior-repaints',
+        title: 'Interior repaints',
+        clientOrPropertyType: 'Office',
+        location: 'Melbourne',
+        sectorSlug: 'commercial-offices',
+        challenge: 'Repaint while the office stayed occupied.',
+        scopeOfWork: ['Walls and ceilings'],
+        images: [],
+        outcome: ['Repainted without disrupting staff.'],
+        relatedServiceSlugs: [],
+        relatedLocationSlugs: [],
+        isFeatured: false,
+      }),
+    );
+
+    const result = await saveEntry({ status: 'idle' }, fd);
+    expect(result.status).toBe('ok');
+    expect(upsert).not.toHaveBeenCalled();
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        slug: 'interior-repaints',
+        status: 'published',
+        updated_by: 'kaner@simple.biz',
+      }),
+    );
+    expect(match).toHaveBeenCalledWith({ collection: 'projects', slug: 'interior-painting' });
+    expect(revalidatePath).toHaveBeenCalledWith('/projects/interior-painting/');
+    expect(revalidatePath).toHaveBeenCalledWith('/projects/interior-repaints/');
+  });
+
+  it('expires the cache tag when a published entry is saved back as a draft', async () => {
+    const { saveEntry } = await import('@/app/actions/content');
+    const result = await saveEntry(
+      { status: 'idle' },
+      form({ status: 'draft', previousStatus: 'published' }),
+    );
+    expect(result.status).toBe('ok');
+    expect(updateTag).toHaveBeenCalledWith('content:services');
+  });
+
+  it('does not expire the cache tag when a draft is saved as a draft', async () => {
+    const { saveEntry } = await import('@/app/actions/content');
+    const result = await saveEntry(
+      { status: 'idle' },
+      form({ status: 'draft', previousStatus: 'draft' }),
+    );
+    expect(result.status).toBe('ok');
+    expect(updateTag).not.toHaveBeenCalled();
   });
 });

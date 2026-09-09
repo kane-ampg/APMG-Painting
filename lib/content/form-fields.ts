@@ -26,6 +26,10 @@ function unwrap(schema: z.ZodTypeAny): { inner: z.ZodTypeAny; optional: boolean 
 function kindOf(name: string, schema: z.ZodTypeAny): FieldKind {
   if (schema instanceof z.ZodBoolean) return 'boolean';
   if (schema instanceof z.ZodString) {
+    // `_def.checks` and each check's `{ kind, regex }` shape are Zod 3
+    // internals, not part of its public API. This must be revisited (Zod 4
+    // restructures string validations into a different internal format) if
+    // this project ever upgrades off Zod 3.
     const hasDateRegex = schema._def.checks.some(
       (c) => c.kind === 'regex' && c.regex.source.startsWith('^\\d{4}-\\d{2}-\\d{2}$'),
     );
