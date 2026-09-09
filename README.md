@@ -109,6 +109,31 @@ request time and the public site stays fully static. When the editor publishes, 
 public site's `/api/revalidate` with a shared `REVALIDATE_SECRET` so the change goes live there
 too — see `lib/revalidate/notify.ts` and `app/api/revalidate/route.ts`.
 
+### Content editing
+
+Editors sign in at `/admin/` with a magic link (`supabase.auth.signInWithOtp`) — no password. Who
+may edit is decided by the `admin_allowlist` table in Supabase, not by a role in code: an
+authenticated session is not enough on its own, the signed-in email must also be listed there.
+
+Projects, services and blog posts are edited in the CMS, along with two singletons — business
+details (`settings/site`: phone, email, address, hours, ABN, map coordinates, social links) and the
+contact page (`pages/contact-us`). Sectors, suburbs, FAQs, reviews and accreditations stay in
+`content/*.ts` on purpose — see
+[`docs/superpowers/specs/2026-09-08-headless-cms-design.md`](docs/superpowers/specs/2026-09-08-headless-cms-design.md#2-scope)
+§2 for why.
+
+Without `NEXT_PUBLIC_SUPABASE_URL` set, the site runs entirely from the TypeScript content files
+and `/admin/` is unavailable. To seed a fresh Supabase project from that same content:
+
+```bash
+node --env-file=.env.local scripts/seed-cms.mjs
+```
+
+**Images** go through the media library, not a file upload field on the entry. Each file is stored
+under a hashed, content-derived name with a one-year, immutable `Cache-Control`. Never edit an
+image in place — the hash would no longer match the bytes. Upload the replacement as a new file and
+swap it into the entry instead.
+
 ---
 
 ## Enquiry delivery

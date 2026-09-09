@@ -148,6 +148,33 @@ Also needed at go-live:
 
 ---
 
+## 8. Editing the site yourselves
+
+Once the site is live, Farbod and Zac will each receive a sign-in link by email — no password to
+remember, you click the link and you're in. The editor lives at a separate address to the site
+itself, planned as `edit.apmgpainting.com.au` (to be confirmed before go-live).
+
+**What you can change there:**
+
+- Project and service pages — the text and the photographs
+- Blog posts
+- The business details that appear across the site: phone, email, address, opening hours
+- The contact page wording
+
+Suburb pages, service sectors, FAQs and the Google reviews are not editable in the CMS — they
+stay in the code that runs the site, because changing them affects search rankings and legal
+correctness in ways a text box can't check for you. Ask us if one of these needs to change.
+
+**Alt text is not optional.** Every photograph you add needs a short written description of what
+is in it. This is not decoration — it is what Google reads, since a search engine cannot see a
+photograph. A project photo with no alt text is invisible to image search.
+
+**The AI buttons draft, they don't publish.** Several fields have a button that writes a suggested
+summary, page description or alt text for you. Read what it writes before you save it — it is a
+draft from a machine, not a fact, and you are the one publishing it under the APMG Painting name.
+
+---
+
 ## Summary — what unblocks what
 
 | We receive                                 | What switches on                                                                         |
