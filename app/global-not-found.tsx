@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Inter, Fraunces } from 'next/font/google';
 import Link from 'next/link';
 import './globals.css';
-import { site } from '@/lib/site';
+import { site, siteUrl } from '@/lib/site';
 
 /**
  * The 404 for a URL that matches no route at all.
@@ -38,6 +38,9 @@ const display = Fraunces({
 });
 
 export const metadata: Metadata = {
+  // This page sits above both root layouts, so it inherits nothing — any
+  // relative URL in its metadata has to have a base stated here.
+  metadataBase: new URL(siteUrl),
   title: `Page not found | ${site.name}`,
   robots: { index: false, follow: false },
 };
