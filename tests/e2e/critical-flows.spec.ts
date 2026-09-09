@@ -133,6 +133,17 @@ test.describe('landing page', () => {
       await expect(cards.nth(i).locator('p').first()).not.toBeEmpty();
     }
   });
+
+  test('has an Open Graph image', async ({ page }) => {
+    // `app/opengraph-image.tsx` lived at the app root, outside the
+    // `app/(site)/` route group the public pages moved into. That convention
+    // is per-segment, so it stopped applying to any public page — only
+    // Next's own `/_not-found` kept an og:image. Moving the file back under
+    // `app/(site)/` is what this test guards against regressing.
+    await page.goto('/');
+    const ogImage = page.locator('meta[property="og:image"]');
+    await expect(ogImage).toHaveAttribute('content', /.+/);
+  });
 });
 
 test.describe('projects', () => {
