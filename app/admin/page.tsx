@@ -2,13 +2,6 @@ import Link from 'next/link';
 import { requireAdmin } from '@/lib/auth/admin';
 import { collections } from '@/lib/content/schemas';
 
-// requireAdmin() reads the session cookie on every render, so this page can
-// never be static. Marking it explicitly also stops `next build` from
-// attempting to prerender it — which would otherwise fail the build in any
-// environment without Supabase configured, since `supabaseEnv()` throws
-// before Next can detect the dynamic cookie read.
-export const dynamic = 'force-dynamic';
-
 export default async function AdminHome() {
   const { email } = await requireAdmin();
   return (
