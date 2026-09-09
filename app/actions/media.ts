@@ -41,12 +41,16 @@ export async function uploadMedia(
   const file = formData.get('file');
   const folder = String(formData.get('folder') ?? 'work');
   const alt = String(formData.get('alt') ?? '').trim();
+  const describeLater = formData.get('describeLater') === 'on';
 
   if (!(file instanceof File) || file.size === 0)
     return { status: 'error', message: 'Choose an image.' };
   if (file.size > MAX_BYTES) return { status: 'error', message: 'Images must be under 15 MB.' };
   if (!FOLDERS.has(folder)) return { status: 'error', message: 'Unknown folder.' };
-  if (!alt)
+  // Alt text is required up front unless the editor opted to describe the
+  // image with AI after it is uploaded — "Describe with AI" needs a public
+  // URL, which does not exist until the upload completes.
+  if (!alt && !describeLater)
     return { status: 'error', message: 'Alt text is required. Use "Describe with AI" if stuck.' };
 
   // Read the upload once: the buffer is reused for both processing and storage.

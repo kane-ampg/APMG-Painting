@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { listMedia } from '@/app/actions/media';
+import { MediaAltEditor } from '@/components/admin/media-alt-editor';
 import { MediaUpload } from '@/components/admin/media-upload';
 import { requireAdmin } from '@/lib/auth/admin';
 
@@ -26,7 +27,7 @@ export default async function MediaLibraryPage() {
               className="aspect-[4/3] w-full rounded object-cover"
             />
             <p className="mt-2 break-all font-mono">{row.storage_path}</p>
-            <p className="mt-1 text-ink-soft">{row.alt || <em>No alt text</em>}</p>
+            <MediaAltEditor id={row.id} publicUrl={row.public_url} alt={row.alt} />
           </li>
         ))}
       </ul>
