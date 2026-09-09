@@ -136,6 +136,13 @@ under a hashed, content-derived name with a one-year, immutable `Cache-Control`.
 image in place — the hash would no longer match the bytes. Upload the replacement as a new file and
 swap it into the entry instead.
 
+**Alt text in the library is a default, not a live link.** An entry stores its own `alt` alongside
+each image, copied from the library row at the moment the image is picked. Editing alt text at
+`/admin/media/` therefore changes the library default — images already placed on a page keep their
+alt text until re-picked. To correct a page that is live, re-pick the image on that entry. This is
+deliberate for phase 1: propagating a library edit needs a reverse index from storage path to
+entry, plus a rule for entries whose alt text an editor overrode on purpose.
+
 ---
 
 ## Enquiry delivery
@@ -241,5 +248,50 @@ URLs.
 4. Enquiry delivery configuration.
 5. Lighthouse and axe baselines captured against the live site, so "after" numbers mean something.
 6. `NEXT_PUBLIC_SANDBOX="false"` and `NEXT_PUBLIC_SITE_URL` set to the real origin.
+
+### CMS go-live
+
+Nothing in the repository applies the migration or provisions the Supabase project. In order:
+
+1. **Apply the migration.** Run `supabase/migrations/0001_cms.sql` against the project — paste it
+   into the Supabase SQL editor, or `npx supabase db push` with the CLI linked. Nothing else
+   creates the tables, the RLS policies or the `media` storage bucket, and every step below
+   depends on them.
+2. **Set the environment variables, per role.** Both projects deploy from this repo and this
+   branch; they differ only in these values.
+
+   | Variable                        | Public site                        | Editor                                        |
+   | ------------------------------- | ---------------------------------- | --------------------------------------------- |
+   | `NEXT_PUBLIC_APP_ROLE`          | `site`                             | `editor`                                      |
+   | `NEXT_PUBLIC_SITE_URL`          | `https://apmgpainting.com.au`      | same (canonical, not the editor's own origin) |
+   | `NEXT_PUBLIC_SANDBOX`           | `false` at go-live                 | leave `true` — never indexable                |
+   | `NEXT_PUBLIC_SUPABASE_URL`      | required                           | required                                      |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | required                           | required                                      |
+   | `REVALIDATE_SECRET`             | required, identical both sides     | required, identical both sides                |
+   | `EDITOR_ORIGIN`                 | `https://edit.apmgpainting.com.au` | unused                                        |
+   | `PUBLIC_SITE_ORIGIN`            | unused                             | `https://apmgpainting.com.au`                 |
+   | `ANTHROPIC_API_KEY`             | unused                             | required for the AI buttons                   |
+   | `SUPABASE_SERVICE_ROLE_KEY`     | never set                          | never set (seed script only)                  |
+
+   Generate the secret with `openssl rand -hex 32`. Without Supabase env on the editor, `/admin`
+   answers 503 with a one-line explanation rather than looping.
+
+3. **Add the editors to `admin_allowlist`**, in lowercase. An authenticated session is not enough
+   on its own; the signed-in email must be listed there. Farbod's and Zac's addresses, plus
+   whoever maintains the site.
+4. **Configure Supabase Auth → URL Configuration → Redirect URLs.** Add the editor origin's
+   `https://edit.apmgpainting.com.au/admin/auth/callback/` and
+   `http://localhost:3000/admin/auth/callback/`. `sendMagicLink` derives the origin from the
+   request, so a link sent from the editor points at the editor — but Supabase refuses any
+   redirect target not on this list, and the sign-in silently fails without it.
+5. **Seed the content:** `node --env-file=.env.local scripts/seed-cms.mjs`. Idempotent, and the
+   only place `SUPABASE_SERVICE_ROLE_KEY` is ever used. Needs
+   `NEXT_PUBLIC_SUPABASE_ANON_KEY` too, for the public URLs it writes.
+6. **`npm run verify` with the keys present.** The build reads content, so verifying without them
+   only proves the fallback works.
+7. **Deploy both projects**, then run the checks in Task 13 step 9 of
+   [`docs/superpowers/plans/2026-09-08-headless-cms.md`](docs/superpowers/plans/2026-09-08-headless-cms.md):
+   sign in on the editor, publish a change, confirm it appears on the public site, and confirm
+   `/admin` on the public domain lands on the editor.
 
 Nothing in this repository guarantees any particular search ranking.

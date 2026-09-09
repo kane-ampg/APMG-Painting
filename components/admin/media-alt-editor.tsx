@@ -40,6 +40,10 @@ export function MediaAltEditor({ id, publicUrl, alt: initialAlt }: Props) {
         rows={2}
         className="w-full rounded border border-paper-edge px-2 py-1 text-xs"
       />
+      <p className="text-xs text-ink-soft">
+        Changes the library default. Images already placed on a page keep their alt text until
+        re-picked.
+      </p>
       {!alt.trim() && <p className="text-xs text-red-700">No alt text</p>}
       <div className="flex items-center gap-2">
         <AiButton

@@ -38,9 +38,9 @@
 | Blog index and posts                                                                                                   | `/admin/posts/`            | all fields, Markdown body, AI summary                            | 10, 11  |
 | Phone, email, address, move date, hours, ABN, socials, map pin (header, footer, contact, about, chat, structured data) | `/admin/settings/site/`    | see `SiteSettings`                                               | 12      |
 | Contact page heading, lede, form heading and intro, meta                                                               | `/admin/pages/contact-us/` | see `ContactPageCopy`                                            | 12      |
-| Every image's alt text                                                                                                 | `/admin/media/`            | `alt`, with "Describe with AI"                                   | 8, 10   |
+| Every image's alt text — the library default. Images already placed on a page keep their alt text until re-picked      | `/admin/media/`            | `alt`, with "Describe with AI"                                   | 8, 10   |
 
-Not editable in phase 1, by design: the section headings and intro paragraphs on the landing page ("What we paint", "Where we work most"), sector pages, suburb pages, FAQs, reviews, accreditations, company names. Adding a landing-page copy singleton later is the same shape as `pages/contact-us` and is a half-day task.
+Not editable in phase 1, by design: the section headings and intro paragraphs on the landing page ("What we paint", "Where we work most"), sector pages, suburb pages, FAQs, reviews, accreditations, company names. Nor is alt text retrospective — an entry's `images` carry their own `alt`, copied from the library at pick time, so editing the library changes the default for the next pick and not the pages already using the file. Propagating a library edit into every entry that references it is a phase-2 job; it needs a reverse index from storage path to entry and a decision about entries whose alt text an editor deliberately overrode. Adding a landing-page copy singleton later is the same shape as `pages/contact-us` and is a half-day task.
 
 ## File structure
 

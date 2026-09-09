@@ -161,13 +161,20 @@ itself, planned as `edit.apmgpainting.com.au` (to be confirmed before go-live).
 - The business details that appear across the site: phone, email, address, opening hours
 - The contact page wording
 
-Suburb pages, service sectors, FAQs and the Google reviews are not editable in the CMS — they
-stay in the code that runs the site, because changing them affects search rankings and legal
-correctness in ways a text box can't check for you. Ask us if one of these needs to change.
+Suburb pages, service sectors, FAQs, accreditations and the Google reviews are not editable in
+the CMS — they stay in the code that runs the site, because changing them affects search
+rankings and legal correctness in ways a text box can't check for you. Accreditations in
+particular are a claim about paperwork, so they are only ever changed against a certificate. Ask
+us if one of these needs to change.
 
 **Alt text is not optional.** Every photograph you add needs a short written description of what
 is in it. This is not decoration — it is what Google reads, since a search engine cannot see a
 photograph. A project photo with no alt text is invisible to image search.
+
+One thing to know about how it works: editing a photograph's description in the media library
+changes the library default. Images already placed on a page keep their alt text until re-picked.
+So if you want to correct the description on a page that is already live, open that page in the
+editor and choose the image again — the corrected text comes with it.
 
 **The AI buttons draft, they don't publish.** Several fields have a button that writes a suggested
 summary, page description or alt text for you. Read what it writes before you save it — it is a
