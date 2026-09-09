@@ -12,9 +12,9 @@ vi.mock('@/app/actions/content', () => ({
 }));
 
 const fields: FieldSpec[] = [
-  { name: 'slug', kind: 'text', required: true },
-  { name: 'includes', kind: 'lines', required: false },
-  { name: 'meta', kind: 'json', required: false },
+  { name: 'slug', kind: 'text', required: true, nullable: false },
+  { name: 'includes', kind: 'lines', required: false, nullable: false },
+  { name: 'meta', kind: 'json', required: false, nullable: false },
 ];
 
 function hiddenDataValue(container: HTMLElement): unknown {

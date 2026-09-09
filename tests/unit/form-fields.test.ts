@@ -23,4 +23,28 @@ describe('fieldsFor', () => {
     expect(byName.publishedAt).toMatchObject({ kind: 'date' });
     expect(byName.body).toMatchObject({ kind: 'textarea' });
   });
+
+  it('renders the settings singleton as text, textarea and JSON fields', () => {
+    const byName = Object.fromEntries(fieldsFor('settings').map((f) => [f.name, f]));
+    expect(byName.phone).toMatchObject({ kind: 'text', required: true });
+    expect(byName.serviceAreaPrimary).toMatchObject({ kind: 'text', required: true });
+    // Nullable strings stay single-line inputs rather than falling through to
+    // a JSON textarea, and are not marked required — null is a valid answer.
+    expect(byName.abn).toMatchObject({ kind: 'text', required: false, nullable: true });
+    expect(byName.previousAddress).toMatchObject({ kind: 'text', nullable: true });
+    // Nested shapes are validated JSON, per spec section 6.
+    expect(byName.address).toMatchObject({ kind: 'json' });
+    expect(byName.coords).toMatchObject({ kind: 'json', nullable: true });
+    expect(byName.openingHours).toMatchObject({ kind: 'json', nullable: true });
+    expect(byName.social).toMatchObject({ kind: 'json' });
+    expect(byName.slug).toBeUndefined();
+  });
+
+  it('gives the contact page copy its long-form fields as textareas', () => {
+    const byName = Object.fromEntries(fieldsFor('pages').map((f) => [f.name, f]));
+    expect(byName.lede).toMatchObject({ kind: 'textarea' });
+    expect(byName.formIntro).toMatchObject({ kind: 'textarea' });
+    expect(byName.metaDescription).toMatchObject({ kind: 'textarea' });
+    expect(byName.title).toMatchObject({ kind: 'text' });
+  });
 });

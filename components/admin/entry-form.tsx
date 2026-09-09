@@ -111,6 +111,9 @@ export function EntryForm({ collection, fields, initial, initialStatus, media }:
           }
         }
       }
+      // An emptied input on a nullable field means "there is none", which the
+      // schema spells `null`. Submitting '' would fail validation instead.
+      if (field.nullable && out[field.name] === '') out[field.name] = null;
     }
     return out;
   }, [data, text, fields]);

@@ -2,7 +2,18 @@ import { z } from 'zod';
 import { collectionSchemas, type Collection } from './schemas';
 
 export type FieldKind = 'text' | 'textarea' | 'lines' | 'boolean' | 'image' | 'json' | 'date';
-export type FieldSpec = { name: string; kind: FieldKind; required: boolean };
+export type FieldSpec = {
+  name: string;
+  kind: FieldKind;
+  required: boolean;
+  /**
+   * The schema accepts `null` here. The editor submits `null` rather than `''`
+   * for an empty input, because `''` fails `z.string().nullable()` and an
+   * editor clearing the ABN field means "we do not publish one", not "publish
+   * an empty string".
+   */
+  nullable: boolean;
+};
 
 /** Long-form string fields get a textarea; everything else a single line. */
 const TEXTAREA = new Set([
@@ -13,14 +24,23 @@ const TEXTAREA = new Set([
   'body',
   'excerpt',
   'metaDescription',
+  'lede',
+  'formIntro',
 ]);
 
-function unwrap(schema: z.ZodTypeAny): { inner: z.ZodTypeAny; optional: boolean } {
-  if (schema instanceof z.ZodOptional)
-    return { inner: unwrap(schema.unwrap()).inner, optional: true };
-  if (schema instanceof z.ZodDefault)
-    return { inner: unwrap(schema._def.innerType).inner, optional: true };
-  return { inner: schema, optional: false };
+type Unwrapped = { inner: z.ZodTypeAny; optional: boolean; nullable: boolean };
+
+/**
+ * Strips the wrappers that do not change what the editor shows. Nullable is
+ * carried out rather than swallowed: `abn: z.string().nullable()` has to
+ * render as a text input, not as a JSON textarea, and the form has to know to
+ * send `null` when it is emptied.
+ */
+function unwrap(schema: z.ZodTypeAny): Unwrapped {
+  if (schema instanceof z.ZodOptional) return { ...unwrap(schema.unwrap()), optional: true };
+  if (schema instanceof z.ZodDefault) return { ...unwrap(schema._def.innerType), optional: true };
+  if (schema instanceof z.ZodNullable) return { ...unwrap(schema.unwrap()), nullable: true };
+  return { inner: schema, optional: false, nullable: false };
 }
 
 function kindOf(name: string, schema: z.ZodTypeAny): FieldKind {
@@ -57,7 +77,9 @@ function kindOf(name: string, schema: z.ZodTypeAny): FieldKind {
 export function fieldsFor(collection: Collection): FieldSpec[] {
   const shape = collectionSchemas[collection].shape as Record<string, z.ZodTypeAny>;
   return Object.entries(shape).map(([name, schema]) => {
-    const { inner, optional } = unwrap(schema);
-    return { name, kind: kindOf(name, inner), required: !optional };
+    const { inner, optional, nullable } = unwrap(schema);
+    // A nullable field is not "required" from an editor's point of view: the
+    // key must be present, but null is a legitimate value for it.
+    return { name, kind: kindOf(name, inner), required: !optional && !nullable, nullable };
   });
 }
