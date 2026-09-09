@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { isEditor } from '@/lib/app-role';
 import { hasSupabase, supabaseEnv } from '@/lib/supabase/env';
 
 /**
@@ -9,6 +10,21 @@ import { hasSupabase, supabaseEnv } from '@/lib/supabase/env';
  */
 export async function proxy(request: NextRequest) {
   if (!hasSupabase()) {
+    // On the editor deployment, redirecting to `/` would bounce straight
+    // back: next.config.ts sends `/` to `/admin/` there, and this would
+    // send it back again — a redirect loop instead of a diagnosis. Say what
+    // is actually wrong, and say it in a status code a monitor will notice.
+    if (isEditor()) {
+      console.warn(
+        '[proxy] Editor deployment is missing NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY; /admin is unavailable.',
+      );
+      return new NextResponse(
+        'Editor is not configured: Supabase environment variables are missing.',
+        { status: 503 },
+      );
+    }
+    // On the public site there is no admin to reach, so the homepage is the
+    // right answer and there is no loop to fall into.
     return NextResponse.redirect(new URL('/', request.url));
   }
 

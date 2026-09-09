@@ -213,12 +213,40 @@ public site down, and the editor can be redeployed or rolled back on its own.
 **Cross-deployment publishing.** `updateTag` only clears the cache of the
 deployment it runs in. When the editor publishes, it also calls
 `POST https://apmgpainting.com.au/api/revalidate` with a shared secret and
-the tags and paths to refresh. The public site's route handler calls
-`revalidatePath` for each path (immediate) and `revalidateTag(tag, 'max')`
-for the collection tag. The secret is `REVALIDATE_SECRET`, set on both
-projects; a request without it is a 401 and does nothing. If the call fails,
-the save still succeeds and the editor sees "Saved, but the live site did not
-refresh. Try Publish again." so nothing is silently lost.
+the tags and paths to refresh. The payload is
+`{ tags, paths, layoutPaths? }`. The public site's route handler calls
+`revalidatePath` for each `paths` entry (immediate),
+`revalidatePath(p, 'layout')` for each `layoutPaths` entry, and
+`revalidateTag(tag, 'max')` for the collection tag. Every path in both lists
+is checked against the same site-relative pattern, so a leaked secret can at
+worst force a rebuild of pages that already exist.
+
+`layoutPaths` exists because a business-details publish is not a page
+change: the header, the footer, the chat panel and the LocalBusiness JSON-LD
+all live in the root layout, so expiring the four pages that name the
+address in prose leaves every other page serving the old phone number.
+`saveEntry` sends `layoutPaths: ['/']` for `settings`, which is the local
+`revalidatePath('/', 'layout')` expressed over the wire — without it the
+live site was stale-while-revalidate after a settings change.
+
+The secret is `REVALIDATE_SECRET`, set on both projects; a request without
+it is a 401 and does nothing. If the call fails, the save still succeeds and
+the editor sees "Saved, but the live site did not refresh. Try Publish
+again." so nothing is silently lost.
+
+**Sign-in links follow the deployment, not the canonical origin.**
+`sendMagicLink` builds `emailRedirectTo` from the request's own
+`x-forwarded-host`/`host`, falling back to `NEXT_PUBLIC_SITE_URL`. On the
+editor that env var is the _public_ domain, and a link pointing there lands
+on a redirect back with the auth code already spent. Both origins'
+`/admin/auth/callback/` must be listed under Supabase Auth → URL
+Configuration → Redirect URLs, along with `http://localhost:3000/`'s.
+
+**A misconfigured editor says so rather than looping.** `proxy.ts` returns
+503 with a one-line explanation when the Supabase env vars are missing on
+the editor role, because redirecting to `/` there would bounce straight back
+to `/admin/` via the build-time redirect. On the site role it still
+redirects to `/`, where there is no loop to fall into.
 
 Preview at `/admin/preview/...` renders on the editor deployment from the
 same page components, so drafts are seen exactly as the public site will

@@ -1,7 +1,18 @@
 import 'server-only';
 import { isEditor } from '@/lib/app-role';
 
-export type RevalidatePayload = { tags: string[]; paths: string[] };
+export type RevalidatePayload = {
+  tags: string[];
+  paths: string[];
+  /**
+   * Paths to expire layout-deep rather than page-deep, i.e.
+   * `revalidatePath(p, 'layout')`. `['/']` is the whole site, which is what
+   * a business-details change needs: the header, the footer, the chat panel
+   * and the LocalBusiness JSON-LD all live in the root layout, so listing
+   * pages one by one leaves every other page stale.
+   */
+  layoutPaths?: string[];
+};
 
 /**
  * From the editor deployment, tell the public site what changed. On the
