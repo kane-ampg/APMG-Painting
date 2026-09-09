@@ -175,7 +175,6 @@ export function isCollection(value: string): value is Collection {
   return value in collectionSchemas;
 }
 
-/** Collections with exactly one entry and a fixed slug. No "New", no delete. */
 /**
  * What an editor calls each collection. "settings" and "pages" are storage
  * names; nobody signing in to change the phone number is looking for
@@ -190,6 +189,7 @@ export const collectionTitles: Record<Collection, string> = {
   pages: 'Pages',
 };
 
+/** Collections with exactly one entry and a fixed slug. No "New", no delete. */
 export const singletonSlug = { settings: 'site', pages: 'contact-us' } as const;
 
 export function isSingleton(collection: Collection): collection is keyof typeof singletonSlug {

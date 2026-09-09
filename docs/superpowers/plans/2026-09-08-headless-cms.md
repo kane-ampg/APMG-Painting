@@ -102,13 +102,14 @@ scripts/seed-cms.mjs               one-off: TS content + public/images → Supab
 - Create: `supabase/migrations/0001_cms.sql`
 - Create: `lib/supabase/env.ts`
 - Create: `lib/supabase/server.ts`
-- Create: `lib/supabase/browser.ts`
 - Modify: `.env.example`
 - Test: `tests/unit/supabase-env.test.ts`
 
 **Interfaces:**
 
-- Produces: `hasSupabase(): boolean`, `supabaseEnv(): { url: string; anonKey: string }` (throws when unset), `createServerSupabase(): Promise<SupabaseClient>`, `createBrowserSupabase(): SupabaseClient`.
+- Produces: `hasSupabase(): boolean`, `supabaseEnv(): { url: string; anonKey: string }` (throws when unset), `createServerSupabase(): Promise<SupabaseClient>`.
+
+The admin only ever mutates content through Server Actions, so there is no browser client to build.
 
 - [ ] **Step 1: Provision Supabase**
 
@@ -232,19 +233,6 @@ export async function createServerSupabase() {
       },
     },
   });
-}
-```
-
-`lib/supabase/browser.ts`:
-
-```ts
-'use client';
-import { createBrowserClient } from '@supabase/ssr';
-import { supabaseEnv } from './env';
-
-export function createBrowserSupabase() {
-  const { url, anonKey } = supabaseEnv();
-  return createBrowserClient(url, anonKey);
 }
 ```
 

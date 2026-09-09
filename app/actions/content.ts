@@ -109,11 +109,14 @@ export async function saveEntry(_prev: SaveState, formData: FormData): Promise<S
   // moment a second editor publishes, or a stale tab is submitted. The field
   // is still accepted (and still tells the editor what they are looking at),
   // it just no longer gets a vote here.
-  const { data: existing } = await supabase
+  const { data: existing, error: existingError } = await supabase
     .from('content_entries')
     .select('status')
     .match({ collection, slug: originalSlug ?? slug })
     .maybeSingle();
+  if (existingError) {
+    return { status: 'error', message: `Could not save: ${existingError.message}` };
+  }
   const previousStatus = existing?.status === 'published' ? 'published' : 'draft';
 
   if (isRename) {
