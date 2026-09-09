@@ -9,7 +9,7 @@ import { SiteSettingsProvider } from '@/components/providers/site-settings';
 import { JsonLd } from '@/components/seo/json-ld';
 import { localBusinessSchema } from '@/lib/schema';
 import { getServices, getSiteSettings } from '@/lib/content/source';
-import { site, siteUrl } from '@/lib/site';
+import { noindexAll, site, siteUrl } from '@/lib/site';
 
 /**
  * Fonts are self-hosted and subset by next/font at build time — no runtime
@@ -36,6 +36,8 @@ export const metadata: Metadata = {
   },
   description:
     'APMG Painting is a Melbourne commercial painting contractor, working across schools, healthcare, aged care, strata, retail and industrial sites.',
+  // Layer 1 of the editor deployment's lockdown — see `noindexAll`.
+  robots: noindexAll ? { index: false, follow: false } : undefined,
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

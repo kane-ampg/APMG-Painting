@@ -20,6 +20,7 @@
  */
 
 import type { ContactPageCopy, SiteSettings } from '@/lib/content/types';
+import { isEditor } from '@/lib/app-role';
 
 export const CONTACT_UNVERIFIED = 'NEEDS-CLIENT-CONFIRMATION' as const;
 
@@ -519,3 +520,15 @@ if (!resolvedOrigin && typeof window === 'undefined' && process.env.NODE_ENV ===
 }
 
 export const siteUrl = resolvedOrigin ?? 'http://localhost:3000';
+
+/**
+ * Every noindex layer, forced on for the editor deployment.
+ *
+ * Go-live released the four sandbox lockdown layers — the meta robots tag,
+ * robots.txt, llms.txt and the X-Robots-Tag header — together. The editor
+ * deployment (spec §8a) serves only `/admin/*` and must never be indexable
+ * alongside the live site, so it turns all four back on. It keys off the
+ * build-time role rather than an operator-settable flag, so it cannot be
+ * switched off there by mistake.
+ */
+export const noindexAll = isEditor();

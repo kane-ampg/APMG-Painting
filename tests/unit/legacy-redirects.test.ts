@@ -9,6 +9,16 @@ async function redirects(): Promise<Redirect[]> {
 }
 
 /**
+ * The legacy table only. `next.config.ts` also emits the role-based
+ * `/admin/*` redirect that keeps the public site and the editor deployment in
+ * their own lanes (spec §8a); that one is deliberately temporary and is not
+ * part of the migration map these assertions guard.
+ */
+async function legacyRedirects(): Promise<Redirect[]> {
+  return (await redirects()).filter((r) => r.source.startsWith('/areas/'));
+}
+
+/**
  * Legacy suburb URLs.
  *
  * Every /areas/painters-{suburb}/ on the live WordPress site must land on a
@@ -19,7 +29,7 @@ async function redirects(): Promise<Redirect[]> {
 describe('legacy suburb redirects', () => {
   it('emits one per VIC locality plus the three defect corrections, not one per locality overall, because the generated table is Victoria-only', async () => {
     const vicLocalityCount = allLocalities().filter((l) => l.state === 'VIC').length;
-    const all = await redirects();
+    const all = await legacyRedirects();
     expect(all.length).toBe(vicLocalityCount + 3);
   });
 
@@ -60,7 +70,7 @@ describe('legacy suburb redirects', () => {
   });
 
   it('marks every redirect permanent', async () => {
-    for (const redirect of await redirects()) {
+    for (const redirect of await legacyRedirects()) {
       expect(redirect.permanent, redirect.source).toBe(true);
     }
   });

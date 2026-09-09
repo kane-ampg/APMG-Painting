@@ -1,13 +1,22 @@
 import type { MetadataRoute } from 'next';
-import { siteUrl } from '@/lib/site';
+import { noindexAll, siteUrl } from '@/lib/site';
 
 /**
  * Robots.
  *
  * The live WordPress site's /robots.txt returns HTTP 500, so Google currently
  * receives no directives at all.
+ *
+ * The editor deployment disallows everything: it serves only /admin/* and
+ * must never be crawled alongside the live site. See `noindexAll`.
  */
 export default function robots(): MetadataRoute.Robots {
+  if (noindexAll) {
+    return {
+      rules: [{ userAgent: '*', disallow: '/' }],
+    };
+  }
+
   return {
     rules: [
       {

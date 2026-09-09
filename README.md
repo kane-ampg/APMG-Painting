@@ -87,6 +87,29 @@ source for a CMS later is one adapter rather than a rebuild.
 
 ---
 
+## CMS
+
+### Two deployments
+
+The editor (`/admin/*`) runs as its own Vercel project, separate from the public site, both built
+from the same repo and the same branch:
+
+|                        | Public site                  | Editor                     |
+| ---------------------- | ---------------------------- | -------------------------- |
+| Vercel project         | `apmg-painting`              | `apmg-painting-editor`     |
+| Domain                 | `apmgpainting.com.au`        | `edit.apmgpainting.com.au` |
+| `NEXT_PUBLIC_APP_ROLE` | `site`                       | `editor`                   |
+| Serves                 | everything except `/admin/*` | only `/admin/*`            |
+
+Same repo, same branch, two projects, different `NEXT_PUBLIC_APP_ROLE`. The role is a build-time
+env var read in `next.config.ts`, so the redirect that keeps each deployment in its lane
+(`/admin` → editor on the site, everything else → `/admin/` on the editor) costs nothing at
+request time and the public site stays fully static. When the editor publishes, it calls the
+public site's `/api/revalidate` with a shared `REVALIDATE_SECRET` so the change goes live there
+too — see `lib/revalidate/notify.ts` and `app/api/revalidate/route.ts`.
+
+---
+
 ## Enquiry delivery
 
 `lib/enquiry/transport.ts` defines an `EnquiryTransport` interface with two implementations:

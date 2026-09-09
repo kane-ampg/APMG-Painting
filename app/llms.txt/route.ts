@@ -1,4 +1,4 @@
-import { accreditations, formatAddress, site, siteUrl } from '@/lib/site';
+import { accreditations, formatAddress, noindexAll, site, siteUrl } from '@/lib/site';
 import { googleAggregate, googleReviews } from '@/content/reviews';
 import { servicePath } from '@/content/services';
 import { sectors } from '@/content/sectors';
@@ -30,6 +30,14 @@ import {
 export const dynamic = 'force-static';
 
 export async function GET(): Promise<Response> {
+  // The editor deployment publishes nothing to answer engines. See `noindexAll`.
+  if (noindexAll) {
+    return new Response('User-agent: *\n# Editor deployment. No content published.\n', {
+      status: 404,
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+    });
+  }
+
   const [services, projects, posts, settings] = await Promise.all([
     getServices(),
     getProjects(),

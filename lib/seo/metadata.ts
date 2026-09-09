@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { site, siteUrl } from '@/lib/site';
+import { noindexAll, site, siteUrl } from '@/lib/site';
 
 type BuildMetadataArgs = {
   title: string;
@@ -17,7 +17,7 @@ type BuildMetadataArgs = {
    * is the entire argument for generating them. `nofollow` turns them into
    * dead ends and deletes the internal-link architecture the plan rests on.
    *
-   * Almost nothing should set this. The sandbox lockdown overrides it anyway.
+   * Almost nothing should set this. The editor lockdown overrides it anyway.
    */
   follow?: boolean;
   /**
@@ -85,7 +85,7 @@ export function buildMetadata({
   // The two directives are independent on purpose: an indexable page is
   // `index, follow`, a Tier 3 page is `noindex, follow` — kept out of the
   // index but still crawlable, so its links carry equity up to the region hub.
-  const shouldIndex = index;
+  const shouldIndex = index && !noindexAll;
   const shouldFollow = follow;
 
   return {

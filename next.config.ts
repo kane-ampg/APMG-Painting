@@ -1,8 +1,14 @@
 import type { NextConfig } from 'next';
 import generated from './content/locations.generated.json';
+import { appRole } from './lib/app-role';
 import { supabaseHostname } from './lib/supabase/env';
 
 const supabaseHost = supabaseHostname();
+
+// Which deployment this build is (spec §8a). Read once at build time so the
+// role-based redirects below cost the public site nothing at request time.
+const role = appRole();
+const editorOrigin = process.env.EDITOR_ORIGIN ?? '';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -31,6 +37,25 @@ const nextConfig: NextConfig = {
           ]
         : []),
     ],
+  },
+
+  /**
+   * The header-level half of the editor lockdown.
+   *
+   * Go-live removed the unconditional X-Robots-Tag that used to sit here. It
+   * comes back only on the editor deployment, where it must agree with the
+   * other three layers (`noindexAll` in lib/site.ts): a header-level noindex
+   * overrides everything, so all four have to switch together.
+   */
+  async headers() {
+    if (role !== 'editor') return [];
+
+    return [
+      {
+        source: '/:path*',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      },
+    ];
   },
 
   async redirects() {
@@ -86,6 +111,31 @@ const nextConfig: NextConfig = {
       ...legacySuburbs,
       // No other route renames. /about-us/ and /contact-us/ keep their URLs —
       // they are indexed and a rebuild is not a reason to move them.
+      ...(role === 'editor'
+        ? [
+            // The editor deployment serves nothing public. Every other path
+            // lands on the admin.
+            { source: '/', destination: '/admin/', permanent: false },
+            {
+              source:
+                '/:path((?!admin|api|_next|favicon\\.ico|icon\\.png|apple-icon\\.png|images).*)',
+              destination: '/admin/',
+              permanent: false,
+            },
+          ]
+        : editorOrigin
+          ? [
+              // The public site sends anyone who types /admin to the editor.
+              {
+                source: '/admin/:path*',
+                destination: `${editorOrigin}/admin/:path*`,
+                permanent: false,
+              },
+            ]
+          : [
+              // No editor configured yet: /admin does not exist on the site.
+              { source: '/admin/:path*', destination: '/', permanent: false },
+            ]),
     ];
   },
 };
