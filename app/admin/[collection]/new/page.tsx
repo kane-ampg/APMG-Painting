@@ -3,7 +3,7 @@ import { listMedia } from '@/app/actions/media';
 import { EntryForm } from '@/components/admin/entry-form';
 import { requireAdmin } from '@/lib/auth/admin';
 import { fieldsFor } from '@/lib/content/form-fields';
-import { isCollection, type Collection } from '@/lib/content/schemas';
+import { isCollection, isSingleton, type Collection } from '@/lib/content/schemas';
 import { defaultContactPage, defaultSiteSettings } from '@/lib/site';
 
 const blank: Record<Collection, Record<string, unknown>> = {
@@ -41,8 +41,9 @@ const blank: Record<Collection, Record<string, unknown>> = {
     metaTitle: '',
     metaDescription: '',
   },
-  // Neither is ever reached — the "New" link is hidden for singletons — but
-  // the Record<Collection, ...> type demands an entry for every collection.
+  // Neither is ever reached — the page 404s for singletons before it looks
+  // one up — but the Record<Collection, ...> type demands an entry for
+  // every collection.
   settings: defaultSiteSettings as unknown as Record<string, unknown>,
   pages: defaultContactPage as unknown as Record<string, unknown>,
 };
@@ -53,6 +54,11 @@ export default async function NewEntryPage({ params }: Props) {
   await requireAdmin();
   const { collection } = await params;
   if (!isCollection(collection)) notFound();
+  // A singleton has exactly one row at a fixed slug. The list page hides the
+  // "New" link for those, but the URL is still typeable, and the form it
+  // would render posts a `data` payload that overwrites the live business
+  // details with the blanks below.
+  if (isSingleton(collection)) notFound();
   const media = await listMedia();
   return (
     <>

@@ -5,9 +5,19 @@ import type { MediaRow } from '@/app/actions/media';
 import { toMediaRef } from '@/lib/media/to-media-ref';
 import type { MediaRef } from '@/lib/content/types';
 
-type Props = { media: MediaRow[]; value?: MediaRef; onChange: (ref: MediaRef | undefined) => void };
+type Props = {
+  media: MediaRow[];
+  value?: MediaRef;
+  onChange: (ref: MediaRef | undefined) => void;
+  /**
+   * Id of the element naming this field. There is no form control to point a
+   * `<label for>` at — the picker is a disclosure button and a grid — so the
+   * field's name reaches assistive technology through the button instead.
+   */
+  labelledBy?: string;
+};
 
-export function MediaPicker({ media, value, onChange }: Props) {
+export function MediaPicker({ media, value, onChange, labelledBy }: Props) {
   const [open, setOpen] = useState(false);
   return (
     <div className="flex flex-col gap-2">
@@ -25,8 +35,14 @@ export function MediaPicker({ media, value, onChange }: Props) {
       ) : (
         <p className="text-xs text-ink-soft">No image.</p>
       )}
+      {/* Both ids on purpose: the field's name, then this button's own text,
+          so the accessible name reads "images, Choose from library" rather
+          than losing one half to the other. Self-reference in
+          aria-labelledby is allowed and is what keeps the action visible. */}
       <button
         type="button"
+        id={labelledBy ? `${labelledBy}-action` : undefined}
+        aria-labelledby={labelledBy ? `${labelledBy} ${labelledBy}-action` : undefined}
         className="self-start text-sm underline"
         onClick={() => setOpen((o) => !o)}
       >

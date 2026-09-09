@@ -137,11 +137,23 @@ export function EntryForm({ collection, fields, initial, initialStatus, media }:
         const errors = state.fieldErrors?.[field.name];
         const value = data[field.name];
         const inputId = `field-${field.name}`;
+        const labelId = `label-${field.name}`;
         const label = (
           <label htmlFor={inputId} className="text-sm font-medium">
             {field.name}
             {field.required && <span aria-hidden="true"> *</span>}
           </label>
+        );
+        // An `image` field has no form control for a label to point at — the
+        // picker is a disclosure button and a grid of thumbnails — so a
+        // `<label for>` there would be a dangling reference. The name is a
+        // plain span instead, and reaches the picker's button through
+        // `aria-labelledby`.
+        const pickerLabel = (
+          <span id={labelId} className="text-sm font-medium">
+            {field.name}
+            {field.required && <span aria-hidden="true"> *</span>}
+          </span>
         );
         return (
           <div key={field.name} className="flex flex-col gap-1">
@@ -160,11 +172,12 @@ export function EntryForm({ collection, fields, initial, initialStatus, media }:
               </label>
             ) : field.kind === 'image' ? (
               <>
-                {label}
+                {pickerLabel}
                 <MediaPicker
                   media={media}
                   value={value as MediaRef | undefined}
                   onChange={(r) => set(field.name, r)}
+                  labelledBy={labelId}
                 />
               </>
             ) : field.kind === 'lines' ? (

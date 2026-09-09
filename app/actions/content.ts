@@ -47,10 +47,6 @@ export async function saveEntry(_prev: SaveState, formData: FormData): Promise<S
   if (!isCollection(collection)) return { status: 'error', message: 'Unknown collection.' };
 
   const status = formData.get('status') === 'published' ? 'published' : 'draft';
-  // What the entry's status was before this save. Needed so that moving a
-  // published entry back to draft still expires its public cache entry —
-  // otherwise the live page would keep serving stale content forever.
-  const previousStatus = formData.get('previousStatus') === 'published' ? 'published' : 'draft';
 
   // A singleton's slug is fixed and never submitted — the settings schema has
   // no `slug` field at all, so the form posts an empty one. Settle that here,
@@ -104,6 +100,21 @@ export async function saveEntry(_prev: SaveState, formData: FormData): Promise<S
   const slug = singleton ? singletonSlug[collection] : (parsed.data as { slug: string }).slug;
   const isRename = originalSlug !== null && originalSlug !== slug;
   const supabase = await createServerSupabase();
+
+  // What the row's status actually is right now, read from the database
+  // rather than taken from the form. This decides whether the public cache
+  // has to be expired — taking a published entry back to draft has to bring
+  // its live page down, not leave it stale forever — and the form's hidden
+  // `previousStatus` is a client-supplied value that goes out of date the
+  // moment a second editor publishes, or a stale tab is submitted. The field
+  // is still accepted (and still tells the editor what they are looking at),
+  // it just no longer gets a vote here.
+  const { data: existing } = await supabase
+    .from('content_entries')
+    .select('status')
+    .match({ collection, slug: originalSlug ?? slug })
+    .maybeSingle();
+  const previousStatus = existing?.status === 'published' ? 'published' : 'draft';
 
   if (isRename) {
     const { error } = await supabase

@@ -50,7 +50,7 @@ supabase/
 lib/supabase/
   env.ts                           typed env access + hasSupabase()
   server.ts                        createServerClient for RSC / actions
-  browser.ts                       createBrowserClient for the admin UI
+  public.ts                        session-less client for the cached read path
 lib/content/
   schemas.ts                       Zod schemas: Project, Service, Post, Media ref
   source.ts                        getProjects(), getServices(), getPosts(), get*BySlug()
