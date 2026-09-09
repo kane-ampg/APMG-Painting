@@ -1,6 +1,7 @@
 'use server';
 
 import { headers } from 'next/headers';
+import { getSiteSettings } from '@/lib/content/source';
 import { checkRateLimit } from '@/lib/enquiry/rate-limit';
 import type { EnquiryState } from '@/lib/enquiry/state';
 import { getEnquiryTransport } from '@/lib/enquiry/transport';
@@ -39,13 +40,18 @@ export async function submitEnquiry(
     };
   }
 
+  // The number a rejected visitor is told to ring is the editable one, not a
+  // literal: FormStatus reads it from the settings context, and a Server
+  // Action message that disagreed with it would send people to the old line.
+  const settings = await getSiteSettings();
+
   const limit = checkRateLimit(await clientKey());
   if (!limit.allowed) {
     return {
       status: 'error',
       message: `Too many enquiries from this connection. Please try again in ${Math.ceil(
         limit.retryAfterSeconds / 60,
-      )} minutes, or call us on 1300 97 97 40.`,
+      )} minutes, or call us on ${settings.phone}.`,
     };
   }
 
@@ -54,8 +60,7 @@ export async function submitEnquiry(
   if (!result.delivered && result.reason === 'provider-error') {
     return {
       status: 'error',
-      message:
-        'We could not send your enquiry just now. Please call us on 1300 97 97 40 and we will pick it up straight away.',
+      message: `We could not send your enquiry just now. Please call us on ${settings.phone} and we will pick it up straight away.`,
     };
   }
 

@@ -20,11 +20,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const location = getLocation(slug);
   if (!location) return {};
 
+  const settings = await getSiteSettings();
+
   return buildMetadata({
     title: `Painters ${location.suburb} | APMG Painting`,
     description: location.intro
       ? location.intro.slice(0, 155)
-      : `APMG Painting services ${location.suburb} and the surrounding ${location.region.toLowerCase()} area from our Bayswater North base.`,
+      : `APMG Painting services ${location.suburb} and the surrounding ${location.region.toLowerCase()} area from our ${settings.address.suburb} base.`,
     path: `/areas/${location.slug}/`,
     // Data-driven: weak pages are noindex until they earn otherwise.
     index: location.indexable,

@@ -32,7 +32,7 @@ export default async function AreasPage() {
           <Breadcrumbs crumbs={[{ name: 'Areas we service', path: '/areas/' }]} />
           <h1 className="font-display text-4xl tracking-tight sm:text-5xl">Areas we service</h1>
           <p className="mt-4 max-w-prose text-lg text-ink-soft">
-            We work across metropolitan Melbourne from our base at Bayswater North.
+            We work across metropolitan Melbourne from our base at {settings.address.suburb}.
           </p>
         </Container>
       </Section>

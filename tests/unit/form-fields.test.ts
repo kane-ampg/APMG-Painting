@@ -46,5 +46,9 @@ describe('fieldsFor', () => {
     expect(byName.formIntro).toMatchObject({ kind: 'textarea' });
     expect(byName.metaDescription).toMatchObject({ kind: 'textarea' });
     expect(byName.title).toMatchObject({ kind: 'text' });
+    // A singleton's slug is fixed and set by the save action, so it is not
+    // offered as an editable field even where the schema declares one.
+    expect(byName.slug).toBeUndefined();
+    expect(fieldsFor('pages').some((f) => f.name === 'slug')).toBe(false);
   });
 });
