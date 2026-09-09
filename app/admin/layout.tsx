@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false, googleBot: { index: false, follow: false } },
 };
 
+// Admin pages read the session on every request and must never be prerendered.
+export const dynamic = 'force-dynamic';
+
 /**
  * The admin shell. Auth is enforced per page via requireAdmin() rather than
  * here, because the login page shares this layout.

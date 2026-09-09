@@ -35,8 +35,8 @@ describe('requireAdmin', () => {
 
   it('forbids a signed-in user who is not on the allowlist', async () => {
     mockSupabase({ email: 'someone@example.com' }, false);
-    const { requireAdmin, AdminForbiddenError } = await import('@/lib/auth/admin');
-    await expect(requireAdmin()).rejects.toBeInstanceOf(AdminForbiddenError);
+    const { requireAdmin } = await import('@/lib/auth/admin');
+    await expect(requireAdmin()).rejects.toThrow('REDIRECT:/admin/login/?error=forbidden');
   });
 
   it('returns the email for an allowlisted user', async () => {
