@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { sectors } from '@/content/sectors';
 import { projects } from '@/content/projects';
-import { generateMetadata } from '@/app/[sector]/page';
+import { generateMetadata } from '@/app/(site)/[sector]/page';
 import sitemap from '@/app/sitemap';
 
 /**

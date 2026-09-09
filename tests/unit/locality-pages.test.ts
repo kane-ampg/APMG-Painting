@@ -3,9 +3,9 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { allLocalities, indexableLocalities, regionsInState } from '@/lib/locations';
 import { NearbySuburbs } from '@/components/sections/locality';
-import { generateStaticParams as suburbParams } from '@/app/areas/[state]/[region]/[suburb]/page';
-import { generateStaticParams as regionParams } from '@/app/areas/[state]/[region]/page';
-import { generateStaticParams as stateParams } from '@/app/areas/[state]/page';
+import { generateStaticParams as suburbParams } from '@/app/(site)/areas/[state]/[region]/[suburb]/page';
+import { generateStaticParams as regionParams } from '@/app/(site)/areas/[state]/[region]/page';
+import { generateStaticParams as stateParams } from '@/app/(site)/areas/[state]/page';
 
 /**
  * Static params.
@@ -82,7 +82,7 @@ type Robots = { index: boolean; follow: boolean };
 async function robotsFor(href: string): Promise<Robots> {
   vi.resetModules();
 
-  const page = await import('@/app/areas/[state]/[region]/[suburb]/page');
+  const page = await import('@/app/(site)/areas/[state]/[region]/[suburb]/page');
   const [, , state = '', region = '', suburb = ''] = href.split('/');
   const meta = await page.generateMetadata({
     params: Promise.resolve({ state, region, suburb }),

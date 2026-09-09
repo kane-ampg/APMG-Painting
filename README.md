@@ -53,10 +53,12 @@ npm run dev
 ## How it is put together
 
 ```
-app/                    Routes. Static by default.
-  [sector]/             Sector pages at the root, preserving their live URLs
-  areas/[slug]/         Location pages, indexable per-record
-  projects/[slug]/      Case studies
+app/
+  (site)/               The public site. Static by default. Its own root layout
+    [sector]/           Sector pages at the root, preserving their live URLs
+    areas/[state]/      VIC + QLD state, region and suburb hubs
+    projects/[slug]/    Case studies
+  admin/                The editor. Its own root layout, force-dynamic, noindex
   actions/enquiry.ts    Server Action — exports only async functions
   sitemap.ts robots.ts  Generated, excluding noindex URLs
 components/

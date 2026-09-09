@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { generateMetadata as projectMetadata } from '@/app/projects/[slug]/page';
-import { generateMetadata as suburbMetadata } from '@/app/areas/[state]/[region]/[suburb]/page';
+import { generateMetadata as projectMetadata } from '@/app/(site)/projects/[slug]/page';
+import { generateMetadata as suburbMetadata } from '@/app/(site)/areas/[state]/[region]/[suburb]/page';
 import { projects } from '@/content/projects';
 import { site } from '@/lib/site';
 

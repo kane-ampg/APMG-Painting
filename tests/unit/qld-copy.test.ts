@@ -70,10 +70,10 @@ export const FORBIDDEN = [
  * route files.
  */
 const SOURCE_FILES = [
-  'app/areas/page.tsx',
-  'app/areas/[state]/page.tsx',
-  'app/areas/[state]/[region]/page.tsx',
-  'app/areas/[state]/[region]/[suburb]/page.tsx',
+  'app/(site)/areas/page.tsx',
+  'app/(site)/areas/[state]/page.tsx',
+  'app/(site)/areas/[state]/[region]/page.tsx',
+  'app/(site)/areas/[state]/[region]/[suburb]/page.tsx',
   'components/sections/locality.tsx',
 ];
 

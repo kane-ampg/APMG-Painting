@@ -13,6 +13,16 @@ const editorOrigin = process.env.EDITOR_ORIGIN ?? '';
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
+  experimental: {
+    // The public site and the editor are two root layouts (route group
+    // `(site)` and `admin/`), so there is no single layout for Next to
+    // compose a root `not-found.tsx` into — the documented case for
+    // `app/global-not-found.tsx`. Without this flag an unmatched URL falls
+    // back to Next's own unstyled 404, and the live site's every-URL-500
+    // problem would only be half fixed.
+    globalNotFound: true,
+  },
+
   // Every legacy URL ends in a slash. Keeping that avoids 101 needless redirects.
   trailingSlash: true,
 
