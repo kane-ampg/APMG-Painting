@@ -93,8 +93,10 @@ export function Hero({
                 src={image.src}
                 alt={image.alt}
                 fill
-                // Above the fold on every page that uses it.
-                priority
+                // Above the fold on every page that uses it. `priority` is
+                // deprecated in Next 16 and no longer sets fetchpriority.
+                preload
+                fetchPriority="high"
                 sizes="(min-width: 1024px) 45vw, 100vw"
                 className={`object-cover ${mediaZoom}`}
               />

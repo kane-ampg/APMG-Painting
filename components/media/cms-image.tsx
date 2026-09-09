@@ -5,6 +5,12 @@ type Props = {
   image: MediaRef;
   /** Required. A wrong `sizes` downloads the wrong file and costs LCP. */
   sizes: string;
+  /**
+   * The LCP image. Kept as `priority` for callers, but next/image's own
+   * `priority` prop is deprecated in Next 16 and no longer emits
+   * `fetchpriority=high` — so it maps to `preload` plus an explicit
+   * `fetchPriority`, which is what actually moves the request up the queue.
+   */
   priority?: boolean;
   /** Force fill layout even when dimensions are known (aspect-ratio boxes). */
   fill?: boolean;
@@ -30,7 +36,8 @@ export function CmsImage({ image, sizes, priority = false, fill = false, classNa
         alt={image.alt}
         fill
         sizes={sizes}
-        priority={priority}
+        preload={priority}
+        fetchPriority={priority ? 'high' : undefined}
         placeholder={hasBlur ? 'blur' : 'empty'}
         blurDataURL={image.blurDataURL}
         className={className}
@@ -45,7 +52,8 @@ export function CmsImage({ image, sizes, priority = false, fill = false, classNa
       width={image.width}
       height={image.height}
       sizes={sizes}
-      priority={priority}
+      preload={priority}
+      fetchPriority={priority ? 'high' : undefined}
       placeholder={hasBlur ? 'blur' : 'empty'}
       blurDataURL={image.blurDataURL}
       className={className}

@@ -27,7 +27,8 @@ export function Header({ settings }: { settings: SiteSettings }) {
               alt="APMG Painting"
               width={378}
               height={285}
-              priority
+              preload
+              fetchPriority="high"
               className="h-11 w-auto sm:h-14"
             />
           </Link>

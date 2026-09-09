@@ -50,11 +50,11 @@ function prefersLessData(): boolean {
  *
  * ## What actually renders first
  *
- * The poster, always, as a `priority` next/image — it is the LCP element and it
- * paints before a byte of video is requested. The `<video>` never exists on the
- * server: it appears on the first render after hydration and fades over the
- * poster once it can play. The poster is the reel's own first frame, so the
- * swap is invisible.
+ * The poster, always, as a preloaded, `fetchpriority=high` next/image — it is
+ * the LCP element and it paints before a byte of video is requested. The
+ * `<video>` never exists on the server: it appears on the first render after
+ * hydration and fades over the poster once it can play. The poster is the
+ * reel's own first frame, so the swap is invisible.
  *
  * Deferring the element that far is what makes the three exits below possible,
  * and it is also how the 720p and 1080p encodes get chosen without relying on
@@ -228,7 +228,8 @@ export function HeroReel({
           src={poster.src}
           alt={poster.alt}
           fill
-          priority
+          preload
+          fetchPriority="high"
           sizes="100vw"
           className="object-cover"
         />
