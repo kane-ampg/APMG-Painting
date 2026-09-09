@@ -114,6 +114,21 @@ test.describe('navigation', () => {
   });
 });
 
+test.describe('landing page', () => {
+  test('"What we paint" renders a card per service with a photo or a plain card', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    const cards = page.locator('#services article');
+    const count = await cards.count();
+    expect(count).toBeGreaterThanOrEqual(5);
+    for (let i = 0; i < count; i++) {
+      await expect(cards.nth(i).getByRole('heading', { level: 3 })).toBeVisible();
+      await expect(cards.nth(i).locator('p').first()).not.toBeEmpty();
+    }
+  });
+});
+
 test.describe('projects', () => {
   test('opens a case study with its documented detail', async ({ page }) => {
     await page.goto('/projects/');
