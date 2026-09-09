@@ -125,10 +125,21 @@ test.describe('landing page', () => {
     // the section renders whatever is published, and a test that fails
     // because an editor unpublished a service is testing the wrong thing.
     // What matters is that every card that renders is complete.
+    //
+    // The section is scroll-revealed (components/motion/scroll-reveal.tsx):
+    // GSAP hides below-the-fold [data-reveal] elements with inline
+    // `autoAlpha` (opacity + visibility) until they cross the trigger line.
+    // Whether the first card starts on-screen depends on load timing and
+    // viewport, so scroll to it explicitly rather than relying on it landing
+    // at the viewport edge.
+    await cards.first().scrollIntoViewIfNeeded();
     await expect(cards.first()).toBeVisible();
     const count = await cards.count();
     expect(count).toBeGreaterThanOrEqual(1);
     for (let i = 0; i < count; i++) {
+      // Same scroll-reveal concern as above: scroll each card into view
+      // before asserting on its contents.
+      await cards.nth(i).scrollIntoViewIfNeeded();
       await expect(cards.nth(i).getByRole('heading', { level: 3 })).toBeVisible();
       await expect(cards.nth(i).locator('p').first()).not.toBeEmpty();
     }
