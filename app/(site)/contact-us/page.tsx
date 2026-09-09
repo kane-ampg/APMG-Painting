@@ -28,91 +28,94 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export default async function ContactPage() {
-  const [copy, settings] = await Promise.all([getPage('contact-us'), getSiteSettings()]);
+/**
+ * Contact.
+ *
+ * The one page on the site where the visitor has already decided. Everything
+ * here is arranged around that: the three ways to reach APMG sit above the
+ * form rather than under it, because a facilities manager with a phone in
+ * their hand should never have to scroll past a fourteen-field form to find a
+ * number — and the form itself is given a column of reassurance beside it
+ * instead of standing alone in a narrow measure, which is what it did before.
+ *
+ * The masthead is the only dark full-bleed opening outside the homepage fold,
+ * and it is earned: the photograph is the signed depot with the whole fleet in
+ * front of it, which answers "are these people real" faster than any sentence
+ * on the page could.
+ *
+ * Nothing here states an hours or response-time commitment.
+ * `settings.openingHours` is still null and APMG has never published one — a
+ * "we reply within 2 hours" line would be the single easiest claim to write on
+ * this page and the single easiest one to break.
+ */
 
-  /**
-   * Contact.
-   *
-   * The one page on the site where the visitor has already decided. Everything
-   * here is arranged around that: the three ways to reach APMG sit above the
-   * form rather than under it, because a facilities manager with a phone in
-   * their hand should never have to scroll past a fourteen-field form to find a
-   * number — and the form itself is given a column of reassurance beside it
-   * instead of standing alone in a narrow measure, which is what it did before.
-   *
-   * The masthead is the only dark full-bleed opening outside the homepage fold,
-   * and it is earned: the photograph is the signed depot with the whole fleet in
-   * front of it, which answers "are these people real" faster than any sentence
-   * on the page could.
-   *
-   * Nothing here states an hours or response-time commitment. `settings.openingHours`
-   * is still null and APMG has never published one — a "we reply within 2 hours"
-   * line would be the single easiest claim to write on this page and the single
-   * easiest one to break.
-   */
-
-  /**
-   * The three ways in, in the order they are actually used.
-   *
-   * Not a card grid. Three cells on one rule, the phone given the display size
-   * because for a trade business it carries more traffic than the other two put
-   * together, and the office given a directions link because an address without
-   * one is a fact rather than an action.
-   */
-  function channelsFor(settings: SiteSettings) {
-    return [
-      {
-        label: 'Call',
-        value: settings.phone,
-        href: phoneHref(settings.phone),
-        note: 'One number for every site.',
-        lead: true,
-        external: false,
-      },
-      {
-        label: 'Email',
-        value: settings.email,
-        href: `mailto:${settings.email}`,
-        note: 'Drawings, scopes and tender packs.',
-        lead: false,
-        external: false,
-      },
-      {
-        label: 'Office',
-        value: formatAddress(settings.address),
-        href: directionsUrl(settings.address),
-        note: 'Get directions',
-        lead: false,
-        external: true,
-      },
-    ] as const;
-  }
-
-  /**
-   * What the enquiry actually sets off.
-   *
-   * Every line is the same commitment made elsewhere on the site — the homepage
-   * process rail and the form's own site-assessment hint — restated at the point
-   * where somebody is deciding whether to fill the thing in. Numbered because
-   * the order is the content: the site visit happens before the number, and that
-   * sequencing is the whole argument.
-   */
-  const NEXT_STEPS = [
+/**
+ * The three ways in, in the order they are actually used.
+ *
+ * Not a card grid. Three cells on one rule, the phone given the display size
+ * because for a trade business it carries more traffic than the other two put
+ * together, and the office given a directions link because an address without
+ * one is a fact rather than an action.
+ *
+ * A function of the settings rather than a constant, because the phone, email
+ * and address are the CMS `settings/site` singleton now. Nothing else about
+ * the row changed.
+ */
+function channelsFor(settings: SiteSettings) {
+  return [
     {
-      heading: 'We come back with questions',
-      body: 'Access, hours and scope, mostly. Those are quicker to settle before anyone attends than to discover on site.',
+      label: 'Call',
+      value: settings.phone,
+      href: phoneHref(settings.phone),
+      note: 'One number for every site.',
+      lead: true,
+      external: false,
     },
     {
-      heading: 'We attend before we quote',
-      body: 'Preparation is the largest variable in any painting job, and it cannot be judged from a photograph or a floor area.',
+      label: 'Email',
+      value: settings.email,
+      href: `mailto:${settings.email}`,
+      note: 'Drawings, scopes and tender packs.',
+      lead: false,
+      external: false,
     },
     {
-      heading: 'You get an itemised scope',
-      body: 'Labour, materials and scheduling broken out — and broken down per location where the work spans several sites.',
+      label: 'Office',
+      value: formatAddress(settings.address),
+      href: directionsUrl(settings.address),
+      note: 'Get directions',
+      lead: false,
+      external: true,
     },
   ] as const;
+}
 
+/**
+ * What the enquiry actually sets off.
+ *
+ * Every line is the same commitment made elsewhere on the site — the homepage
+ * process rail and the form's own site-assessment hint — restated at the point
+ * where somebody is deciding whether to fill the thing in. Numbered because
+ * the order is the content: the site visit happens before the number, and that
+ * sequencing is the whole argument.
+ */
+const NEXT_STEPS = [
+  {
+    heading: 'We come back with questions',
+    body: 'Access, hours and scope, mostly. Those are quicker to settle before anyone attends than to discover on site.',
+  },
+  {
+    heading: 'We attend before we quote',
+    body: 'Preparation is the largest variable in any painting job, and it cannot be judged from a photograph or a floor area.',
+  },
+  {
+    heading: 'You get an itemised scope',
+    body: 'Labour, materials and scheduling broken out — and broken down per location where the work spans several sites.',
+  },
+] as const;
+
+export default async function ContactPage() {
+  const [copy, settings] = await Promise.all([getPage('contact-us'), getSiteSettings()]);
   const channels = channelsFor(settings);
 
   return (

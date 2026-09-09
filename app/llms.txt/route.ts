@@ -32,7 +32,7 @@ export const dynamic = 'force-static';
 export async function GET(): Promise<Response> {
   // The editor deployment publishes nothing to answer engines. See `noindexAll`.
   if (noindexAll) {
-    return new Response('User-agent: *\n# Editor deployment. No content published.\n', {
+    return new Response('Not available on the editor deployment.\n', {
       status: 404,
       headers: { 'Content-Type': 'text/plain; charset=utf-8' },
     });
