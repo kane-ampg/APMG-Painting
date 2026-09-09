@@ -259,8 +259,6 @@ export type SiteSettings = {
     /** ISO date the business occupies this address, or null if already there. */
     effectiveFrom: string | null;
   };
-  /** Shown alongside the move note until effectiveFrom passes. */
-  previousAddress: string | null;
   abn: string | null;
   coords: { latitude: number; longitude: number } | null;
   openingHours: readonly { days: readonly string[]; opens: string; closes: string }[] | null;

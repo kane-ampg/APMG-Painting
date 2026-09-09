@@ -5,7 +5,13 @@ import {
   isSingleton,
   singletonSlug,
 } from '@/lib/content/schemas';
-import { defaultSiteSettings, addressNote, formatAddress, phoneHref } from '@/lib/site';
+import {
+  addressEffectiveMonth,
+  defaultSiteSettings,
+  formatAddress,
+  internationalPhone,
+  phoneHref,
+} from '@/lib/site';
 
 describe('site settings', () => {
   it('accepts the current hard-coded facts as the seed', () => {
@@ -64,14 +70,45 @@ describe('site settings', () => {
     );
   });
 
-  it('shows the move note before the effective date and drops it after', () => {
-    const settings = {
+  it('names a future address month until the move date, then drops it', () => {
+    // Nothing to describe today — the seed carries no move date — but the
+    // footer's line has to expire on its own once an editor sets one.
+    expect(addressEffectiveMonth(defaultSiteSettings)).toBeNull();
+
+    const moving = {
       ...defaultSiteSettings,
       address: { ...defaultSiteSettings.address, effectiveFrom: '2026-10-01' },
-      previousAddress: 'Factory 15/30 Ramset Dr, Chirnside Park VIC 3116',
     };
-    expect(addressNote(settings, new Date('2026-09-15'))).toMatch(/from October 2026/);
-    expect(addressNote(settings, new Date('2026-10-02'))).toBeNull();
+    expect(addressEffectiveMonth(moving, new Date('2026-09-15'))).toBe('October 2026');
+    expect(addressEffectiveMonth(moving, new Date('2026-10-02'))).toBeNull();
+  });
+
+  it('country-codes the display number without mangling any Australian shape', () => {
+    // Every one of these is a number `auPhone` accepts, so the formatter has
+    // to read back whatever the form lets an editor save. The two failures
+    // this covers were a six-digit 13 number sliced as a landline, and an
+    // already-country-coded number having its 61 grouped as subscriber
+    // digits ("+61 3 9123 4567" -> "+61 6 1391 234567").
+    const cases: [string, string][] = [
+      ['1300 97 97 40', '+61 1300 979 740'],
+      ['1300 123 456', '+61 1300 123 456'],
+      ['1800 123 456', '+61 1800 123 456'],
+      ['13 26 84', '+61 13 26 84'],
+      ['0412 345 678', '+61 412 345 678'],
+      ['03 9876 5432', '+61 3 9876 5432'],
+      ['(03) 9876 5432', '+61 3 9876 5432'],
+      ['+61 3 9123 4567', '+61 3 9123 4567'],
+      ['61 412 345 678', '+61 412 345 678'],
+    ];
+
+    for (const [display, expected] of cases) {
+      expect(internationalPhone(display), display).toBe(expected);
+      // The form must accept everything the formatter claims to handle.
+      expect(
+        siteSettingsSchema.safeParse({ ...defaultSiteSettings, phone: display }).success,
+        display,
+      ).toBe(true);
+    }
   });
 
   it('knows which collections are singletons', () => {

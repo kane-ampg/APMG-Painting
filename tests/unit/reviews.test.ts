@@ -13,7 +13,7 @@ import { services } from '@/content/services';
 import {
   accreditationLogos,
   accreditations,
-  addressNote,
+  addressEffectiveMonth,
   defaultSiteSettings,
   directionsUrl,
   formatAddress,
@@ -159,15 +159,14 @@ describe('the office address', () => {
   it('qualifies the address only while a move date is set, then expires', () => {
     // The failure mode this exists for is a "we're moving in October" line
     // outliving the move. There is no move to describe today — the defaults
-    // carry no date — but the note an editor can set has to expire on its own.
-    expect(addressNote(defaultSiteSettings)).toBeNull();
+    // carry no date — but a date an editor sets has to expire on its own.
+    expect(addressEffectiveMonth(defaultSiteSettings)).toBeNull();
 
     const moving = {
       ...defaultSiteSettings,
       address: { ...defaultSiteSettings.address, effectiveFrom: '2026-10-01' },
-      previousAddress: 'Factory 15/30 Ramset Dr, Chirnside Park VIC 3116',
     };
-    expect(addressNote(moving, new Date('2026-09-01T00:00:00Z'))).toContain('October 2026');
-    expect(addressNote(moving, new Date('2026-10-01T00:00:00Z'))).toBeNull();
+    expect(addressEffectiveMonth(moving, new Date('2026-09-01T00:00:00Z'))).toBe('October 2026');
+    expect(addressEffectiveMonth(moving, new Date('2026-10-01T00:00:00Z'))).toBeNull();
   });
 });

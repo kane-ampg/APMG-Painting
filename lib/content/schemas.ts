@@ -83,14 +83,48 @@ export const postSchema = z.object({
  * company's contact facts; the trading and legal names stay in lib/site.ts
  * because "one company name" is a code rule, not editable copy.
  */
+/**
+ * The national number, with no trunk `0` and no country code.
+ *
+ * Grouping is not standardised in the wild: APMG's own 1300 is printed in
+ * twos ("1300 97 97 40"), the conventional form is threes ("1300 123 456"),
+ * and rejecting either would be a validation bug rather than a standard.
+ */
+const NATIONAL_PHONE = [
+  // Landline: one-digit area code, then eight subscriber digits.
+  String.raw`[2378](?:\s?\d{4}){2}`,
+  // Mobile.
+  String.raw`4\d{2}(?:\s?\d{3}){2}`,
+  // 1300/1800, in twos or in threes.
+  String.raw`1[38]00(?:\s?\d{2}){3}`,
+  String.raw`1[38]00(?:\s?\d{3}){2}`,
+  // Six-digit 13 number.
+  String.raw`13\s?\d{2}\s?\d{2}`,
+].join('|');
+
+/**
+ * Australian phone formats, local and international.
+ *
+ * The international form is accepted because `internationalPhone()` in
+ * lib/site.ts has to read back whatever an editor saves here: the two have to
+ * agree on what a phone number is, or a value that saves cleanly produces a
+ * mangled `telephone` in the LocalBusiness node.
+ */
 const auPhone = z
   .string()
   .trim()
-  // 1300/1800 numbers are printed both ways in the wild — APMG's own is
-  // grouped in twos ("1300 97 97 40"), but "1300 123 456" is the conventional
-  // form and rejecting it would be a validation bug, not a standard.
   .regex(
-    /^(\(0\d\)\s?\d{4}\s?\d{4}|0\d(\s?\d{4}){2}|1[38]00(\s?\d{2}){3}|1[38]00(\s?\d{3}){2}|13\s?\d{2}\s?\d{2}|04\d{2}(\s?\d{3}){2})$/,
+    new RegExp(
+      String.raw`^(?:` +
+        // International: the country code stands in for the trunk 0, which
+        // some editors leave in anyway.
+        String.raw`\+?61\s?0?(?:${NATIONAL_PHONE})` +
+        // Local: a bracketed area code, or the trunk 0 on the numbers that
+        // carry one.
+        String.raw`|\(0\d\)\s?\d{4}\s?\d{4}` +
+        String.raw`|0?(?:${NATIONAL_PHONE})` +
+        String.raw`)$`,
+    ),
     'Australian landline, 1300/1800 or mobile number',
   );
 
@@ -113,7 +147,6 @@ export const siteSettingsSchema = z.object({
     country: z.literal('AU'),
     effectiveFrom: isoDate.nullable(),
   }),
-  previousAddress: z.string().nullable(),
   abn,
   coords: z
     .object({ latitude: z.number().min(-44).max(-10), longitude: z.number().min(112).max(154) })

@@ -105,9 +105,9 @@ Recorded during review and left on purpose. Ordered by value.
   a link. Harmless past the door; bounded by Supabase send limits.
 - **`content/faqs.ts`** still hard-codes the suburb; every other public surface
   reads settings.
-- **`addressNote`** is time-dependent but rendered into pages cached with
-  `revalidate: false`; the move notice drops on the next publish rather than
-  on the date.
+- **`addressEffectiveMonth`** is time-dependent but rendered into pages cached
+  with `revalidate: false`; the footer's "from October 2026" line drops on the
+  next publish rather than on the date.
 - **Test polish:** the `CmsImage` blur test asserts `backgroundSize: cover`
   rather than the forwarded `blurDataURL`; `clampMeta` does not strip a
   trailing full stop before the ellipsis; raw SDK error messages reach admins.

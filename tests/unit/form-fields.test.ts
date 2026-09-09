@@ -31,7 +31,6 @@ describe('fieldsFor', () => {
     // Nullable strings stay single-line inputs rather than falling through to
     // a JSON textarea, and are not marked required — null is a valid answer.
     expect(byName.abn).toMatchObject({ kind: 'text', required: false, nullable: true });
-    expect(byName.previousAddress).toMatchObject({ kind: 'text', nullable: true });
     // Nested shapes are validated JSON, per spec section 6.
     expect(byName.address).toMatchObject({ kind: 'json' });
     expect(byName.coords).toMatchObject({ kind: 'json', nullable: true });

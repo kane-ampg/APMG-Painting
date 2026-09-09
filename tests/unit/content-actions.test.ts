@@ -222,7 +222,6 @@ describe('saveEntry on a singleton', () => {
           country: 'AU',
           effectiveFrom: null,
         },
-        previousAddress: null,
         abn: null,
         coords: null,
         openingHours: null,

@@ -3540,7 +3540,7 @@ git commit -m "feat(blog): add CMS-backed blog with BlogPosting schema and sitem
 - Modify: `lib/content/types.ts` (add `SiteSettings`, `ContactPageCopy`)
 - Modify: `lib/content/schemas.ts` (add `siteSettingsSchema`, `contactPageSchema`, `isSingleton`, `singletonSlug`)
 - Modify: `lib/content/source.ts` (add `getSiteSettings`, `getPage`)
-- Modify: `lib/site.ts` (turn `formattedAddress`/`addressNote` into functions of settings; export `defaultSiteSettings`)
+- Modify: `lib/site.ts` (turn `formattedAddress` into a function of settings, add `addressEffectiveMonth`; export `defaultSiteSettings`)
 - Create: `components/providers/site-settings.tsx`
 - Modify: `app/layout.tsx`, `app/contact-us/page.tsx`, `app/about-us/page.tsx`, `app/llms.txt/route.ts`, `components/layout/header.tsx`, `components/layout/footer.tsx`, `components/navigation/mobile-menu.tsx`, `components/chat/quote-chat.tsx`, `components/forms/form-status.tsx`, `components/sections/index.tsx`, `lib/schema/index.ts`
 - Modify: `app/actions/content.ts` (`pathsFor`, layout revalidation, no delete for singletons), `app/admin/[collection]/page.tsx`, `app/admin/[collection]/new/page.tsx`, `app/admin/page.tsx`
@@ -3549,7 +3549,7 @@ git commit -m "feat(blog): add CMS-backed blog with BlogPosting schema and sitem
 
 **Interfaces:**
 
-- Produces: `SiteSettings` and `ContactPageCopy` types; `siteSettingsSchema`, `contactPageSchema`; `isSingleton(c): boolean`; `singletonSlug: { settings: 'site'; pages: 'contact-us' }`; `getSiteSettings(): Promise<SiteSettings>`; `getPage(slug: 'contact-us'): Promise<ContactPageCopy>`; `formatAddress(a: SiteSettings['address']): string`; `addressNote(s: SiteSettings, now?: Date): string | null`; `phoneHref(display: string): string`; `SiteSettingsProvider`, `useSiteSettings()`.
+- Produces: `SiteSettings` and `ContactPageCopy` types; `siteSettingsSchema`, `contactPageSchema`; `isSingleton(c): boolean`; `singletonSlug: { settings: 'site'; pages: 'contact-us' }`; `getSiteSettings(): Promise<SiteSettings>`; `getPage(slug: 'contact-us'): Promise<ContactPageCopy>`; `formatAddress(a: SiteSettings['address']): string`; `addressEffectiveMonth(s: SiteSettings, now?: Date): string | null`; `phoneHref(display: string): string`; `SiteSettingsProvider`, `useSiteSettings()`.
 - Consumes: `all()` and `seeds` from Task 3; `EntryForm`, `fieldsFor`, `saveEntry` from Task 9; `localBusinessSchema(services)` signature from Task 4.
 
 - [ ] **Step 1: Write the failing tests**
@@ -3564,7 +3564,7 @@ import {
   isSingleton,
   singletonSlug,
 } from '@/lib/content/schemas';
-import { defaultSiteSettings, addressNote, formatAddress, phoneHref } from '@/lib/site';
+import { addressEffectiveMonth, defaultSiteSettings, formatAddress, phoneHref } from '@/lib/site';
 
 describe('site settings', () => {
   it('accepts the current hard-coded facts as the seed', () => {
@@ -3598,14 +3598,13 @@ describe('site settings', () => {
     );
   });
 
-  it('shows the move note before the effective date and drops it after', () => {
+  it('names the move month before the effective date and drops it after', () => {
     const settings = {
       ...defaultSiteSettings,
       address: { ...defaultSiteSettings.address, effectiveFrom: '2026-10-01' },
-      previousAddress: 'Factory 15/30 Ramset Dr, Chirnside Park VIC 3116',
     };
-    expect(addressNote(settings, new Date('2026-09-15'))).toMatch(/from October 2026/);
-    expect(addressNote(settings, new Date('2026-10-02'))).toBeNull();
+    expect(addressEffectiveMonth(settings, new Date('2026-09-15'))).toBe('October 2026');
+    expect(addressEffectiveMonth(settings, new Date('2026-10-02'))).toBeNull();
   });
 
   it('knows which collections are singletons', () => {
@@ -3693,8 +3692,6 @@ export type SiteSettings = {
     /** ISO date the business occupies this address, or null if already there. */
     effectiveFrom: string | null;
   };
-  /** Shown alongside the move note until effectiveFrom passes. */
-  previousAddress: string | null;
   abn: string | null;
   coords: { latitude: number; longitude: number } | null;
   openingHours: readonly { days: readonly string[]; opens: string; closes: string }[] | null;
@@ -3744,7 +3741,6 @@ export const siteSettingsSchema = z.object({
     country: z.literal('AU'),
     effectiveFrom: isoDate.nullable(),
   }),
-  previousAddress: z.string().nullable(),
   abn,
   coords: z
     .object({ latitude: z.number().min(-44).max(-10), longitude: z.number().min(112).max(154) })
@@ -3828,7 +3824,6 @@ export const defaultSiteSettings: SiteSettings = {
     country: site.address.country,
     effectiveFrom: site.address.effectiveFrom,
   },
-  previousAddress: 'Factory 15/30 Ramset Dr, Chirnside Park VIC 3116',
   abn: site.abn,
   coords: site.coords,
   openingHours: site.openingHours,
@@ -3848,16 +3843,22 @@ export function formatAddress(address: SiteSettings['address']): string {
   return [address.street, `${address.suburb} ${address.state} ${address.postcode}`].join(', ');
 }
 
-export function addressNote(settings: SiteSettings, now: Date = new Date()): string | null {
-  if (!settings.address.effectiveFrom || !settings.previousAddress) return null;
+export function addressEffectiveMonth(
+  settings: SiteSettings,
+  now: Date = new Date(),
+): string | null {
+  if (!settings.address.effectiveFrom) return null;
   const effective = new Date(`${settings.address.effectiveFrom}T00:00:00Z`);
   if (Number.isNaN(effective.getTime()) || now >= effective) return null;
-  const month = MONTHS[effective.getUTCMonth()];
-  return `Our office from ${month} ${effective.getUTCFullYear()}. Until then we work from ${settings.previousAddress}.`;
+  return `${MONTHS[effective.getUTCMonth()]} ${effective.getUTCFullYear()}`;
 }
 ```
 
-Delete the old `formattedAddress` constant, the old `addressNote(now)` and `previousAddress` exports. The compiler will list every consumer; Step 6 fixes each.
+Delete the old `formattedAddress` constant and the old `addressNote(now)` and
+`previousAddress` exports. There is no transition left to describe — the office
+address is simply the address — so no sentence replaces them; the footer runs
+the month on its own if an editor sets a future `effectiveFrom`. The compiler
+will list every consumer; Step 6 fixes each.
 
 Also add the contact page defaults next to it (values copied from today's `app/contact-us/page.tsx`):
 
@@ -3947,10 +3948,10 @@ export function useSiteSettings(): SiteSettings {
 Then, file by file:
 
 - `components/layout/header.tsx` (server): accept `settings: SiteSettings`; render `phoneHref(settings.phone)` and `settings.phone`.
-- `components/layout/footer.tsx` (server): accept `settings`; use `formatAddress(settings.address)`, `addressNote(settings)`, `phoneHref`, `settings.email`, `settings.abn`, `settings.serviceAreaPrimary`. Keep `site.legalName`.
+- `components/layout/footer.tsx` (server): accept `settings`; use `formatAddress(settings.address)`, `addressEffectiveMonth(settings)`, `phoneHref`, `settings.email`, `settings.abn`, `settings.serviceAreaPrimary`. Keep `site.legalName`.
 - `components/navigation/mobile-menu.tsx`, `components/chat/quote-chat.tsx`, `components/forms/form-status.tsx` (client): replace `site.phone.display` with `useSiteSettings().phone` and `site.phone.href` with `phoneHref(useSiteSettings().phone)`. `phoneHref` is a pure function and safe to import into client code; make sure `lib/site.ts` has no `server-only` import.
 - `components/sections/index.tsx`: the sections that render the phone (`CtaBand` and the two others at the lines the grep found) are server components; give each a `phone: string` prop and pass `settings.phone` from the pages that render them. The suburb line near the region list takes `baseSuburb: string`.
-- `app/about-us/page.tsx`: `const settings = await getSiteSettings();` and use `formatAddress`, `addressNote(settings)`, `settings.address.suburb`, `settings.abn`, `settings.previousAddress`.
+- `app/about-us/page.tsx`: `const settings = await getSiteSettings();` and use `formatAddress`, `directionsUrl(settings.address)`, `settings.address.suburb` and `settings.abn`.
 - `app/llms.txt/route.ts`: read phone, email and address from `getSiteSettings()`.
 - `lib/schema/index.ts`: `localBusinessSchema(services, settings: SiteSettings)`; read `email`, `telephone`, `address`, `sameAs` (filter nulls), `coords` and `openingHours` from `settings`. `locationSchema` (or whichever builder reads `site.address.state` and `site.coords` for the GeoCircle) also takes `settings`.
 
@@ -3963,7 +3964,7 @@ import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import { CommercialEnquiryForm } from '@/components/forms/enquiry-forms';
 import { Container, Section, SectionHeading } from '@/components/ui';
 import { getPage, getSiteSettings } from '@/lib/content/source';
-import { addressNote, formatAddress, phoneHref } from '@/lib/site';
+import { formatAddress, phoneHref } from '@/lib/site';
 
 export async function generateMetadata(): Promise<Metadata> {
   const copy = await getPage('contact-us');
@@ -3976,7 +3977,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ContactPage() {
   const [copy, settings] = await Promise.all([getPage('contact-us'), getSiteSettings()]);
-  const note = addressNote(settings);
 
   return (
     <>
@@ -4014,10 +4014,7 @@ export default async function ContactPage() {
               <dt className="text-xs font-semibold uppercase tracking-label text-ink-muted">
                 Address
               </dt>
-              <dd className="mt-1 text-ink">
-                {formatAddress(settings.address)}
-                {note && <span className="mt-1 block text-sm text-ink-soft">{note}</span>}
-              </dd>
+              <dd className="mt-1 text-ink">{formatAddress(settings.address)}</dd>
             </div>
             {settings.openingHours && settings.openingHours.length > 0 && (
               <div>
@@ -4103,7 +4100,7 @@ In `app/admin/[collection]/page.tsx`, hide "New" when `isSingleton(collection)`,
 
 (Those two are never reached because the "New" link is hidden, but the `Record<Collection, ...>` type demands them.)
 
-`fieldsFor` needs no change: `phone`, `email`, `serviceAreaPrimary` become text inputs, `address`, `coords`, `openingHours`, `social` become JSON fields, `abn` and `previousAddress` become text. Add `'lede'` and `'formIntro'` to the `TEXTAREA` set in `lib/content/form-fields.ts`.
+`fieldsFor` needs no change: `phone`, `email`, `serviceAreaPrimary` become text inputs, `address`, `coords`, `openingHours`, `social` become JSON fields, `abn` becomes text. Add `'lede'` and `'formIntro'` to the `TEXTAREA` set in `lib/content/form-fields.ts`.
 
 - [ ] **Step 8: Seed the singletons**
 

@@ -331,7 +331,6 @@ export const defaultSiteSettings: SiteSettings = {
     // in /admin later, at which point the note appears on its own.
     effectiveFrom: null,
   },
-  previousAddress: null,
   abn: site.abn,
   coords: site.coords,
   openingHours: site.openingHours,
@@ -397,15 +396,40 @@ export function phoneHref(display: string): string {
  */
 export function internationalPhone(display: string): string {
   const digits = display.replace(/\D/g, '');
-  const national = digits.startsWith('0') ? digits.slice(1) : digits;
 
-  // 1300/1800 service numbers group 4-3-3; mobiles (leading 4) group 3-3-3;
-  // landlines carry a one-digit area code and group 4-4.
-  const grouped = /^1[38]00/.test(national)
-    ? [national.slice(0, 4), national.slice(4, 7), national.slice(7)]
-    : national.startsWith('4')
-      ? [national.slice(0, 3), national.slice(3, 6), national.slice(6)]
-      : [national.slice(0, 1), national.slice(1, 5), national.slice(5)];
+  /*
+   * Strip whichever prefix the editor typed before grouping the rest.
+   *
+   * Both are prefixes to the same national number and neither is part of it:
+   * the trunk `0` on landlines and mobiles, and the `61` on a number already
+   * written in international form. Missing the `61` case regrouped
+   * "+61 3 9123 4567" as "+61 6 1391 234567" — a number that dials nowhere,
+   * emitted into the LocalBusiness node where nobody would see it.
+   */
+  const national = digits.startsWith('61')
+    ? digits.slice(2)
+    : digits.startsWith('0')
+      ? digits.slice(1)
+      : digits;
+
+  /*
+   * Grouped by number type, longest-specific first. Anything that matches no
+   * shape is passed through as one group rather than sliced on a guess: a
+   * run-together number is ugly, an incorrectly split one is wrong.
+   */
+  const grouped = /^13\d{4}$/.test(national)
+    ? // Six-digit 13 numbers, in twos: 13 26 84.
+      [national.slice(0, 2), national.slice(2, 4), national.slice(4)]
+    : /^1[38]00\d{6}$/.test(national)
+      ? // 1300/1800 service numbers, 4-3-3.
+        [national.slice(0, 4), national.slice(4, 7), national.slice(7)]
+      : /^4\d{8}$/.test(national)
+        ? // Mobiles, 3-3-3.
+          [national.slice(0, 3), national.slice(3, 6), national.slice(6)]
+        : /^[2378]\d{8}$/.test(national)
+          ? // Landlines: one-digit area code, then 4-4.
+            [national.slice(0, 1), national.slice(1, 5), national.slice(5)]
+          : [national];
 
   return `+61 ${grouped.filter(Boolean).join(' ')}`;
 }
@@ -431,8 +455,15 @@ const MONTHS = [
 ] as const;
 
 /**
- * "October 2026", or null once the move date has passed. The terse form of
- * `addressNote` for surfaces with no room for the sentence — the footer.
+ * "October 2026", or null once the move date has passed.
+ *
+ * The only surface for a future address: the footer runs it under the address
+ * line. Formatted by hand rather than through `toLocaleDateString`, because
+ * month names from ICU differ between the build container and a developer's
+ * machine and this string is baked into static HTML. Takes the settings
+ * rather than reading the file, so an editor who sets a move date in /admin
+ * moves the line with it; `now` is injectable so the expiry is testable
+ * without touching the clock.
  */
 export function addressEffectiveMonth(
   settings: SiteSettings,
@@ -444,25 +475,6 @@ export function addressEffectiveMonth(
   if (Number.isNaN(effective.getTime()) || now >= effective) return null;
 
   return `${MONTHS[effective.getUTCMonth()]} ${effective.getUTCFullYear()}`;
-}
-
-/**
- * The qualifier that runs beside the address until the move completes, or null
- * once it has.
- *
- * Formatted by hand rather than through `toLocaleDateString`, because month
- * names from ICU differ between the build container and a developer's machine
- * and this string is baked into static HTML.
- *
- * Takes the settings rather than reading the file, so an editor who changes
- * the address in /admin moves the note with it. `now` is injectable so the
- * expiry is testable without touching the clock.
- */
-export function addressNote(settings: SiteSettings, now: Date = new Date()): string | null {
-  const month = addressEffectiveMonth(settings, now);
-  if (!month || !settings.previousAddress) return null;
-
-  return `Our office from ${month}. Until then we work from ${settings.previousAddress}.`;
 }
 
 /**
