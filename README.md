@@ -81,9 +81,10 @@ different ways — "APMG Painting", "APMG Painting Services", "APMG Services", "
 Pty Ltd" — plus one typo ("AMPG"). Every surface that states a business fact imports from this one
 module, so that drift cannot recur. A unit test fails the build if the old variants reappear.
 
-**Content is local TypeScript, not a CMS.** This was a deliberate decision, pending confirmation of
-who actually edits the site. Everything goes through typed accessors in `content/`, so swapping the
-source for a CMS later is one adapter rather than a rebuild.
+**Content lives in typed TypeScript files under `content/`** as the seed and the no-database
+fallback — the app runs from these with no Supabase configured. Once Supabase is configured, the
+CMS (see [CMS](#cms) below) is the source of truth for projects, services, posts, business details
+and the contact page. Sectors, suburbs, FAQs, reviews and accreditations stay in code on purpose.
 
 ---
 

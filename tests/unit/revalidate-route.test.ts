@@ -35,6 +35,14 @@ describe('POST /api/revalidate', () => {
     expect((await POST(request({ tags: [], paths: [] }, 'Bearer anything'))).status).toBe(503);
   });
 
+  it('rejects a null body even with a valid bearer', async () => {
+    vi.stubEnv('REVALIDATE_SECRET', 's3cret');
+    const { POST } = await import('@/app/api/revalidate/route');
+    const res = await POST(request(null, 'Bearer s3cret'));
+    expect(res.status).toBe(400);
+    expect(revalidateTag).not.toHaveBeenCalled();
+  });
+
   it('revalidates only content tags and site-relative paths', async () => {
     vi.stubEnv('REVALIDATE_SECRET', 's3cret');
     const { POST } = await import('@/app/api/revalidate/route');
