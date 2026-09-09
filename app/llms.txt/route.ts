@@ -1,6 +1,6 @@
 import { accreditations, formattedAddress, isSandbox, site, siteUrl } from '@/lib/site';
 import { googleAggregate, googleReviews } from '@/content/reviews';
-import { getProjects, getServices } from '@/lib/content/source';
+import { getPosts, getProjects, getServices } from '@/lib/content/source';
 import { sectors } from '@/content/sectors';
 import { locations } from '@/content/locations';
 import { homeFaqs } from '@/content/faqs';
@@ -31,7 +31,7 @@ export async function GET(): Promise<Response> {
     });
   }
 
-  const [services, projects] = await Promise.all([getServices(), getProjects()]);
+  const [services, projects, posts] = await Promise.all([getServices(), getProjects(), getPosts()]);
   const verified = accreditations.filter((a) => a.verified);
 
   const body = `# ${site.name}
@@ -57,6 +57,14 @@ ${sectors.map((s) => `- [${s.shortTitle}](${siteUrl}${s.legacyPath}): ${s.intro}
 ## Documented projects
 
 ${projects.map((p) => `- [${p.title}](${siteUrl}/projects/${p.slug}/): ${p.location}. ${p.challenge}`).join('\n')}
+
+## Notes
+
+${
+  posts.length > 0
+    ? posts.map((p) => `- [${p.title}](${siteUrl}/blog/${p.slug}/): ${p.excerpt}`).join('\n')
+    : 'Nothing published yet.'
+}
 
 ## Suburbs served
 

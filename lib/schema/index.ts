@@ -1,7 +1,7 @@
 import { formattedAddress, site, siteUrl, verifiedAccreditations } from '@/lib/site';
 import { averageRating, firstPartyReviews } from '@/content/reviews';
 import { locations } from '@/content/locations';
-import type { Project, Service } from '@/lib/content/types';
+import type { Post, Project, Service } from '@/lib/content/types';
 
 /** The APMG mark, dark-on-transparent — the header variant. */
 export const brandLogoPath = '/images/brand/apmg-logo-ink.webp';
@@ -270,6 +270,32 @@ export function projectSchema(project: Project): JsonLdValue {
       '@type': 'Place',
       name: project.location,
     },
+  };
+}
+
+/**
+ * Blog posts are published as the organisation, not as an invented personal
+ * byline — APMG has no editorial staff to attribute a post to. Never carries
+ * an aggregateRating: a post is not a business listing.
+ */
+export function blogPostingSchema(post: Post): JsonLdValue {
+  const url = `${siteUrl}/blog/${post.slug}/`;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    '@id': `${url}#article`,
+    headline: post.title,
+    description: post.excerpt,
+    url,
+    mainEntityOfPage: url,
+    datePublished: post.publishedAt,
+    dateModified: post.updatedAt ?? post.publishedAt,
+    inLanguage: 'en-AU',
+    // The business writes as itself. No invented personal bylines.
+    author: { '@id': `${siteUrl}/#organization` },
+    publisher: { '@id': `${siteUrl}/#organization` },
+    ...(post.cover ? { image: post.cover.src } : {}),
+    keywords: post.tags.join(', '),
   };
 }
 

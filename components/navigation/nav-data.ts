@@ -25,6 +25,7 @@ export const mainNav: readonly NavItem[] = [
     ],
   },
   { label: 'Projects', href: '/projects/' },
+  { label: 'Blog', href: '/blog/' },
   { label: 'Trade services', href: '/trade-services/' },
   { label: 'About', href: '/about-us/' },
   { label: 'Contact', href: '/contact-us/' },

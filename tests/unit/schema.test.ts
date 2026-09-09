@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  blogPostingSchema,
   breadcrumbSchema,
   localBusinessSchema,
   organizationSchema,
@@ -113,5 +114,33 @@ describe('structured data', () => {
     const schema = projectSchema(project);
     expect(schema.headline).toBe(project.title);
     expect(JSON.stringify(schema.contentLocation)).toContain('Vermont');
+  });
+});
+
+describe('blog posting schema', () => {
+  const post = {
+    slug: 'sequencing-an-occupied-office',
+    title: 'Sequencing a repaint in an occupied office',
+    excerpt: 'How zones are handed back.',
+    body: '# Heading\n\nText.',
+    publishedAt: '2026-09-01',
+    updatedAt: '2026-09-08',
+    author: 'APMG Painting',
+    tags: ['office'],
+    metaTitle: 'Sequencing an occupied office repaint | APMG Painting',
+    metaDescription: 'How zones are handed back.',
+  };
+
+  it('is a BlogPosting authored by the organisation with both dates', () => {
+    const data = blogPostingSchema(post);
+    expect(data['@type']).toBe('BlogPosting');
+    expect(data.datePublished).toBe('2026-09-01');
+    expect(data.dateModified).toBe('2026-09-08');
+    expect(JSON.stringify(data.author)).toContain('#organization');
+    expect(String(data.url)).toMatch(/\/blog\/sequencing-an-occupied-office\/$/);
+  });
+
+  it('never emits an aggregateRating', () => {
+    expect(JSON.stringify(blogPostingSchema(post))).not.toMatch(/aggregateRating/);
   });
 });
