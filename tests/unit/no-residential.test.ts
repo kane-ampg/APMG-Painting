@@ -22,6 +22,8 @@ describe('residential surface is gone', () => {
   });
 
   it('has no residential route', () => {
-    expect(globSync('app/residential-painting/**', { cwd: process.cwd() })).toEqual([]);
+    // `app/**` rather than `app/`: the public routes live under the `(site)`
+    // route group, which is invisible in the URL but very much present here.
+    expect(globSync('app/**/residential-painting/**', { cwd: process.cwd() })).toEqual([]);
   });
 });

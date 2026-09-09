@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, Fraunces } from 'next/font/google';
-import './globals.css';
+import '../globals.css';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { QuoteChat } from '@/components/chat/quote-chat';
