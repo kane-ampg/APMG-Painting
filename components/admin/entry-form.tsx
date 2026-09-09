@@ -100,7 +100,10 @@ export function EntryForm({ collection, fields, initial, initialStatus, media }:
       } else if (field.kind === 'json') {
         const raw = (text[field.name] ?? '').trim();
         if (raw === '') {
-          out[field.name] = undefined;
+          // Cleared: `null` where the schema accepts it (coords, openingHours),
+          // `undefined` where the field is merely optional, so it is omitted
+          // rather than sent as an explicit null the schema would reject.
+          out[field.name] = field.nullable ? null : undefined;
         } else {
           try {
             out[field.name] = JSON.parse(raw);

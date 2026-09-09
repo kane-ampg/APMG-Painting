@@ -23,6 +23,31 @@ describe('site settings', () => {
     expect(siteSettingsSchema.safeParse(bad).success).toBe(false);
   });
 
+  it('accepts a 1300 or 1800 number printed in three-digit groups', () => {
+    // APMG's own number is grouped in twos, but "1300 123 456" is the
+    // conventional printing and an editor typing it must not be rejected.
+    for (const phone of [
+      '1300 123 456',
+      '1800 123 456',
+      '1300123456',
+      '1300 97 97 40',
+      '(03) 9876 5432',
+      '0412 345 678',
+      '13 12 34',
+    ]) {
+      expect(siteSettingsSchema.safeParse({ ...defaultSiteSettings, phone }).success, phone).toBe(
+        true,
+      );
+    }
+    // '1300 12' is deliberately absent: it is a valid six-digit 13 number
+    // ("13 00 12"), which the 13xxxx alternative admits on purpose.
+    for (const phone of ['+1 555 123 4567', '1300 123 4567', '1900 123 456', 'call us']) {
+      expect(siteSettingsSchema.safeParse({ ...defaultSiteSettings, phone }).success, phone).toBe(
+        false,
+      );
+    }
+  });
+
   it('rejects an ABN that is not eleven digits', () => {
     expect(siteSettingsSchema.safeParse({ ...defaultSiteSettings, abn: '1234' }).success).toBe(
       false,

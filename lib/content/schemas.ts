@@ -86,8 +86,11 @@ export const postSchema = z.object({
 const auPhone = z
   .string()
   .trim()
+  // 1300/1800 numbers are printed both ways in the wild — APMG's own is
+  // grouped in twos ("1300 97 97 40"), but "1300 123 456" is the conventional
+  // form and rejecting it would be a validation bug, not a standard.
   .regex(
-    /^(\(0\d\)\s?\d{4}\s?\d{4}|0\d(\s?\d{4}){2}|1[38]00(\s?\d{2}){3}|13\s?\d{2}\s?\d{2}|04\d{2}(\s?\d{3}){2})$/,
+    /^(\(0\d\)\s?\d{4}\s?\d{4}|0\d(\s?\d{4}){2}|1[38]00(\s?\d{2}){3}|1[38]00(\s?\d{3}){2}|13\s?\d{2}\s?\d{2}|04\d{2}(\s?\d{3}){2})$/,
     'Australian landline, 1300/1800 or mobile number',
   );
 

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { collectionSchemas, type Collection } from './schemas';
+import { collectionSchemas, isSingleton, type Collection } from './schemas';
 
 export type FieldKind = 'text' | 'textarea' | 'lines' | 'boolean' | 'image' | 'json' | 'date';
 export type FieldSpec = {
@@ -76,7 +76,12 @@ function kindOf(name: string, schema: z.ZodTypeAny): FieldKind {
  */
 export function fieldsFor(collection: Collection): FieldSpec[] {
   const shape = collectionSchemas[collection].shape as Record<string, z.ZodTypeAny>;
-  return Object.entries(shape).map(([name, schema]) => {
+  // A singleton's slug is fixed and set by the save action, so showing it as
+  // an editable field invites an edit that is silently discarded.
+  const entries = Object.entries(shape).filter(
+    ([name]) => !(isSingleton(collection) && name === 'slug'),
+  );
+  return entries.map(([name, schema]) => {
     const { inner, optional, nullable } = unwrap(schema);
     // A nullable field is not "required" from an editor's point of view: the
     // key must be present, but null is a legitimate value for it.
