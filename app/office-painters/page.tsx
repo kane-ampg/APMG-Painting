@@ -12,7 +12,7 @@ import {
 import { Container, Prose, Section, SectionHeading } from '@/components/ui';
 import { JsonLd } from '@/components/seo/json-ld';
 import { faqSchema, serviceSchema } from '@/lib/schema';
-import { getProject, getService } from '@/lib/content/source';
+import { getProject, getService, getSiteSettings } from '@/lib/content/source';
 import { officeFaqs } from '@/content/faqs';
 
 /**
@@ -70,9 +70,10 @@ const OFFICE_SURFACES = [
 ];
 
 export default async function OfficePaintersPage() {
-  const [service, ndis] = await Promise.all([
+  const [service, ndis, settings] = await Promise.all([
     getService('office-painting'),
     getProject('ndis-commercial-painting'),
+    getSiteSettings(),
   ]);
 
   return (
@@ -83,6 +84,7 @@ export default async function OfficePaintersPage() {
           description:
             'Office and workplace painting across Melbourne, delivered after hours or in staged zones.',
           path: '/office-painters/',
+          settings,
         })}
       />
       <JsonLd data={faqSchema(officeFaqs)} />
@@ -171,6 +173,7 @@ export default async function OfficePaintersPage() {
         heading="Repainting your workplace?"
         body="Tell us the floor area and the hours we are allowed in, and we will come and look."
         cta={{ label: 'Request a site assessment', href: '/contact-us/#commercial' }}
+        phone={settings.phone}
       />
     </>
   );

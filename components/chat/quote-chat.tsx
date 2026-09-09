@@ -16,7 +16,8 @@ import {
 import { QUICK_ANSWERS } from '@/lib/enquiry/chat-faqs';
 import { initialEnquiryState } from '@/lib/enquiry/state';
 import { microLabel } from '@/components/ui';
-import { isSandbox, site } from '@/lib/site';
+import { isSandbox, phoneHref } from '@/lib/site';
+import { useSiteSettings } from '@/components/providers/site-settings';
 import { cn } from '@/lib/utils';
 
 /**
@@ -44,6 +45,7 @@ type Turn = { role: 'bot' | 'user'; text: string };
 
 export function QuoteChat() {
   const pathname = usePathname();
+  const settings = useSiteSettings();
 
   const [open, setOpen] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
@@ -323,8 +325,7 @@ export function QuoteChat() {
 
           {isSandbox && (
             <p className="border-b border-signal-400/40 bg-signal-400/15 px-4 py-2 text-xs text-ink-soft">
-              Preview build — enquiries are not delivered. Call {site.phone.display} to reach the
-              team.
+              Preview build — enquiries are not delivered. Call {settings.phone} to reach the team.
             </p>
           )}
 
@@ -451,10 +452,10 @@ export function QuoteChat() {
           <footer className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-paper-edge bg-paper-sunken px-4 py-2.5 text-xs text-ink-muted">
             <span>Prefer not to chat?</span>
             <a
-              href={site.phone.href}
+              href={phoneHref(settings.phone)}
               className="font-semibold text-brand-700 underline decoration-brand-600/40 underline-offset-2 hover:decoration-brand-600"
             >
-              {site.phone.display}
+              {settings.phone}
             </a>
             <Link
               href={`${QUOTE_PATH}${QUOTE_HASH}`}

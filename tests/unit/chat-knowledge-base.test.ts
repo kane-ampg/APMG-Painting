@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { accreditations, formattedAddress, site } from '@/lib/site';
+import { accreditations, defaultSiteSettings, formatAddress, phoneHref, site } from '@/lib/site';
 import { QUICK_ANSWERS, QUICK_QUESTIONS } from '@/lib/enquiry/chat-faqs';
 
 /**
@@ -24,10 +24,10 @@ describe('the knowledge base carries the canonical business facts', () => {
   it.each([
     ['trading name', site.name],
     ['legal name', site.legalName],
-    ['phone', site.phone.display],
-    ['tel: href', site.phone.href.replace('tel:', '')],
-    ['email', site.email],
-    ['address', formattedAddress],
+    ['phone', defaultSiteSettings.phone],
+    ['tel: href', phoneHref(defaultSiteSettings.phone).replace('tel:', '')],
+    ['email', defaultSiteSettings.email],
+    ['address', formatAddress(defaultSiteSettings.address)],
     ['founding year', String(site.founded)],
     ['service radius', String(site.serviceArea.radiusKm)],
   ])('states the %s', (_label, value) => {
@@ -35,7 +35,7 @@ describe('the knowledge base carries the canonical business facts', () => {
   });
 
   it('does not publish an ABN, because the site has none', () => {
-    expect(site.abn).toBeNull();
+    expect(defaultSiteSettings.abn).toBeNull();
     expect(KB).not.toMatch(/ABN[:\s]+\d/i);
   });
 });

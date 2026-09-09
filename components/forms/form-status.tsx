@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { site } from '@/lib/site';
+import { useSiteSettings } from '@/components/providers/site-settings';
 
 /**
  * The result of an enquiry submission.
@@ -24,6 +24,7 @@ export function FormStatus({
   delivered?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const settings = useSiteSettings();
 
   useEffect(() => {
     if (status !== 'idle') ref.current?.focus();
@@ -50,7 +51,7 @@ export function FormStatus({
           <p className="font-semibold">Your details passed validation — but were not sent.</p>
           <p className="mt-1">
             This is a preview build with no mail delivery configured, so nobody has received this.
-            Please call {site.phone.display} to reach the team.
+            Please call {settings.phone} to reach the team.
           </p>
         </>
       ) : (

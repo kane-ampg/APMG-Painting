@@ -7,7 +7,8 @@ import { createPortal } from 'react-dom';
 import { mainNav } from './nav-data';
 import { isCurrentPage, isSamePath, navActiveState } from '@/lib/nav/active';
 import { cn } from '@/lib/utils';
-import { site } from '@/lib/site';
+import { phoneHref } from '@/lib/site';
+import { useSiteSettings } from '@/components/providers/site-settings';
 
 /** The menu section the given page sits under, if it is not a top-level item. */
 function activeSection(pathname: string): string | null {
@@ -40,6 +41,7 @@ function activeSection(pathname: string): string | null {
  */
 export function MobileMenu() {
   const pathname = usePathname();
+  const settings = useSiteSettings();
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(() => activeSection(pathname));
   const panelId = useId();
@@ -293,10 +295,10 @@ export function MobileMenu() {
                   Request a site assessment
                 </Link>
                 <a
-                  href={site.phone.href}
+                  href={phoneHref(settings.phone)}
                   className="rounded py-2 text-center text-sm font-semibold text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
                 >
-                  {site.phone.display}
+                  {settings.phone}
                 </a>
               </div>
             </div>

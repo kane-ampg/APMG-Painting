@@ -102,4 +102,15 @@ for (const service of services) {
   await upsertEntry('services', service.slug, { ...service, image });
 }
 
+// The two singletons. `lib/site.ts` imports nothing from Next, so tsx can
+// load it, and these are the same values the app falls back to with no
+// database — seeding them makes the row the source of truth without changing
+// what the site says.
+const { defaultSiteSettings, defaultContactPage } = await tsImport(
+  '../lib/site.ts',
+  import.meta.url,
+);
+await upsertEntry('settings', 'site', defaultSiteSettings);
+await upsertEntry('pages', 'contact-us', defaultContactPage);
+
 console.log('Seed complete.');

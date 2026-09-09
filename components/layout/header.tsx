@@ -4,9 +4,10 @@ import { DesktopNav } from '@/components/navigation/desktop-nav';
 import { MobileMenu } from '@/components/navigation/mobile-menu';
 import { QuoteCta } from '@/components/navigation/quote-cta';
 import { Container } from '@/components/ui';
-import { site } from '@/lib/site';
+import { phoneHref } from '@/lib/site';
+import type { SiteSettings } from '@/lib/content/types';
 
-export function Header() {
+export function Header({ settings }: { settings: SiteSettings }) {
   return (
     <header className="sticky top-0 z-40 border-b border-paper-edge bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <Container width="wide">
@@ -35,11 +36,11 @@ export function Header() {
 
           <div className="flex items-center gap-2 sm:gap-3">
             <a
-              href={site.phone.href}
+              href={phoneHref(settings.phone)}
               className="rounded-md px-2 py-2 text-sm font-semibold text-brand-700 hover:bg-paper-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 sm:px-3"
             >
               <span className="sr-only">Call </span>
-              {site.phone.display}
+              {settings.phone}
             </a>
             <QuoteCta className="hidden rounded-md bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 lg:inline-block">
               Get a quote

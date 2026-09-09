@@ -4,7 +4,7 @@ import { ContentBlock, CtaBand, FaqList, Hero, MediaBand } from '@/components/se
 import { JsonLd } from '@/components/seo/json-ld';
 import { faqSchema, serviceSchema } from '@/lib/schema';
 import { Card, Prose } from '@/components/ui';
-import { getService } from '@/lib/content/source';
+import { getService, getSiteSettings } from '@/lib/content/source';
 import { tradeFaqs } from '@/content/faqs';
 
 /**
@@ -53,7 +53,10 @@ const SEQUENCE = [
 ];
 
 export default async function TradeServicesPage() {
-  const service = await getService('builders-and-head-contractors');
+  const [service, settings] = await Promise.all([
+    getService('builders-and-head-contractors'),
+    getSiteSettings(),
+  ]);
 
   return (
     <>
@@ -63,6 +66,7 @@ export default async function TradeServicesPage() {
           description:
             'Painting delivered into a construction programme — staged to the build, sequenced around other trades, and carried through to handover, across Melbourne.',
           path: '/trade-services/',
+          settings,
         })}
       />
       <JsonLd data={faqSchema(tradeFaqs)} />
@@ -125,6 +129,7 @@ export default async function TradeServicesPage() {
         heading="Painting on your build?"
         body="Tell us where painting sits in the programme and we will tell you how we fit around it."
         cta={{ label: 'Get in touch', href: '/contact-us/' }}
+        phone={settings.phone}
       />
     </>
   );

@@ -1,6 +1,6 @@
-import { accreditations, formattedAddress, isSandbox, site, siteUrl } from '@/lib/site';
+import { accreditations, formatAddress, isSandbox, site, siteUrl } from '@/lib/site';
 import { googleAggregate, googleReviews } from '@/content/reviews';
-import { getPosts, getProjects, getServices } from '@/lib/content/source';
+import { getPosts, getProjects, getServices, getSiteSettings } from '@/lib/content/source';
 import { sectors } from '@/content/sectors';
 import { locations } from '@/content/locations';
 import { homeFaqs } from '@/content/faqs';
@@ -31,16 +31,21 @@ export async function GET(): Promise<Response> {
     });
   }
 
-  const [services, projects, posts] = await Promise.all([getServices(), getProjects(), getPosts()]);
+  const [services, projects, posts, settings] = await Promise.all([
+    getServices(),
+    getProjects(),
+    getPosts(),
+    getSiteSettings(),
+  ]);
   const verified = accreditations.filter((a) => a.verified);
 
   const body = `# ${site.name}
 
-> ${site.tagline}. ${site.legalName}, founded ${site.founded}, based at ${formattedAddress}. Work is carried out across ${site.serviceArea.primary}, within roughly ${site.serviceArea.radiusKm} km of the Bayswater North base.
+> ${site.tagline}. ${site.legalName}, founded ${site.founded}, based at ${formatAddress(settings.address)}. Work is carried out across ${settings.serviceAreaPrimary}, within roughly ${site.serviceArea.radiusKm} km of the ${settings.address.suburb} base.
 
 APMG Painting is a commercial painting and property maintenance contractor. The work is painting programmes in buildings that stay open while they are painted — schools, clinics, aged care, strata, retail, hospitality and industrial sites.
 
-Contact: ${site.phone.display} · ${site.email}
+Contact: ${settings.phone} · ${settings.email}
 
 ## How the work is quoted
 
@@ -68,11 +73,11 @@ ${
 
 ## Suburbs served
 
-Melbourne metropolitan area, worked from ${site.address.suburb}. "Do you work in X?" is the most common question an answer engine gets asked about a trade business, so the suburbs with documented work are listed rather than left to a link:
+Melbourne metropolitan area, worked from ${settings.address.suburb}. "Do you work in X?" is the most common question an answer engine gets asked about a trade business, so the suburbs with documented work are listed rather than left to a link:
 
 ${locations.map((l) => `- ${l.suburb}, ${l.region}${l.indexable ? '' : ' (no documented project yet)'}`).join('\n')}
 
-Suburbs outside this list within roughly ${site.serviceArea.radiusKm} km of ${site.address.suburb} are still serviced; the list records where work is documented, not the limit of the service area.
+Suburbs outside this list within roughly ${site.serviceArea.radiusKm} km of ${settings.address.suburb} are still serviced; the list records where work is documented, not the limit of the service area.
 
 ## Common questions
 

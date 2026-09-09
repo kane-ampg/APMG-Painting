@@ -22,7 +22,7 @@ import { ButtonLink, Container, Prose, Section, SectionHeading } from '@/compone
 import { faqSchema } from '@/lib/schema';
 import { homeFaqs } from '@/content/faqs';
 import { locations } from '@/content/locations';
-import { getFeaturedProjects, getServices } from '@/lib/content/source';
+import { getFeaturedProjects, getServices, getSiteSettings } from '@/lib/content/source';
 import { sectors } from '@/content/sectors';
 import { site } from '@/lib/site';
 
@@ -115,7 +115,11 @@ const APPROACH = [
 
 export default async function HomePage() {
   const yearsTrading = new Date().getFullYear() - site.founded;
-  const [services, featuredProjects] = await Promise.all([getServices(), getFeaturedProjects()]);
+  const [services, featuredProjects, settings] = await Promise.all([
+    getServices(),
+    getFeaturedProjects(),
+    getSiteSettings(),
+  ]);
 
   return (
     <>
@@ -138,6 +142,7 @@ export default async function HomePage() {
           alt: 'Melbourne from the air over Docklands, looking across the Yarra to the CBD skyline',
         }}
         scrollTo={{ label: 'What we paint', href: '#services' }}
+        phone={settings.phone}
       />
 
       <TrustBar />
@@ -245,7 +250,7 @@ export default async function HomePage() {
       <GoogleReviewWall />
 
       <ContentBlock eyebrow="Areas" heading="Where we work across Melbourne">
-        <ServiceAreas locations={locations} />
+        <ServiceAreas locations={locations} baseSuburb={settings.address.suburb} />
       </ContentBlock>
 
       <ContentBlock tone="sunken" heading="About APMG Painting">
@@ -288,6 +293,7 @@ export default async function HomePage() {
         heading="Tell us what needs painting"
         body="Commercial enquiries get a site assessment before a number."
         cta={{ label: 'Request a quote', href: '/contact-us/' }}
+        phone={settings.phone}
       />
     </>
   );

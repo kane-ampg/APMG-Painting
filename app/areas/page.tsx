@@ -5,6 +5,7 @@ import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import { CtaBand } from '@/components/sections';
 import { Container, Placeholder, Prose, Section } from '@/components/ui';
 import { locationsByRegion } from '@/content/locations';
+import { getSiteSettings } from '@/lib/content/source';
 
 /**
  * Areas hub.
@@ -20,8 +21,9 @@ export const metadata: Metadata = buildMetadata({
   path: '/areas/',
 });
 
-export default function AreasPage() {
+export default async function AreasPage() {
   const byRegion = locationsByRegion();
+  const settings = await getSiteSettings();
 
   return (
     <>
@@ -80,6 +82,7 @@ export default function AreasPage() {
         heading="Not sure if you are in range?"
         body="Call and ask — it is a faster answer than a form."
         cta={{ label: 'Get in touch', href: '/contact-us/' }}
+        phone={settings.phone}
       />
     </>
   );

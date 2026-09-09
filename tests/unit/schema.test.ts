@@ -10,30 +10,48 @@ import {
 import { getProject } from '@/content/projects';
 import { locations } from '@/content/locations';
 import { services } from '@/content/services';
-import { site } from '@/lib/site';
+import { defaultSiteSettings } from '@/lib/site';
 
 describe('structured data', () => {
   it('never emits an aggregateRating', () => {
     // The live site shows "5.0, based on 70 reviews" from a third-party widget.
     // Review markup must describe reviews the site itself hosts and can
     // evidence, so none is emitted.
-    const payloads = [organizationSchema(), localBusinessSchema(services)];
+    const payloads = [
+      organizationSchema(defaultSiteSettings),
+      localBusinessSchema(services, defaultSiteSettings),
+    ];
     for (const payload of payloads) {
       expect(JSON.stringify(payload)).not.toMatch(/aggregateRating|reviewCount|ratingValue/);
     }
   });
 
   it('uses the canonical phone number, not a CallRail tracking number', () => {
-    expect(localBusinessSchema(services).telephone).toBe('1300 97 97 40');
+    expect(localBusinessSchema(services, defaultSiteSettings).telephone).toBe('1300 97 97 40');
+  });
+
+  it('LocalBusiness reflects the settings it is given, not the file', () => {
+    const changed = {
+      ...defaultSiteSettings,
+      phone: '1300 00 00 00',
+      email: 'hello@apmgpainting.com.au',
+    };
+    const data = localBusinessSchema(services, changed);
+    expect(data.telephone).toBe('1300 00 00 00');
+    expect(data.email).toBe('hello@apmgpainting.com.au');
   });
 
   it('states one legal entity name', () => {
-    expect(organizationSchema().legalName).toBe('APMG Painting Services Pty Ltd');
+    expect(organizationSchema(defaultSiteSettings).legalName).toBe(
+      'APMG Painting Services Pty Ltd',
+    );
   });
 
   it('scopes the service area to Melbourne', () => {
-    expect(JSON.stringify(localBusinessSchema(services))).toContain('Melbourne');
-    expect(JSON.stringify(localBusinessSchema(services))).not.toMatch(
+    expect(JSON.stringify(localBusinessSchema(services, defaultSiteSettings))).toContain(
+      'Melbourne',
+    );
+    expect(JSON.stringify(localBusinessSchema(services, defaultSiteSettings))).not.toMatch(
       /Australia[- ]wide|nationwide/i,
     );
   });
@@ -41,11 +59,11 @@ describe('structured data', () => {
   it('declares the specific trade, not just the parent category', () => {
     // "HomeAndConstructionBusiness" also covers plumbers and roofers. The
     // painting-specific type is what makes the entity unambiguous.
-    expect(localBusinessSchema(services)['@type']).toContain('HousePainter');
+    expect(localBusinessSchema(services, defaultSiteSettings)['@type']).toContain('HousePainter');
   });
 
   it('names every suburb it publishes a page for in areaServed', () => {
-    const served = JSON.stringify(localBusinessSchema(services).areaServed);
+    const served = JSON.stringify(localBusinessSchema(services, defaultSiteSettings).areaServed);
     // "painters <suburb>" is the query a local trade can actually win, so
     // each suburb has to appear as its own served area rather than being
     // flattened into a single "Melbourne" node.
@@ -60,10 +78,10 @@ describe('structured data', () => {
     // is dangerous: a wrong latitude moves the business, and invented hours
     // tell people to call an empty office. Structure ships now, values ship
     // when APMG supplies them.
-    const schema = localBusinessSchema(services);
+    const schema = localBusinessSchema(services, defaultSiteSettings);
 
-    expect(site.coords).toBeNull();
-    expect(site.openingHours).toBeNull();
+    expect(defaultSiteSettings.coords).toBeNull();
+    expect(defaultSiteSettings.openingHours).toBeNull();
 
     expect(schema.geo).toBeUndefined();
     expect(schema.openingHoursSpecification).toBeUndefined();
@@ -76,10 +94,10 @@ describe('structured data', () => {
     // told that this entity and that profile are the same business. Resolved
     // from the review widget on apmgpainting.com.au, so it is APMG's own
     // profile rather than a guessed one.
-    const schema = localBusinessSchema(services);
+    const schema = localBusinessSchema(services, defaultSiteSettings);
 
-    expect(site.social.google).toContain('place_id:');
-    expect(schema.sameAs).toContain(site.social.google);
+    expect(defaultSiteSettings.social.google).toContain('place_id:');
+    expect(schema.sameAs).toContain(defaultSiteSettings.social.google);
   });
 
   it('offers the same service area on a service as on the business', () => {
@@ -89,9 +107,10 @@ describe('structured data', () => {
       name: 'Interior painting',
       description: 'Interior work in occupied spaces.',
       path: '/commercial/',
+      settings: defaultSiteSettings,
     });
     expect(JSON.stringify(service.areaServed)).toEqual(
-      JSON.stringify(localBusinessSchema(services).areaServed),
+      JSON.stringify(localBusinessSchema(services, defaultSiteSettings).areaServed),
     );
   });
 

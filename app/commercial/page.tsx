@@ -14,7 +14,7 @@ import { Container, Prose, Section, SectionHeading } from '@/components/ui';
 import { JsonLd } from '@/components/seo/json-ld';
 import { faqSchema, serviceSchema } from '@/lib/schema';
 import { sectors } from '@/content/sectors';
-import { getFeaturedProjects } from '@/lib/content/source';
+import { getFeaturedProjects, getSiteSettings } from '@/lib/content/source';
 import { faqsFor } from '@/content/faqs';
 
 /**
@@ -56,7 +56,10 @@ const PROCESS = [
 ];
 
 export default async function CommercialPage() {
-  const featuredProjects = await getFeaturedProjects();
+  const [featuredProjects, settings] = await Promise.all([
+    getFeaturedProjects(),
+    getSiteSettings(),
+  ]);
 
   return (
     <>
@@ -66,6 +69,7 @@ export default async function CommercialPage() {
           description:
             'Commercial painting contracting across Melbourne, including education, healthcare, aged care, strata, retail, hospitality and industrial sites.',
           path: '/commercial/',
+          settings,
         })}
       />
       {/* The page already carried the FAQ content; it emitted no FAQPage, so
@@ -148,6 +152,7 @@ export default async function CommercialPage() {
         heading="Request a site assessment"
         body="Tell us the sector, the location and the hours we are allowed on site. We will come and look before quoting."
         cta={{ label: 'Start a commercial enquiry', href: '/contact-us/#commercial' }}
+        phone={settings.phone}
       />
     </>
   );

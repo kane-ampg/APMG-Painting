@@ -1,5 +1,13 @@
 /**
- * Canonical business facts — the single source of truth.
+ * Canonical business facts, and the seed for the ones an editor may change.
+ *
+ * The trading and legal names, the founding year, the tagline and the
+ * accreditations are code and stay here: the one-company-name rule below is
+ * not editable copy. The contact facts — phone, email, address, ABN, coords,
+ * hours, socials — now live in the CMS `settings/site` singleton, and this
+ * file supplies `defaultSiteSettings`, which seeds that row and answers when
+ * there is no database. Read them through `getSiteSettings()`, never from
+ * `site.*`.
  *
  * The live WordPress site renders the company name four different ways
  * ("APMG Painting", "APMG Painting Services", "APMG Services",
@@ -10,6 +18,8 @@
  * Anything marked NEEDS-CLIENT-CONFIRMATION is not rendered publicly until
  * APMG supplies it. Nothing here is invented.
  */
+
+import type { ContactPageCopy, SiteSettings } from '@/lib/content/types';
 
 export const CONTACT_UNVERIFIED = 'NEEDS-CLIENT-CONFIRMATION' as const;
 
@@ -271,14 +281,65 @@ export const verifiedAccreditations = accreditations.filter((a) => a.verified);
  */
 export const accreditationLogos = verifiedAccreditations.filter((a) => a.logo !== undefined);
 
-/** Formatted one-line address for the footer and contact page. */
-export const formattedAddress = [
-  site.address.street,
-  `${site.address.suburb} ${site.address.state} ${site.address.postcode}`,
-].join(', ');
+/**
+ * Seed and fallback for the CMS `settings/site` entry. Once seeded, the
+ * database wins; this object only answers when there is no database.
+ * Values are the ones that were hard-coded here before the CMS existed, so
+ * nothing is retyped and the two cannot drift.
+ */
+export const defaultSiteSettings: SiteSettings = {
+  phone: site.phone.display,
+  email: site.email,
+  address: {
+    street: site.address.street,
+    suburb: site.address.suburb,
+    state: site.address.state,
+    postcode: site.address.postcode,
+    country: site.address.country,
+    effectiveFrom: site.address.effectiveFrom,
+  },
+  /** The address APMG occupies until the Bayswater North move completes. */
+  previousAddress: 'Factory 15/30 Ramset Dr, Chirnside Park VIC 3116',
+  abn: site.abn,
+  coords: site.coords,
+  openingHours: site.openingHours,
+  serviceAreaPrimary: site.serviceArea.primary,
+  social: {
+    instagram: site.social.instagram,
+    facebook: site.social.facebook,
+    google: site.social.google,
+  },
+};
 
-/** The address APMG occupies until the Bayswater North move completes. */
-export const previousAddress = 'Factory 15/30 Ramset Dr, Chirnside Park VIC 3116';
+/**
+ * Seed and fallback for the CMS `pages/contact-us` entry. The copy is the
+ * copy /contact-us/ carried before it became editable.
+ */
+export const defaultContactPage: ContactPageCopy = {
+  slug: 'contact-us',
+  title: 'Contact us',
+  lede: 'Tell us about the site and we will get back to you — or just call.',
+  formHeading: 'Request a site assessment',
+  formIntro:
+    'For schools, clinics, aged care, strata, retail, hospitality, offices and industrial sites. The operating-hours question matters more than any other — tell us when we are allowed on site.',
+  metaTitle: 'Contact APMG Painting | Melbourne Painters',
+  metaDescription:
+    'Contact APMG Painting. Tell us about the site and the scope, or call 1300 97 97 40 for a commercial site assessment.',
+};
+
+/**
+ * The tel: link, derived from the display number rather than stored beside
+ * it — two fields that have to agree are two fields that eventually do not.
+ * Pure, so client components may import it; this module has no `server-only`.
+ */
+export function phoneHref(display: string): string {
+  return `tel:${display.replace(/\D/g, '')}`;
+}
+
+/** Formatted one-line address for the footer and contact page. */
+export function formatAddress(address: SiteSettings['address']): string {
+  return [address.street, `${address.suburb} ${address.state} ${address.postcode}`].join(', ');
+}
 
 const MONTHS = [
   'January',
@@ -296,6 +357,22 @@ const MONTHS = [
 ] as const;
 
 /**
+ * "October 2026", or null once the move date has passed. The terse form of
+ * `addressNote` for surfaces with no room for the sentence — the footer.
+ */
+export function addressEffectiveMonth(
+  settings: SiteSettings,
+  now: Date = new Date(),
+): string | null {
+  if (!settings.address.effectiveFrom) return null;
+
+  const effective = new Date(`${settings.address.effectiveFrom}T00:00:00Z`);
+  if (Number.isNaN(effective.getTime()) || now >= effective) return null;
+
+  return `${MONTHS[effective.getUTCMonth()]} ${effective.getUTCFullYear()}`;
+}
+
+/**
  * The qualifier that runs beside the address until the move completes, or null
  * once it has.
  *
@@ -303,14 +380,15 @@ const MONTHS = [
  * names from ICU differ between the build container and a developer's machine
  * and this string is baked into static HTML.
  *
- * `now` is injectable so the expiry is testable without touching the clock.
+ * Takes the settings rather than reading the file, so an editor who changes
+ * the address in /admin moves the note with it. `now` is injectable so the
+ * expiry is testable without touching the clock.
  */
-export function addressNote(now: Date = new Date()): string | null {
-  const effective = new Date(`${site.address.effectiveFrom}T00:00:00Z`);
-  if (Number.isNaN(effective.getTime()) || now >= effective) return null;
+export function addressNote(settings: SiteSettings, now: Date = new Date()): string | null {
+  const month = addressEffectiveMonth(settings, now);
+  if (!month || !settings.previousAddress) return null;
 
-  const month = MONTHS[effective.getUTCMonth()];
-  return `Our office from ${month} ${effective.getUTCFullYear()}. Until then we work from ${previousAddress}.`;
+  return `Our office from ${month}. Until then we work from ${settings.previousAddress}.`;
 }
 
 /**

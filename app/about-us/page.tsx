@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { ContentBlock, CtaBand, Hero, TrustBar } from '@/components/sections';
 import { Container, Prose, Section, SectionHeading } from '@/components/ui';
-import { accreditations, addressNote, formattedAddress, previousAddress, site } from '@/lib/site';
+import { accreditations, addressEffectiveMonth, formatAddress, site } from '@/lib/site';
+import { getSiteSettings } from '@/lib/content/source';
 
 export const metadata: Metadata = buildMetadata({
   title: 'About APMG Painting | Melbourne Painting Contractor',
@@ -11,13 +12,17 @@ export const metadata: Metadata = buildMetadata({
   path: '/about-us/',
 });
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const settings = await getSiteSettings();
+  // Both null once the move date passes, so the paragraph expires on its own.
+  const movingFrom = addressEffectiveMonth(settings);
+
   return (
     <>
       <Hero
         eyebrow="About"
         heading="A painting contractor built around how sites actually run"
-        lede={`Founded in ${site.founded} and based in ${site.address.suburb}, APMG Painting works across commercial and industrial projects throughout metropolitan Melbourne.`}
+        lede={`Founded in ${site.founded} and based in ${settings.address.suburb}, APMG Painting works across commercial and industrial projects throughout metropolitan Melbourne.`}
         primaryCta={{ label: 'See our projects', href: '/projects/' }}
         secondaryCta={{ label: 'Get in touch', href: '/contact-us/' }}
         image={{
@@ -79,16 +84,18 @@ export default function AboutPage() {
 
       <ContentBlock heading="Where we are">
         <Prose>
-          <p>{formattedAddress}. We work across metropolitan Melbourne from there.</p>
-          {addressNote() && (
+          <p>
+            {formatAddress(settings.address)}. We work across metropolitan Melbourne from there.
+          </p>
+          {movingFrom && settings.previousAddress && (
             <p>
-              APMG moves into the Bayswater North office in October 2026. Until then the team works
-              from {previousAddress} — same phone, same crews, same jobs.
+              APMG moves into the {settings.address.suburb} office in {movingFrom}. Until then the
+              team works from {settings.previousAddress} — same phone, same crews, same jobs.
             </p>
           )}
           <p>
-            {site.abn
-              ? `ABN ${site.abn}.`
+            {settings.abn
+              ? `ABN ${settings.abn}.`
               : 'An ABN is not currently published on the website. It is required for complete business structured data and should be supplied.'}
           </p>
         </Prose>
@@ -98,6 +105,7 @@ export default function AboutPage() {
         heading="Work with us"
         body="Every enquiry starts the same way — tell us what needs painting, where it is, and when we are allowed on site."
         cta={{ label: 'Get in touch', href: '/contact-us/' }}
+        phone={settings.phone}
       />
     </>
   );

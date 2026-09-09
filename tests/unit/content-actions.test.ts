@@ -8,8 +8,9 @@ vi.mock('@/lib/auth/admin', () => ({ requireAdmin: async () => ({ email: 'kaner@
 const upsert = vi.fn(async () => ({ error: null }));
 const match = vi.fn(async () => ({ error: null }));
 const update = vi.fn(() => ({ match }));
+const del = vi.fn(() => ({ match }));
 vi.mock('@/lib/supabase/server', () => ({
-  createServerSupabase: async () => ({ from: () => ({ upsert, update }) }),
+  createServerSupabase: async () => ({ from: () => ({ upsert, update, delete: del }) }),
 }));
 
 describe('saveEntry', () => {
@@ -128,5 +129,81 @@ describe('saveEntry', () => {
     );
     expect(result.status).toBe('ok');
     expect(updateTag).not.toHaveBeenCalled();
+  });
+});
+
+describe('saveEntry on a singleton', () => {
+  afterEach(() => vi.clearAllMocks());
+
+  /**
+   * The settings schema has no `slug` field, so the editor form posts an
+   * empty `slug` and an empty `originalSlug`. Neither may be treated as a
+   * rename, and the row's slug is the fixed one regardless of what arrives.
+   */
+  const settingsForm = () => {
+    const fd = new FormData();
+    fd.set('collection', 'settings');
+    fd.set('slug', '');
+    fd.set('originalSlug', '');
+    fd.set('status', 'published');
+    fd.set('previousStatus', 'published');
+    fd.set(
+      'data',
+      JSON.stringify({
+        phone: '1300 97 97 40',
+        email: 'info@apmgpainting.com.au',
+        address: {
+          street: '1 Turbo Drive',
+          suburb: 'Bayswater North',
+          state: 'VIC',
+          postcode: '3153',
+          country: 'AU',
+          effectiveFrom: null,
+        },
+        previousAddress: null,
+        abn: null,
+        coords: null,
+        openingHours: null,
+        serviceAreaPrimary: 'Melbourne, Victoria',
+        social: { instagram: null, facebook: null, google: null },
+      }),
+    );
+    return fd;
+  };
+
+  it('upserts the fixed slug and never treats the save as a rename', async () => {
+    const { saveEntry } = await import('@/app/actions/content');
+    const result = await saveEntry({ status: 'idle' }, settingsForm());
+    expect(result.status).toBe('ok');
+    expect(update).not.toHaveBeenCalled();
+    expect(upsert).toHaveBeenCalledWith(
+      expect.objectContaining({ collection: 'settings', slug: 'site', status: 'published' }),
+      { onConflict: 'collection,slug' },
+    );
+  });
+
+  it('expires every page, because the layout states the business details', async () => {
+    const { saveEntry } = await import('@/app/actions/content');
+    await saveEntry({ status: 'idle' }, settingsForm());
+    expect(revalidatePath).toHaveBeenCalledWith('/', 'layout');
+    expect(revalidatePath).toHaveBeenCalledWith('/contact-us/');
+    expect(revalidatePath).toHaveBeenCalledWith('/llms.txt');
+  });
+
+  it('rejects an ABN that is not eleven digits, and saves nothing', async () => {
+    const { saveEntry } = await import('@/app/actions/content');
+    const fd = settingsForm();
+    fd.set('data', JSON.stringify({ ...JSON.parse(String(fd.get('data'))), abn: '1234' }));
+    const result = await saveEntry({ status: 'idle' }, fd);
+    expect(result.status).toBe('error');
+    expect(result.fieldErrors?.abn).toBeDefined();
+    expect(upsert).not.toHaveBeenCalled();
+  });
+
+  it('refuses to delete a singleton', async () => {
+    const { deleteEntry } = await import('@/app/actions/content');
+    await expect(deleteEntry('settings', 'site')).rejects.toThrow(/cannot be deleted/i);
+    await expect(deleteEntry('pages', 'contact-us')).rejects.toThrow(/cannot be deleted/i);
+    expect(del).not.toHaveBeenCalled();
   });
 });

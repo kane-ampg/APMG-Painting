@@ -5,8 +5,7 @@ import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import { CtaBand, ProjectGrid, TestimonialBlock } from '@/components/sections';
 import { Container, Placeholder, Prose, Section, SectionHeading } from '@/components/ui';
 import { getLocation, locations } from '@/content/locations';
-import { getProject } from '@/lib/content/source';
-import { site } from '@/lib/site';
+import { getProject, getSiteSettings } from '@/lib/content/source';
 
 export function generateStaticParams() {
   return locations.map((location) => ({ slug: location.slug }));
@@ -37,9 +36,12 @@ export default async function LocationPage({ params }: Props) {
   const location = getLocation(slug);
   if (!location) notFound();
 
-  const projects = (
-    await Promise.all(location.projectSlugs.map((projectSlug) => getProject(projectSlug)))
-  ).filter((project) => project !== undefined);
+  const [projects, settings] = await Promise.all([
+    Promise.all(location.projectSlugs.map((projectSlug) => getProject(projectSlug))).then((all) =>
+      all.filter((project) => project !== undefined),
+    ),
+    getSiteSettings(),
+  ]);
 
   return (
     <>
@@ -76,7 +78,7 @@ export default async function LocationPage({ params }: Props) {
             ) : (
               <p>
                 APMG Painting services {location.suburb} and the surrounding{' '}
-                {location.region.toLowerCase()} area from our base at {site.address.suburb}.
+                {location.region.toLowerCase()} area from our base at {settings.address.suburb}.
               </p>
             )}
             {location.localNotes?.map((note) => (
@@ -111,6 +113,7 @@ export default async function LocationPage({ params }: Props) {
         heading={`Painting in ${location.suburb}?`}
         body="Tell us what needs doing and we will come and look."
         cta={{ label: 'Get in touch', href: '/contact-us/' }}
+        phone={settings.phone}
       />
     </>
   );

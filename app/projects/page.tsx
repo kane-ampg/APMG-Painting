@@ -3,7 +3,7 @@ import { buildMetadata } from '@/lib/seo/metadata';
 import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import { CtaBand, ProjectGrid } from '@/components/sections';
 import { Container, Placeholder, Prose, Section, SectionHeading } from '@/components/ui';
-import { getFeaturedProjects, getProjects } from '@/lib/content/source';
+import { getFeaturedProjects, getProjects, getSiteSettings } from '@/lib/content/source';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Painting Projects & Case Studies | APMG Painting',
@@ -13,7 +13,11 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default async function ProjectsPage() {
-  const [featuredProjects, projects] = await Promise.all([getFeaturedProjects(), getProjects()]);
+  const [featuredProjects, projects, settings] = await Promise.all([
+    getFeaturedProjects(),
+    getProjects(),
+    getSiteSettings(),
+  ]);
   const thin = projects.filter((project) => !project.isFeatured);
 
   return (
@@ -59,6 +63,7 @@ export default async function ProjectsPage() {
         heading="Want something similar?"
         body="Tell us about the site and we will tell you how we would approach it."
         cta={{ label: 'Get in touch', href: '/contact-us/' }}
+        phone={settings.phone}
       />
     </>
   );

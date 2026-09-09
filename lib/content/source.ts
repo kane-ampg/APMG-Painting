@@ -1,10 +1,17 @@
 import { unstable_cache } from 'next/cache';
 import { hasSupabase } from '@/lib/supabase/env';
-import { collectionSchemas, type Collection, type EntryOf } from './schemas';
+import {
+  collectionSchemas,
+  isSingleton,
+  singletonSlug,
+  type Collection,
+  type EntryOf,
+} from './schemas';
 import { contentTag } from './tags';
-import type { Post, Project, Service } from './types';
+import type { ContactPageCopy, Post, Project, Service, SiteSettings } from './types';
 import { projects as seedProjects } from '@/content/projects';
 import { services as seedServices } from '@/content/services';
+import { defaultContactPage, defaultSiteSettings } from '@/lib/site';
 
 /**
  * The content adapter.
@@ -20,6 +27,11 @@ const seeds: { [C in Collection]: readonly EntryOf<C>[] } = {
   projects: seedProjects as readonly EntryOf<'projects'>[],
   services: seedServices as readonly EntryOf<'services'>[],
   posts: [],
+  // Same cast as the two above: SiteSettings types `address.state` as a
+  // plain string while the schema narrows it to the AU state enum, and the
+  // seed is the value the schema was written from.
+  settings: [defaultSiteSettings] as readonly EntryOf<'settings'>[],
+  pages: [defaultContactPage],
 };
 
 type Row = { slug: string; status: 'draft' | 'published'; data: unknown };
@@ -108,7 +120,14 @@ export async function getEntryForPreview<C extends Collection>(
   slug: string,
 ): Promise<{ status: 'draft' | 'published'; data: EntryOf<C> } | undefined> {
   if (!hasSupabase()) {
-    const seed = seeds[collection].find((e) => e.slug === slug);
+    // A singleton's seed carries no slug of its own (settings has no `slug`
+    // field at all), so match on the fixed slug for those and on the entry's
+    // own slug for everything else.
+    const seed = isSingleton(collection)
+      ? slug === singletonSlug[collection]
+        ? seeds[collection][0]
+        : undefined
+      : (seeds[collection] as readonly { slug: string }[]).find((e) => e.slug === slug);
     return seed ? { status: 'published', data: seed as EntryOf<C> } : undefined;
   }
   const { createServerSupabase } = await import('@/lib/supabase/server');
@@ -124,4 +143,21 @@ export async function getEntryForPreview<C extends Collection>(
   const parsed = collectionSchemas[collection].safeParse(data.data);
   if (!parsed.success) return undefined;
   return { status: data.status as 'draft' | 'published', data: parsed.data as EntryOf<C> };
+}
+
+// --- Singletons ------------------------------------------------------------
+
+/**
+ * Always resolves: a missing or invalid row falls back to the code defaults.
+ * `parseRows` already drops an invalid row with a warning, so a half-saved
+ * settings row can never take the phone number off the site.
+ */
+export async function getSiteSettings(): Promise<SiteSettings> {
+  const rows = await all('settings');
+  return rows[0] ?? defaultSiteSettings;
+}
+
+export async function getPage(slug: 'contact-us'): Promise<ContactPageCopy> {
+  const rows = await all('pages');
+  return rows.find((p) => p.slug === slug) ?? defaultContactPage;
 }

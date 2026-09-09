@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QuoteChat } from '@/components/chat/quote-chat';
+import { SiteSettingsProvider } from '@/components/providers/site-settings';
+import { defaultSiteSettings } from '@/lib/site';
 
 /**
  * The floating quote chat.
@@ -36,16 +38,26 @@ beforeEach(() => {
 
 const launcher = () => screen.getByRole('button', { name: /get a quote|chat/i });
 
+// The widget states the phone number, which lives in the CMS settings and
+// reaches client components through the provider the root layout renders.
+// The defaults are what the provider carries with no database.
+const renderChat = () =>
+  render(
+    <SiteSettingsProvider value={defaultSiteSettings}>
+      <QuoteChat />
+    </SiteSettingsProvider>,
+  );
+
 async function openChat() {
   const user = userEvent.setup();
-  render(<QuoteChat />);
+  renderChat();
   await user.click(launcher());
   return user;
 }
 
 describe('the launcher', () => {
   it('starts closed, so it never blocks the page on arrival', () => {
-    render(<QuoteChat />);
+    renderChat();
     expect(launcher()).toHaveAttribute('aria-expanded', 'false');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
@@ -63,7 +75,7 @@ describe('the launcher', () => {
 
   it('stays out of the way on the contact page, where the full form already is', () => {
     pathname.current = '/contact-us/';
-    render(<QuoteChat />);
+    renderChat();
     expect(screen.queryByRole('button', { name: /get a quote|chat/i })).not.toBeInTheDocument();
   });
 });

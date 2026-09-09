@@ -1,10 +1,19 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireAdmin } from '@/lib/auth/admin';
-import { isCollection } from '@/lib/content/schemas';
+import { isCollection, isSingleton, type Collection } from '@/lib/content/schemas';
 import { createServerSupabase } from '@/lib/supabase/server';
 
 type Props = { params: Promise<{ collection: string }> };
+
+/** "settings" and "pages" are storage names; these are what an editor reads. */
+const TITLES: Record<Collection, string> = {
+  projects: 'Projects',
+  services: 'Services',
+  posts: 'Posts',
+  settings: 'Business details',
+  pages: 'Pages',
+};
 
 export default async function CollectionPage({ params }: Props) {
   await requireAdmin();
@@ -18,17 +27,14 @@ export default async function CollectionPage({ params }: Props) {
     .eq('collection', collection)
     .order('updated_at', { ascending: false });
 
-  // Interim check: 'settings' | 'pages' don't exist as collections yet
-  // (Task 12 adds them as singletons). Once isSingleton() lands, this
-  // becomes !isSingleton(collection). Widened to string because the
-  // current Collection union has no overlap with those literals.
-  const collectionName: string = collection;
-  const canCreate = collectionName !== 'settings' && collectionName !== 'pages';
+  // A singleton has exactly one row at a fixed slug, so there is nothing to
+  // create and nothing to delete.
+  const canCreate = !isSingleton(collection);
 
   return (
     <>
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-3xl capitalize tracking-tight">{collection}</h1>
+        <h1 className="font-display text-3xl tracking-tight">{TITLES[collection]}</h1>
         {canCreate && (
           <Link
             href={`/admin/${collection}/new/`}

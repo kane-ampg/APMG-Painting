@@ -14,7 +14,7 @@ import { Card, Container, Placeholder, Prose, Section, SectionHeading } from '@/
 import { JsonLd } from '@/components/seo/json-ld';
 import { faqSchema, serviceSchema } from '@/lib/schema';
 import { sectors } from '@/content/sectors';
-import { getProject } from '@/lib/content/source';
+import { getProject, getSiteSettings } from '@/lib/content/source';
 
 /**
  * Sector pages.
@@ -53,9 +53,12 @@ export default async function SectorPage({ params }: Props) {
   const sector = bySlug.get(slug);
   if (!sector) notFound();
 
-  const projects = (
-    await Promise.all(sector.projectSlugs.map((projectSlug) => getProject(projectSlug)))
-  ).filter((project) => project !== undefined);
+  const [projects, settings] = await Promise.all([
+    Promise.all(sector.projectSlugs.map((projectSlug) => getProject(projectSlug))).then((all) =>
+      all.filter((project) => project !== undefined),
+    ),
+    getSiteSettings(),
+  ]);
 
   return (
     <>
@@ -64,6 +67,7 @@ export default async function SectorPage({ params }: Props) {
           name: sector.title,
           description: sector.metaDescription,
           path: sector.legacyPath,
+          settings,
         })}
       />
       <JsonLd data={faqSchema(sector.faqs)} />
@@ -144,6 +148,7 @@ export default async function SectorPage({ params }: Props) {
         heading={`Talk to us about ${sector.shortTitle.toLowerCase()} work`}
         body="Tell us the site, the constraints and when we are allowed on it."
         cta={{ label: 'Request a site assessment', href: '/contact-us/#commercial' }}
+        phone={settings.phone}
       />
     </>
   );

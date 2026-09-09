@@ -18,7 +18,7 @@ import {
   Section,
 } from '@/components/ui';
 import { cn } from '@/lib/utils';
-import { accreditationLogos, accreditations, site } from '@/lib/site';
+import { accreditationLogos, accreditations, phoneHref } from '@/lib/site';
 import {
   averageRating,
   firstPartyReviews,
@@ -37,7 +37,7 @@ export function Hero({
   lede,
   primaryCta,
   secondaryCta,
-  showPhone = false,
+  phone,
   image,
   crumbs,
 }: {
@@ -46,8 +46,12 @@ export function Hero({
   lede: string;
   primaryCta: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
-  /** Adds a tap-to-call line under the buttons. */
-  showPhone?: boolean;
+  /**
+   * Adds a tap-to-call line under the buttons. The display number, passed in
+   * rather than imported: it is editable in /admin and this is a server
+   * component, so the page that renders the hero supplies it.
+   */
+  phone?: string;
   image?: { src: string; alt: string };
   /**
    * Renders the trail inside the hero band, above the heading — the same top-of-page
@@ -79,14 +83,14 @@ export function Hero({
                 </ButtonLink>
               )}
             </div>
-            {showPhone && (
+            {phone && (
               <p className="mt-5 text-sm text-ink-soft">
                 Or call{' '}
                 <a
-                  href={site.phone.href}
+                  href={phoneHref(phone)}
                   className="font-semibold text-brand-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
                 >
-                  {site.phone.display}
+                  {phone}
                 </a>{' '}
                 — Monday to Friday.
               </p>
@@ -161,6 +165,7 @@ export function HomeHero({
   proof,
   poster,
   scrollTo,
+  phone,
 }: {
   eyebrow: string;
   /** Opening of the h1, set in white. */
@@ -178,6 +183,8 @@ export function HomeHero({
    *  fold falls back to whenever the video does not load. */
   poster: { src: string; alt: string };
   scrollTo: { label: string; href: string };
+  /** Display number, from the CMS settings. */
+  phone: string;
 }) {
   return (
     <HeroReel poster={poster}>
@@ -229,10 +236,10 @@ export function HomeHero({
               <p className="mt-5 text-sm text-white/80 [text-shadow:0_1px_16px_rgba(15,17,19,0.7)] short:mt-4">
                 Or call{' '}
                 <a
-                  href={site.phone.href}
+                  href={phoneHref(phone)}
                   className="rounded font-semibold text-white underline decoration-brand-500 decoration-2 underline-offset-4 hover:text-brand-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
                 >
-                  {site.phone.display}
+                  {phone}
                 </a>{' '}
                 — Monday to Friday.
               </p>
@@ -542,10 +549,13 @@ export function CtaBand({
   heading,
   body,
   cta,
+  phone,
 }: {
   heading: string;
   body: string;
   cta: { label: string; href: string };
+  /** Display number, from the CMS settings. */
+  phone: string;
 }) {
   return (
     <Section tone="brand">
@@ -559,8 +569,8 @@ export function CtaBand({
             <ButtonLink href={cta.href} variant="accent">
               {cta.label}
             </ButtonLink>
-            <ButtonLink href={site.phone.href} variant="ghostLight">
-              {site.phone.display}
+            <ButtonLink href={phoneHref(phone)} variant="ghostLight">
+              {phone}
             </ButtonLink>
           </div>
         </div>
@@ -877,7 +887,14 @@ export function FeatureGrid({
  * links to the areas hub for the full directory rather than shipping a wall of
  * name-swapped links, which is the exact pattern the rebuild is undoing.
  */
-export function ServiceAreas({ locations }: { locations: readonly Location[] }) {
+export function ServiceAreas({
+  locations,
+  baseSuburb,
+}: {
+  locations: readonly Location[];
+  /** The suburb the business works from, from the CMS settings. */
+  baseSuburb: string;
+}) {
   const evidenced = locations.filter((l) => l.projectSlugs.length > 0);
   const regions = [...new Set(locations.map((l) => l.region))];
 
@@ -902,7 +919,7 @@ export function ServiceAreas({ locations }: { locations: readonly Location[] }) 
       <p className="max-w-prose text-sm text-ink-soft">
         Those are the suburbs with a documented job behind them. We work right across{' '}
         {regions.length} regions of metropolitan Melbourne — {regions.slice(0, -1).join(', ')} and{' '}
-        {regions[regions.length - 1]} — from our base at {site.address.suburb}.{' '}
+        {regions[regions.length - 1]} — from our base at {baseSuburb}.{' '}
         <Link
           href="/areas/"
           className="font-semibold text-brand-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"

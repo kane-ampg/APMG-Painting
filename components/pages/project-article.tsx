@@ -5,7 +5,7 @@ import { Container, mediaZoom, Placeholder, Section, SectionHeading } from '@/co
 import { JsonLd } from '@/components/seo/json-ld';
 import { projectSchema } from '@/lib/schema';
 import { isPlaceholder } from '@/lib/content/types';
-import type { Project, Sector, Service } from '@/lib/content/types';
+import type { Project, Sector, Service, SiteSettings } from '@/lib/content/types';
 import { getLocation } from '@/content/locations';
 
 function DetailList({ heading, items }: { heading: string; items?: readonly string[] }) {
@@ -34,6 +34,8 @@ type Props = {
    * lookup is async, so this component stays a plain sync render.
    */
   relatedServices?: readonly Service[];
+  /** Business details, for the closing call-to-action's phone number. */
+  settings: SiteSettings;
 };
 
 /**
@@ -41,7 +43,7 @@ type Props = {
  * `notFound()` guard. Shared with the admin preview so a draft shows exactly
  * what publishing would produce, rather than a stand-in.
  */
-export function ProjectArticle({ project, sector, relatedServices = [] }: Props) {
+export function ProjectArticle({ project, sector, relatedServices = [], settings }: Props) {
   const cover = project.images[0];
   const gallery = project.images.slice(1);
 
@@ -203,6 +205,7 @@ export function ProjectArticle({ project, sector, relatedServices = [] }: Props)
         heading="Similar site, similar constraints?"
         body="Tell us what needs painting and when we are allowed on site."
         cta={{ label: 'Request a site assessment', href: '/contact-us/#commercial' }}
+        phone={settings.phone}
       />
     </>
   );

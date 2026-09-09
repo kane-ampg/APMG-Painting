@@ -1,7 +1,7 @@
-import { formattedAddress, site, siteUrl, verifiedAccreditations } from '@/lib/site';
+import { site, siteUrl, verifiedAccreditations } from '@/lib/site';
 import { averageRating, firstPartyReviews } from '@/content/reviews';
 import { locations } from '@/content/locations';
-import type { Post, Project, Service } from '@/lib/content/types';
+import type { Post, Project, Service, SiteSettings } from '@/lib/content/types';
 
 /** The APMG mark, dark-on-transparent — the header variant. */
 export const brandLogoPath = '/images/brand/apmg-logo-ink.webp';
@@ -24,7 +24,7 @@ export const brandLogoPath = '/images/brand/apmg-logo-ink.webp';
 
 type JsonLdValue = Record<string, unknown>;
 
-export function organizationSchema(): JsonLdValue {
+export function organizationSchema(settings: SiteSettings): JsonLdValue {
   const knowsAbout = verifiedAccreditations.map((a) => a.label);
 
   return {
@@ -38,21 +38,36 @@ export function organizationSchema(): JsonLdValue {
     // entity a visitor sees are the same one.
     logo: `${siteUrl}${brandLogoPath}`,
     foundingDate: String(site.founded),
-    email: site.email,
-    telephone: site.phone.display,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: site.address.street,
-      addressLocality: site.address.suburb,
-      addressRegion: site.address.state,
-      postalCode: site.address.postcode,
-      addressCountry: site.address.country,
-    },
+    email: settings.email,
+    telephone: settings.phone,
+    address: postalAddress(settings),
     // Same three profiles as the LocalBusiness node, so both nodes point Google
     // at one entity rather than two half-described ones.
-    sameAs: [site.social.instagram, site.social.facebook, site.social.google].filter(Boolean),
+    sameAs: sameAsFragment(settings),
     ...(knowsAbout.length > 0 ? { knowsAbout } : {}),
   };
+}
+
+/** The one PostalAddress node both business types emit. */
+function postalAddress(settings: SiteSettings): JsonLdValue {
+  return {
+    '@type': 'PostalAddress',
+    streetAddress: settings.address.street,
+    addressLocality: settings.address.suburb,
+    addressRegion: settings.address.state,
+    postalCode: settings.address.postcode,
+    addressCountry: settings.address.country,
+  };
+}
+
+/**
+ * The profile links, nulls dropped. Same three on both nodes, so Google is
+ * pointed at one entity rather than two half-described ones.
+ */
+function sameAsFragment(settings: SiteSettings): string[] {
+  return [settings.social.instagram, settings.social.facebook, settings.social.google].filter(
+    (url): url is string => Boolean(url),
+  );
 }
 
 /**
@@ -67,28 +82,29 @@ export function organizationSchema(): JsonLdValue {
  *
  * The `GeoCircle` is the form Google most directly associates with a
  * service-area business, and it appears only once APMG confirms the base
- * coordinates. See the note on `site.coords`.
+ * coordinates. See the note on `site.coords` in lib/site.ts, which seeds
+ * `settings.coords`.
  */
-function areaServedFragment(): JsonLdValue[] {
+function areaServedFragment(settings: SiteSettings): JsonLdValue[] {
   const suburbs = locations.map((location) => ({
     '@type': 'City',
     name: location.suburb,
     address: {
       '@type': 'PostalAddress',
       addressLocality: location.suburb,
-      addressRegion: site.address.state,
-      addressCountry: site.address.country,
+      addressRegion: settings.address.state,
+      addressCountry: settings.address.country,
     },
   }));
 
-  const circle = site.coords
+  const circle = settings.coords
     ? [
         {
           '@type': 'GeoCircle',
           geoMidpoint: {
             '@type': 'GeoCoordinates',
-            latitude: site.coords.latitude,
-            longitude: site.coords.longitude,
+            latitude: settings.coords.latitude,
+            longitude: settings.coords.longitude,
           },
           geoRadius: site.serviceArea.radiusKm * 1000,
         },
@@ -104,11 +120,11 @@ function areaServedFragment(): JsonLdValue[] {
 }
 
 /** Opening hours, only once APMG has confirmed them. */
-function openingHoursFragment(): JsonLdValue {
-  if (!site.openingHours) return {};
+function openingHoursFragment(settings: SiteSettings): JsonLdValue {
+  if (!settings.openingHours) return {};
 
   return {
-    openingHoursSpecification: site.openingHours.map((entry) => ({
+    openingHoursSpecification: settings.openingHours.map((entry) => ({
       '@type': 'OpeningHoursSpecification',
       dayOfWeek: entry.days,
       opens: entry.opens,
@@ -143,7 +159,10 @@ function offerCatalogFragment(services: readonly Service[]): JsonLdValue {
   };
 }
 
-export function localBusinessSchema(services: readonly Service[]): JsonLdValue {
+export function localBusinessSchema(
+  services: readonly Service[],
+  settings: SiteSettings,
+): JsonLdValue {
   return {
     '@context': 'https://schema.org',
     // HomeAndConstructionBusiness is the parent category; HousePainter is the
@@ -156,32 +175,25 @@ export function localBusinessSchema(services: readonly Service[]): JsonLdValue {
     url: `${siteUrl}/`,
     logo: `${siteUrl}${brandLogoPath}`,
     image: `${siteUrl}${brandLogoPath}`,
-    telephone: site.phone.display,
-    email: site.email,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: site.address.street,
-      addressLocality: site.address.suburb,
-      addressRegion: site.address.state,
-      postalCode: site.address.postcode,
-      addressCountry: site.address.country,
-    },
-    ...(site.coords
+    telephone: settings.phone,
+    email: settings.email,
+    address: postalAddress(settings),
+    ...(settings.coords
       ? {
           geo: {
             '@type': 'GeoCoordinates',
-            latitude: site.coords.latitude,
-            longitude: site.coords.longitude,
+            latitude: settings.coords.latitude,
+            longitude: settings.coords.longitude,
           },
         }
       : {}),
-    areaServed: areaServedFragment(),
+    areaServed: areaServedFragment(settings),
     // The Google Business Profile is the entity link that matters most for the
     // map pack. Resolved from the review widget on the live site.
-    sameAs: [site.social.instagram, site.social.facebook, site.social.google].filter(Boolean),
-    description: `${site.name} is a commercial painting contractor based in ${site.address.suburb}, serving metropolitan Melbourne.`,
+    sameAs: sameAsFragment(settings),
+    description: `${site.name} is a commercial painting contractor based in ${settings.address.suburb}, serving metropolitan Melbourne.`,
     ...offerCatalogFragment(services),
-    ...openingHoursFragment(),
+    ...openingHoursFragment(settings),
     // Spreads to nothing while content/reviews.ts holds no first-party entries.
     // priceRange stays absent until APMG supplies a defensible band.
     ...aggregateRatingFragment(),
@@ -236,6 +248,8 @@ export function serviceSchema(args: {
   name: string;
   description: string;
   path: string;
+  /** Needed for `areaServed`, which must match the business node exactly. */
+  settings: SiteSettings;
 }): JsonLdValue {
   return {
     '@context': 'https://schema.org',
@@ -247,7 +261,7 @@ export function serviceSchema(args: {
     // Same three-level area as the business itself. A service page that claims
     // a narrower area than the business does is a contradiction Google has to
     // resolve, and it resolves it against you.
-    areaServed: areaServedFragment(),
+    areaServed: areaServedFragment(args.settings),
     url: `${siteUrl}${args.path}`,
   };
 }
@@ -310,6 +324,3 @@ export function faqSchema(items: readonly { question: string; answer: string }[]
     })),
   };
 }
-
-/** Address string reused by components that display rather than mark up. */
-export { formattedAddress };

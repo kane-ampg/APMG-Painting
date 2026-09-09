@@ -10,7 +10,13 @@ import {
 } from '@/content/reviews';
 import { localBusinessSchema } from '@/lib/schema';
 import { services } from '@/content/services';
-import { accreditationLogos, accreditations, addressNote, site } from '@/lib/site';
+import {
+  accreditationLogos,
+  accreditations,
+  addressNote,
+  defaultSiteSettings,
+  site,
+} from '@/lib/site';
 
 /**
  * The three claims APMG asked for on 24 August 2026 — accreditations, Google
@@ -41,7 +47,7 @@ describe('Google reviews stay out of review markup', () => {
   });
 
   it('emits no aggregateRating or review block on the business', () => {
-    const schema = localBusinessSchema(services);
+    const schema = localBusinessSchema(services, defaultSiteSettings);
 
     expect(schema.aggregateRating).toBeUndefined();
     expect(schema.review).toBeUndefined();
@@ -131,7 +137,7 @@ describe('the Bayswater North move', () => {
   });
 
   it('qualifies the address until the move date', () => {
-    const note = addressNote(new Date('2026-09-01T00:00:00Z'));
+    const note = addressNote(defaultSiteSettings, new Date('2026-09-01T00:00:00Z'));
 
     expect(note).toContain('October 2026');
     expect(note).toContain('Chirnside Park');
@@ -140,7 +146,7 @@ describe('the Bayswater North move', () => {
   it('drops the qualifier once the move date passes', () => {
     // The failure mode this exists for is a "we're moving in October" line
     // still sitting on the contact page in 2028. It expires on its own.
-    expect(addressNote(new Date('2026-10-01T00:00:00Z'))).toBeNull();
-    expect(addressNote(new Date('2028-01-01T00:00:00Z'))).toBeNull();
+    expect(addressNote(defaultSiteSettings, new Date('2026-10-01T00:00:00Z'))).toBeNull();
+    expect(addressNote(defaultSiteSettings, new Date('2028-01-01T00:00:00Z'))).toBeNull();
   });
 });
