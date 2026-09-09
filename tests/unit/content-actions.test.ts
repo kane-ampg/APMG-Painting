@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const updateTag = vi.fn();
 const revalidatePath = vi.fn();
@@ -9,11 +9,28 @@ const upsert = vi.fn(async () => ({ error: null }));
 const match = vi.fn(async () => ({ error: null }));
 const update = vi.fn(() => ({ match }));
 const del = vi.fn(() => ({ match }));
+
+// `saveEntry` reads the row's current status before writing, and uses that
+// — not the form's hidden `previousStatus` — to decide whether the public
+// cache has to be expired. `storedStatus` is what the database "holds".
+let storedStatus: 'draft' | 'published' | null = null;
+const selectMatch = vi.fn(() => ({
+  maybeSingle: async () => ({
+    data: storedStatus === null ? null : { status: storedStatus },
+    error: null,
+  }),
+}));
+const select = vi.fn(() => ({ match: selectMatch }));
 vi.mock('@/lib/supabase/server', () => ({
-  createServerSupabase: async () => ({ from: () => ({ upsert, update, delete: del }) }),
+  createServerSupabase: async () => ({
+    from: () => ({ upsert, update, delete: del, select }),
+  }),
 }));
 
 describe('saveEntry', () => {
+  beforeEach(() => {
+    storedStatus = 'published';
+  });
   afterEach(() => vi.clearAllMocks());
 
   const form = (over: Record<string, string>) => {
@@ -107,32 +124,64 @@ describe('saveEntry', () => {
       }),
     );
     expect(match).toHaveBeenCalledWith({ collection: 'projects', slug: 'interior-painting' });
+    // The status read is keyed on the slug the row still has, not the new one.
+    expect(selectMatch).toHaveBeenCalledWith({
+      collection: 'projects',
+      slug: 'interior-painting',
+    });
     expect(revalidatePath).toHaveBeenCalledWith('/projects/interior-painting/');
     expect(revalidatePath).toHaveBeenCalledWith('/projects/interior-repaints/');
   });
 
   it('expires the cache tag when a published entry is saved back as a draft', async () => {
+    storedStatus = 'published';
     const { saveEntry } = await import('@/app/actions/content');
-    const result = await saveEntry(
-      { status: 'idle' },
-      form({ status: 'draft', previousStatus: 'published' }),
-    );
+    const result = await saveEntry({ status: 'idle' }, form({ status: 'draft' }));
     expect(result.status).toBe('ok');
+    expect(selectMatch).toHaveBeenCalledWith({
+      collection: 'services',
+      slug: 'interior-painting',
+    });
     expect(updateTag).toHaveBeenCalledWith('content:services');
   });
 
   it('does not expire the cache tag when a draft is saved as a draft', async () => {
+    storedStatus = 'draft';
     const { saveEntry } = await import('@/app/actions/content');
-    const result = await saveEntry(
-      { status: 'idle' },
-      form({ status: 'draft', previousStatus: 'draft' }),
-    );
+    const result = await saveEntry({ status: 'idle' }, form({ status: 'draft' }));
     expect(result.status).toBe('ok');
+    expect(updateTag).not.toHaveBeenCalled();
+  });
+
+  it('trusts the stored status over the form, in both directions', async () => {
+    // The hidden `previousStatus` field is whatever the browser was holding
+    // when the page loaded. A second editor publishing, or a stale tab being
+    // submitted, makes it a lie — and the lie costs either a live page that
+    // never comes down or a needless site-wide rebuild.
+    const { saveEntry } = await import('@/app/actions/content');
+
+    storedStatus = 'published';
+    await saveEntry({ status: 'idle' }, form({ status: 'draft', previousStatus: 'draft' }));
+    expect(updateTag).toHaveBeenCalledWith('content:services');
+
+    vi.clearAllMocks();
+    storedStatus = 'draft';
+    await saveEntry({ status: 'idle' }, form({ status: 'draft', previousStatus: 'published' }));
+    expect(updateTag).not.toHaveBeenCalled();
+  });
+
+  it('treats a brand-new entry as never having been published', async () => {
+    storedStatus = null;
+    const { saveEntry } = await import('@/app/actions/content');
+    await saveEntry({ status: 'idle' }, form({ status: 'draft' }));
     expect(updateTag).not.toHaveBeenCalled();
   });
 });
 
 describe('saveEntry on a singleton', () => {
+  beforeEach(() => {
+    storedStatus = 'published';
+  });
   afterEach(() => vi.clearAllMocks());
 
   /**

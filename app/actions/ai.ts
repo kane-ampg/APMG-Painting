@@ -3,6 +3,7 @@
 import { requireAdmin } from '@/lib/auth/admin';
 import { describeImage, draftPostSummary, hasAi, summariseProject } from '@/lib/ai/claude';
 import { projectSchema } from '@/lib/content/schemas';
+import { supabaseHostname } from '@/lib/supabase/env';
 
 export type AiResult<T> = { ok: true; data: T } | { ok: false; message: string };
 
@@ -25,10 +26,33 @@ export async function aiPostSummary(input: { title: string; body: string }) {
   }
 }
 
+/**
+ * Only this project's media bucket. The URL is handed to the model as a
+ * remote image to fetch, so an unchecked value here is a request the server
+ * makes on a stranger's behalf. Matching `supabaseHostname()` rather than a
+ * `*.supabase.co` pattern means somebody else's Supabase project does not
+ * qualify, and a self-hosted or custom-domain Supabase still does.
+ */
+function isLibraryImage(imageUrl: string): boolean {
+  const host = supabaseHostname();
+  if (!host) return false;
+  let parsed: URL;
+  try {
+    parsed = new URL(imageUrl);
+  } catch {
+    return false;
+  }
+  return (
+    parsed.protocol === 'https:' &&
+    parsed.host === host &&
+    parsed.pathname.startsWith('/storage/v1/object/public/media/')
+  );
+}
+
 export async function aiDescribeImage(imageUrl: string) {
   await requireAdmin();
   if (!hasAi()) return unavailable<Awaited<ReturnType<typeof describeImage>>>();
-  if (!/^https:\/\/[^/]+\.supabase\.co\/storage\/v1\/object\/public\/media\//.test(imageUrl)) {
+  if (!isLibraryImage(imageUrl)) {
     return { ok: false as const, message: 'Only images in the media library can be described.' };
   }
   try {

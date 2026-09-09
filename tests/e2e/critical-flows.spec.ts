@@ -1,5 +1,4 @@
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
-import { services } from '@/content/services';
 
 /**
  * The critical end-to-end flows named in the brief.
@@ -122,8 +121,13 @@ test.describe('landing page', () => {
     const res = await page.goto('/');
     expect(res?.ok()).toBe(true);
     const cards = page.locator('#services article');
-    await expect(cards).toHaveCount(services.length);
+    // At least one, not exactly `services.length`: with the CMS configured
+    // the section renders whatever is published, and a test that fails
+    // because an editor unpublished a service is testing the wrong thing.
+    // What matters is that every card that renders is complete.
+    await expect(cards.first()).toBeVisible();
     const count = await cards.count();
+    expect(count).toBeGreaterThanOrEqual(1);
     for (let i = 0; i < count; i++) {
       await expect(cards.nth(i).getByRole('heading', { level: 3 })).toBeVisible();
       await expect(cards.nth(i).locator('p').first()).not.toBeEmpty();

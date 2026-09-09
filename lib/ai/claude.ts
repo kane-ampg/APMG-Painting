@@ -42,6 +42,28 @@ export function clampMeta(text: string, max = 160): string {
 
 const client = () => new Anthropic();
 
+/**
+ * Opus 5 thinks by default, and thinking counts against `max_tokens`. At the
+ * 1000-2000 these calls used to ask for, a task that reasoned at all ran out
+ * of budget before writing its structured output, and the only symptom was
+ * `parsed_output` coming back empty. 8000 is generous for three fields of
+ * prose and still bounded.
+ */
+const MAX_TOKENS = 8000;
+
+/**
+ * A refusal is an HTTP 200 with `stop_reason: 'refusal'` and no output, so it
+ * has to be checked before `parsed_output` — otherwise it reads as "the
+ * model returned no structured output", which sends the editor looking for a
+ * bug in the form. `fallbacks: 'default'` above means the whole chain
+ * declined by the time this fires.
+ */
+function assertNotRefused(stopReason: string | null | undefined): void {
+  if (stopReason === 'refusal') {
+    throw new Error('The model declined this request. Edit the text and try again.');
+  }
+}
+
 const postSummarySchema = z.object({
   excerpt: z.string().describe('Two sentences, under 300 characters, for the blog index card.'),
   metaTitle: z.string().describe('Under 60 characters, ends with " | APMG Painting".'),
@@ -51,7 +73,7 @@ const postSummarySchema = z.object({
 export async function draftPostSummary(input: { title: string; body: string }) {
   const response = await client().beta.messages.parse({
     model: MODEL,
-    max_tokens: 2000,
+    max_tokens: MAX_TOKENS,
     betas: ['server-side-fallback-2026-07-01'],
     fallbacks: 'default',
     output_config: { effort: 'low', format: zodOutputFormat(postSummarySchema) },
@@ -63,6 +85,7 @@ export async function draftPostSummary(input: { title: string; body: string }) {
       },
     ],
   });
+  assertNotRefused(response.stop_reason);
   const parsed = response.parsed_output;
   if (!parsed) throw new Error('The model returned no structured output.');
   return {
@@ -84,7 +107,7 @@ const imageSchema = z.object({
 export async function describeImage(imageUrl: string) {
   const response = await client().beta.messages.parse({
     model: MODEL,
-    max_tokens: 1000,
+    max_tokens: MAX_TOKENS,
     betas: ['server-side-fallback-2026-07-01'],
     fallbacks: 'default',
     output_config: { effort: 'low', format: zodOutputFormat(imageSchema) },
@@ -102,6 +125,7 @@ export async function describeImage(imageUrl: string) {
       },
     ],
   });
+  assertNotRefused(response.stop_reason);
   const parsed = response.parsed_output;
   if (!parsed) throw new Error('The model returned no structured output.');
   return { alt: parsed.alt.trim().slice(0, 125), caption: parsed.caption.trim() };
@@ -127,7 +151,7 @@ export async function summariseProject(project: Project) {
   );
   const response = await client().beta.messages.parse({
     model: MODEL,
-    max_tokens: 1500,
+    max_tokens: MAX_TOKENS,
     betas: ['server-side-fallback-2026-07-01'],
     fallbacks: 'default',
     output_config: { effort: 'low', format: zodOutputFormat(projectSummarySchema) },
@@ -136,6 +160,7 @@ export async function summariseProject(project: Project) {
       { role: 'user', content: `Summarise this case study from these facts only:\n\n${facts}` },
     ],
   });
+  assertNotRefused(response.stop_reason);
   const parsed = response.parsed_output;
   if (!parsed) throw new Error('The model returned no structured output.');
   return { summary: parsed.summary.trim(), metaDescription: clampMeta(parsed.metaDescription) };

@@ -176,6 +176,20 @@ export function isCollection(value: string): value is Collection {
 }
 
 /** Collections with exactly one entry and a fixed slug. No "New", no delete. */
+/**
+ * What an editor calls each collection. "settings" and "pages" are storage
+ * names; nobody signing in to change the phone number is looking for
+ * "settings". Shared by the list page and the entry editor so the two cannot
+ * name the same thing differently.
+ */
+export const collectionTitles: Record<Collection, string> = {
+  projects: 'Projects',
+  services: 'Services',
+  posts: 'Posts',
+  settings: 'Business details',
+  pages: 'Pages',
+};
+
 export const singletonSlug = { settings: 'site', pages: 'contact-us' } as const;
 
 export function isSingleton(collection: Collection): collection is keyof typeof singletonSlug {
