@@ -14,10 +14,11 @@ const del = vi.fn(() => ({ match }));
 // — not the form's hidden `previousStatus` — to decide whether the public
 // cache has to be expired. `storedStatus` is what the database "holds".
 let storedStatus: 'draft' | 'published' | null = null;
+let selectError: { message: string } | null = null;
 const selectMatch = vi.fn(() => ({
   maybeSingle: async () => ({
     data: storedStatus === null ? null : { status: storedStatus },
-    error: null,
+    error: selectError,
   }),
 }));
 const select = vi.fn(() => ({ match: selectMatch }));
@@ -30,6 +31,7 @@ vi.mock('@/lib/supabase/server', () => ({
 describe('saveEntry', () => {
   beforeEach(() => {
     storedStatus = 'published';
+    selectError = null;
   });
   afterEach(() => vi.clearAllMocks());
 
@@ -176,11 +178,22 @@ describe('saveEntry', () => {
     await saveEntry({ status: 'idle' }, form({ status: 'draft' }));
     expect(updateTag).not.toHaveBeenCalled();
   });
+
+  it('reports an error and writes nothing when the status read fails', async () => {
+    selectError = { message: 'connection reset' };
+    const { saveEntry } = await import('@/app/actions/content');
+    const result = await saveEntry({ status: 'idle' }, form({}));
+    expect(result.status).toBe('error');
+    expect(result.message).toBe('Could not save: connection reset');
+    expect(upsert).not.toHaveBeenCalled();
+    expect(update).not.toHaveBeenCalled();
+  });
 });
 
 describe('saveEntry on a singleton', () => {
   beforeEach(() => {
     storedStatus = 'published';
+    selectError = null;
   });
   afterEach(() => vi.clearAllMocks());
 

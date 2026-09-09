@@ -62,6 +62,9 @@ function assertNotRefused(stopReason: string | null | undefined): void {
   if (stopReason === 'refusal') {
     throw new Error('The model declined this request. Edit the text and try again.');
   }
+  if (stopReason === 'max_tokens') {
+    throw new Error('The model ran out of room. Shorten the text and try again.');
+  }
 }
 
 const postSummarySchema = z.object({

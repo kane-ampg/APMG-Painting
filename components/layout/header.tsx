@@ -28,7 +28,6 @@ export function Header({ settings }: { settings: SiteSettings }) {
               width={378}
               height={285}
               preload
-              fetchPriority="high"
               className="h-11 w-auto sm:h-14"
             />
           </Link>

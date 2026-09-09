@@ -19,6 +19,8 @@ let client: SupabaseClient | null = null;
 export function createPublicSupabase(): SupabaseClient {
   if (client) return client;
   const { url, anonKey } = supabaseEnv();
-  client = createClient(url, anonKey, { auth: { persistSession: false } });
+  client = createClient(url, anonKey, {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  });
   return client;
 }
