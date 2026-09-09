@@ -11,10 +11,17 @@ import { defaultSiteSettings } from '@/lib/site';
  * assert the action *reads* the number rather than that it happens to match.
  */
 const { settings } = vi.hoisted(() => ({
-  settings: { current: null as unknown as { phone: string } },
+  settings: {
+    current: null as unknown as { phone: string },
+    /** Set to make the settings read throw, as a Supabase blip would. */
+    fails: false,
+  },
 }));
 vi.mock('@/lib/content/source', () => ({
-  getSiteSettings: async () => settings.current,
+  getSiteSettings: async () => {
+    if (settings.fails) throw new Error('supabase unavailable');
+    return settings.current;
+  },
 }));
 
 vi.mock('next/headers', () => ({
@@ -58,6 +65,7 @@ function validForm(): FormData {
 describe('submitEnquiry failure messages', () => {
   afterEach(() => {
     allowed.current = true;
+    settings.fails = false;
     transportResult.current = { delivered: true };
     vi.resetModules();
   });
@@ -105,6 +113,21 @@ describe('submitEnquiry failure messages', () => {
 
   it('still reports a delivered submission as success', async () => {
     settings.current = defaultSiteSettings;
+    const { submitEnquiry } = await import('@/app/actions/enquiry');
+
+    const result = await submitEnquiry({ status: 'idle' }, validForm());
+
+    expect(result.status).toBe('success');
+    expect(result.delivered).toBe(true);
+  });
+
+  it('does not cost a visitor their enquiry when the settings read fails', async () => {
+    // The settings read is a database round trip. If it were awaited up front
+    // — or awaited at all on the happy path — a transient Supabase error would
+    // turn a perfectly good enquiry into a failure. It is read only inside the
+    // two branches that need a phone number, and this asserts that.
+    settings.current = defaultSiteSettings;
+    settings.fails = true;
     const { submitEnquiry } = await import('@/app/actions/enquiry');
 
     const result = await submitEnquiry({ status: 'idle' }, validForm());

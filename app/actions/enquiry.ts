@@ -43,24 +43,29 @@ export async function submitEnquiry(
   // The number a rejected visitor is told to ring is the editable one, not a
   // literal: FormStatus reads it from the settings context, and a Server
   // Action message that disagreed with it would send people to the old line.
-  const settings = await getSiteSettings();
-
+  //
+  // Read inside the two failure branches rather than up front. It is a
+  // database round trip on the path of every submission otherwise, and the
+  // one thing it must never do is cost somebody their enquiry — the happy
+  // path does not need a phone number at all.
   const limit = checkRateLimit(await clientKey());
   if (!limit.allowed) {
+    const { phone } = await getSiteSettings();
     return {
       status: 'error',
       message: `Too many enquiries from this connection. Please try again in ${Math.ceil(
         limit.retryAfterSeconds / 60,
-      )} minutes, or call us on ${settings.phone}.`,
+      )} minutes, or call us on ${phone}.`,
     };
   }
 
   const result = await getEnquiryTransport().send(enquiry);
 
   if (!result.delivered && result.reason === 'provider-error') {
+    const { phone } = await getSiteSettings();
     return {
       status: 'error',
-      message: `We could not send your enquiry just now. Please call us on ${settings.phone} and we will pick it up straight away.`,
+      message: `We could not send your enquiry just now. Please call us on ${phone} and we will pick it up straight away.`,
     };
   }
 

@@ -14,12 +14,15 @@ import { getSiteSettings } from '@/lib/content/source';
  * pages beneath it are indexable only where they carry real evidence, which is
  * decided per record in content/locations.ts, not per route.
  */
-export const metadata: Metadata = buildMetadata({
-  title: 'Areas We Service | Melbourne Painters | APMG Painting',
-  description:
-    'APMG Painting works across metropolitan Melbourne from Bayswater North. Suburbs and regions we service, with links to projects completed nearby.',
-  path: '/areas/',
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+
+  return buildMetadata({
+    title: 'Areas We Service | Melbourne Painters | APMG Painting',
+    description: `APMG Painting works across metropolitan Melbourne from ${settings.address.suburb}. Suburbs and regions we service, with links to projects completed nearby.`,
+    path: '/areas/',
+  });
+}
 
 export default async function AreasPage() {
   const byRegion = locationsByRegion();

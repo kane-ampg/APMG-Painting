@@ -85,6 +85,58 @@ describe('content source with Supabase', () => {
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('broken'), expect.anything());
   });
 
+  it('falls back to the default business details when the read fails', async () => {
+    // fetchPublished throws on a query error, and getSiteSettings is awaited
+    // by the root layout and by the enquiry action. A network blip or an RLS
+    // misconfiguration must not fail a page render or cost somebody their
+    // enquiry, so these two getters catch where the others deliberately do not.
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://abc.supabase.co');
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon');
+    vi.doMock('@/lib/supabase/server', () => ({
+      createServerSupabase: async () => ({
+        from: () => ({
+          select: () => ({
+            eq: () => ({
+              eq: () => ({ order: async () => ({ data: null, error: { message: 'boom' } }) }),
+            }),
+          }),
+        }),
+      }),
+    }));
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const { getSiteSettings, getPage } = await import('@/lib/content/source');
+    const { defaultContactPage, defaultSiteSettings } = await import('@/lib/site');
+
+    await expect(getSiteSettings()).resolves.toEqual(defaultSiteSettings);
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('settings read failed'),
+      expect.anything(),
+    );
+
+    await expect(getPage('contact-us')).resolves.toEqual(defaultContactPage);
+    warn.mockRestore();
+  });
+
+  it('still fails loudly for projects, which should break a build', async () => {
+    // The counterpart to the test above: only the singletons swallow a read
+    // error, because only they have something safe to fall back to.
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://abc.supabase.co');
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon');
+    vi.doMock('@/lib/supabase/server', () => ({
+      createServerSupabase: async () => ({
+        from: () => ({
+          select: () => ({
+            eq: () => ({
+              eq: () => ({ order: async () => ({ data: null, error: { message: 'boom' } }) }),
+            }),
+          }),
+        }),
+      }),
+    }));
+    const { getProjects } = await import('@/lib/content/source');
+    await expect(getProjects()).rejects.toThrow(/boom/);
+  });
+
   it('tags the posts cache and never expires it on a timer', async () => {
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://abc.supabase.co');
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon');
