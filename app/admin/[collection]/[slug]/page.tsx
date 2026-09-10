@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { listMedia } from '@/app/actions/media';
 import { EntryForm } from '@/components/admin/entry-form';
+import { advancedFields } from '@/lib/admin/labels';
 import { requireAdmin } from '@/lib/auth/admin';
 import { fieldsFor } from '@/lib/content/form-fields';
 import { collectionTitles, isCollection, isSingleton, singletonSlug } from '@/lib/content/schemas';
@@ -36,6 +37,7 @@ export default async function EditEntryPage({ params }: Props) {
           initial={entry.data as Record<string, unknown>}
           initialStatus={entry.status}
           media={media}
+          advanced={advancedFields[collection]}
         />
       </div>
     </>
