@@ -10,22 +10,6 @@ import { AiButton } from './ai-button';
 
 export type FieldGroup = { heading: string; fields: readonly string[] };
 
-type Props = {
-  collection: string;
-  fields: FieldSpec[];
-  initial: Record<string, unknown>;
-  initialStatus: 'draft' | 'published';
-  media: MediaRow[];
-  /** Field names to tuck into the collapsed Advanced group at the bottom. */
-  advanced?: readonly string[];
-  /** Optional headings that split the fields into labelled sets, in order. */
-  groups?: readonly FieldGroup[];
-  /** Where Preview should go. Defaults to the draft preview for this entry. */
-  previewHref?: string;
-  /** Extra note above the buttons, e.g. which page this form is editing. */
-  note?: string;
-};
-
 function asArray(value: unknown): unknown[] {
   return Array.isArray(value) ? [...value] : [];
 }
@@ -112,8 +96,9 @@ export function cleanField(spec: FieldSpec, value: unknown, original: unknown): 
     }
 
     case 'number': {
-      if (value === null || value === undefined || value === '')
+      if (value === null || value === undefined || value === '') {
         return spec.nullable ? null : undefined;
+      }
       const parsed = Number(value);
       return Number.isNaN(parsed) ? value : parsed;
     }
@@ -133,46 +118,58 @@ export function cleanField(spec: FieldSpec, value: unknown, original: unknown): 
   }
 }
 
-export function EntryForm({
+/**
+ * The payload. Every field the form shows is cleaned; everything else in the
+ * entry rides along untouched, which is what lets a page-level form edit four
+ * fields of a project without dropping the other fifteen.
+ */
+export function buildSubmission(
+  fields: readonly FieldSpec[],
+  data: Record<string, unknown>,
+  initial: Record<string, unknown>,
+): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...data };
+  for (const field of fields) {
+    const cleaned = cleanField(field, data[field.name], initial[field.name]);
+    if (cleaned === undefined) delete out[field.name];
+    else out[field.name] = cleaned;
+  }
+  return out;
+}
+
+type FieldSetProps = {
+  collection: string;
+  fields: readonly FieldSpec[];
+  data: Record<string, unknown>;
+  onChange: (name: string, value: unknown) => void;
+  media: MediaRow[];
+  errors?: Record<string, string[]>;
+  /** Field names to tuck into the collapsed Advanced group at the bottom. */
+  advanced?: readonly string[];
+  /** Optional headings that split the fields into labelled sets, in order. */
+  groups?: readonly FieldGroup[];
+};
+
+/**
+ * The fields of one entry, with no form and no buttons of its own.
+ *
+ * Separate from `EntryForm` because a page editor shows several entries at
+ * once and saves them from a single action bar — one Save per page, not one
+ * per card.
+ */
+export function EntryFieldSet({
   collection,
   fields,
-  initial,
-  initialStatus,
+  data,
+  onChange,
   media,
+  errors,
   advanced = [],
   groups,
-  previewHref,
-  note,
-}: Props) {
-  const [data, setData] = useState<Record<string, unknown>>(initial);
-  const [state, action, pending] = useActionState<SaveState, FormData>(saveEntry, {
-    status: 'idle',
-  });
-  const set = (name: string, value: unknown) => setData((d) => ({ ...d, [name]: value }));
-
-  /**
-   * The payload. Every field the form shows is cleaned; everything else in
-   * the entry rides along untouched, which is what lets a page-level form
-   * edit four fields of a project without dropping the other fifteen.
-   */
-  const submission = useMemo(() => {
-    const out: Record<string, unknown> = { ...data };
-    for (const field of fields) {
-      const cleaned = cleanField(field, data[field.name], initial[field.name]);
-      if (cleaned === undefined) delete out[field.name];
-      else out[field.name] = cleaned;
-    }
-    return out;
-  }, [data, fields, initial]);
-
+}: FieldSetProps) {
   const byName = new Map(fields.map((field) => [field.name, field]));
   const isAdvanced = (name: string) => advanced.includes(name);
-  const mainFields = fields.filter((field) => !isAdvanced(field.name));
-  const advancedFieldSpecs = fields.filter((field) => isAdvanced(field.name));
-
-  const slug = String(data.slug ?? initial.slug ?? '');
-  const originalSlug = String(initial.slug ?? '');
-  const preview = previewHref ?? (slug ? `/admin/preview/${collection}/${slug}/` : null);
+  const advancedSpecs = fields.filter((field) => isAdvanced(field.name));
 
   const renderField = (field: FieldSpec) => (
     <div key={field.name}>
@@ -181,16 +178,18 @@ export function EntryForm({
         path={field.name}
         spec={field}
         value={data[field.name]}
-        onChange={(value) => set(field.name, value)}
+        onChange={(value) => onChange(field.name, value)}
         media={media}
-        errors={state.fieldErrors?.[field.name]}
+        errors={errors?.[field.name]}
       />
       {collection === 'posts' && field.name === 'excerpt' && (
         <div className="mt-2">
           <AiButton
             task="post-summary"
             input={{ title: String(data.title ?? ''), body: String(data.body ?? '') }}
-            onResult={(result) => setData((d) => ({ ...d, ...result }))}
+            onResult={(result) => {
+              for (const [name, text] of Object.entries(result)) onChange(name, text);
+            }}
           />
         </div>
       )}
@@ -198,13 +197,7 @@ export function EntryForm({
   );
 
   return (
-    <form action={action} className="flex flex-col gap-6">
-      <input type="hidden" name="collection" value={collection} />
-      <input type="hidden" name="slug" value={slug} />
-      <input type="hidden" name="originalSlug" value={originalSlug} />
-      <input type="hidden" name="previousStatus" value={initialStatus} />
-      <input type="hidden" name="data" value={JSON.stringify(submission)} />
-
+    <div className="flex flex-col gap-6">
       {groups
         ? groups.map((group) => {
             const specs = group.fields.flatMap((name) => {
@@ -221,19 +214,81 @@ export function EntryForm({
               </fieldset>
             );
           })
-        : mainFields.map(renderField)}
+        : fields.filter((field) => !isAdvanced(field.name)).map(renderField)}
 
-      {advancedFieldSpecs.length > 0 && (
+      {advancedSpecs.length > 0 && (
         <details className="rounded border border-paper-edge bg-paper-sunken p-4">
           <summary className="cursor-pointer text-sm font-medium">Advanced</summary>
           <p className="mt-2 text-xs text-ink-soft">
             Links, listings and dates. Changing these can move or hide the page.
           </p>
-          <div className="mt-4 flex flex-col gap-5">{advancedFieldSpecs.map(renderField)}</div>
+          <div className="mt-4 flex flex-col gap-5">{advancedSpecs.map(renderField)}</div>
         </details>
       )}
+    </div>
+  );
+}
 
-      {note && <p className="text-xs text-ink-soft">{note}</p>}
+type Props = {
+  collection: string;
+  fields: FieldSpec[];
+  initial: Record<string, unknown>;
+  initialStatus: 'draft' | 'published';
+  media: MediaRow[];
+  advanced?: readonly string[];
+  groups?: readonly FieldGroup[];
+  /** Where Preview should go. Defaults to the draft preview for this entry. */
+  previewHref?: string;
+};
+
+/**
+ * One entry, one form, its own Save. Used by the collection editors, where an
+ * entry is the whole screen. The page editor does not use this — it shows
+ * several entries and saves them together.
+ */
+export function EntryForm({
+  collection,
+  fields,
+  initial,
+  initialStatus,
+  media,
+  advanced = [],
+  groups,
+  previewHref,
+}: Props) {
+  const [data, setData] = useState<Record<string, unknown>>(initial);
+  const [state, action, pending] = useActionState<SaveState, FormData>(saveEntry, {
+    status: 'idle',
+  });
+  const onChange = (name: string, value: unknown) => setData((d) => ({ ...d, [name]: value }));
+
+  const submission = useMemo(
+    () => buildSubmission(fields, data, initial),
+    [data, fields, initial],
+  );
+
+  const slug = String(data.slug ?? initial.slug ?? '');
+  const originalSlug = String(initial.slug ?? '');
+  const preview = previewHref ?? (slug ? `/admin/preview/${collection}/${slug}/` : null);
+
+  return (
+    <form action={action} className="flex flex-col gap-6">
+      <input type="hidden" name="collection" value={collection} />
+      <input type="hidden" name="slug" value={slug} />
+      <input type="hidden" name="originalSlug" value={originalSlug} />
+      <input type="hidden" name="previousStatus" value={initialStatus} />
+      <input type="hidden" name="data" value={JSON.stringify(submission)} />
+
+      <EntryFieldSet
+        collection={collection}
+        fields={fields}
+        data={data}
+        onChange={onChange}
+        media={media}
+        errors={state.fieldErrors}
+        advanced={advanced}
+        groups={groups}
+      />
 
       <div className="flex flex-wrap items-center gap-3 border-t border-paper-edge pt-4">
         <button

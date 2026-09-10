@@ -1,48 +1,53 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { listMedia } from '@/app/actions/media';
-import { EntryForm } from '@/components/admin/entry-form';
-import { FIXED_NOTE, getAdminPage, type PageSection } from '@/lib/admin/pages';
+import {
+  PageEditor,
+  type EditableEntry,
+  type SectionModel,
+} from '@/components/admin/page-editor';
 import { advancedFields, labelFor } from '@/lib/admin/labels';
+import { FIXED_NOTE, getAdminPage, sectorOptions, type PageSection } from '@/lib/admin/pages';
 import { requireAdmin } from '@/lib/auth/admin';
-import { fieldsFor } from '@/lib/content/form-fields';
+import { fieldsFor, type FieldSpec } from '@/lib/content/form-fields';
 import type { Collection } from '@/lib/content/schemas';
 import { getEntryForPreview, getSiteSettings } from '@/lib/content/source';
-import type { MediaRow } from '@/lib/media/to-media-ref';
-import { formatAddress } from '@/lib/site';
 import type { SiteSettings } from '@/lib/content/types';
+import { formatAddress } from '@/lib/site';
 
 type Props = { params: Promise<{ page: string }> };
 
-/** The fields a section names, in the order it names them. */
-function specsFor(collection: Collection, names: readonly string[]) {
+/**
+ * The fields a section names, in the order it names them, with the editor's
+ * presentation applied: a sector picks from the sectors that exist, and a
+ * card section shows only the cover photograph, because the cover is the only
+ * photograph that section puts on screen.
+ */
+function specsFor(
+  collection: Collection,
+  names: readonly string[],
+  cardOnly: boolean,
+): FieldSpec[] {
   const all = fieldsFor(collection);
   return names.flatMap((name) => {
     const spec = all.find((candidate) => candidate.name === name);
-    return spec ? [spec] : [];
+    if (!spec) return [];
+    if (collection === 'projects' && name === 'sectorSlug') {
+      const options = sectorOptions();
+      return [
+        {
+          ...spec,
+          kind: 'select' as const,
+          options: options.map((option) => option.value),
+          optionLabels: Object.fromEntries(
+            options.map((option) => [option.value, option.label]),
+          ),
+        },
+      ];
+    }
+    if (cardOnly && spec.kind === 'gallery') return [{ ...spec, coverOnly: true }];
+    return [spec];
   });
-}
-
-function Card({
-  heading,
-  detail,
-  children,
-  muted = false,
-}: {
-  heading: string;
-  detail?: string;
-  children?: React.ReactNode;
-  muted?: boolean;
-}) {
-  return (
-    <section
-      className={`rounded-lg border border-paper-edge p-5 ${muted ? 'bg-paper-sunken' : 'bg-white'}`}
-    >
-      <h2 className="font-display text-xl tracking-tight text-ink">{heading}</h2>
-      {detail && <p className="mt-1 text-sm text-ink-soft">{detail}</p>}
-      {children && <div className="mt-4">{children}</div>}
-    </section>
-  );
 }
 
 /** Plain-English rendering of one business detail. */
@@ -67,66 +72,30 @@ function settingValue(settings: SiteSettings, field: string): string {
   }
 }
 
-async function EntryCard({
-  section,
-  collection,
-  slug,
-  media,
-  fields,
-  heading,
-  detail,
-  nested = false,
-}: {
-  section: PageSection;
-  collection: Collection;
-  slug: string;
-  media: MediaRow[];
-  fields: readonly string[];
-  heading?: string;
-  detail?: string;
-  nested?: boolean;
-}) {
-  const entry = await getEntryForPreview(collection, slug);
-  const data = (entry?.data ?? {}) as Record<string, unknown>;
-  // An entry's own title, never its storage key: the editor recognises
-  // "Office painting", not the string in the URL.
-  const title = heading ?? String(data.title ?? data.shortTitle ?? '') ?? '';
-
-  if (!entry) {
-    return (
-      <Card heading={title || 'Not published'} detail="This entry is not published yet." muted />
-    );
-  }
-
-  const groups = section.kind === 'entry' ? section.groups : undefined;
-  const advancedForSection =
-    section.kind === 'entry' ? (section.advanced ?? []) : (advancedFields[collection] ?? []);
-  const form = (
-    <EntryForm
-      collection={collection}
-      fields={specsFor(collection, fields)}
-      initial={data}
-      initialStatus={entry.status}
-      media={media}
-      groups={groups}
-      advanced={advancedForSection.filter((name) => fields.includes(name))}
-    />
-  );
-
-  if (!nested)
-    return (
-      <Card heading={title} detail={detail}>
-        {form}
-      </Card>
-    );
-
-  return (
-    <div className="rounded border border-paper-edge bg-paper p-4">
-      <h3 className="font-display text-lg tracking-tight text-ink">{title}</h3>
-      {detail && <p className="mt-1 text-sm text-ink-soft">{detail}</p>}
-      <div className="mt-4">{form}</div>
-    </div>
-  );
+async function entryFor(
+  section: Extract<PageSection, { kind: 'entries' | 'entry' }>,
+  slug: string,
+): Promise<EditableEntry | null> {
+  const entry = await getEntryForPreview(section.collection, slug);
+  if (!entry) return null;
+  const data = entry.data as Record<string, unknown>;
+  const advanced =
+    section.kind === 'entry'
+      ? (section.advanced ?? [])
+      : (advancedFields[section.collection] ?? []);
+  return {
+    key: `${section.id}:${slug}`,
+    // An entry's own title, never its storage key: the editor recognises
+    // "Office painting", not the string in the URL.
+    title: String(data.title ?? data.shortTitle ?? slug),
+    collection: section.collection,
+    slug,
+    status: entry.status,
+    data,
+    fields: specsFor(section.collection, section.fields, section.kind === 'entries'),
+    groups: section.kind === 'entry' ? section.groups : undefined,
+    advanced: advanced.filter((name) => section.fields.includes(name)),
+  };
 }
 
 export default async function AdminPageEditor({ params }: Props) {
@@ -136,6 +105,40 @@ export default async function AdminPageEditor({ params }: Props) {
   if (!page) notFound();
 
   const [media, settings] = await Promise.all([listMedia(), getSiteSettings()]);
+
+  const sections: SectionModel[] = await Promise.all(
+    page.sections.map(async (section): Promise<SectionModel> => {
+      if (section.kind === 'fixed') {
+        return { kind: 'fixed', id: section.id, heading: section.heading, detail: section.detail };
+      }
+      if (section.kind === 'settings') {
+        return {
+          kind: 'settings',
+          id: section.id,
+          heading: section.heading,
+          detail: section.detail,
+          values: section.fields.map((field) => ({
+            label: labelFor('settings', field).label,
+            value: settingValue(settings, field),
+          })),
+        };
+      }
+      const slugs = section.kind === 'entry' ? [section.slug] : section.slugs;
+      const resolved = await Promise.all(slugs.map((slug) => entryFor(section, slug)));
+      const missing = slugs.filter((_, index) => resolved[index] === null);
+      return {
+        kind: 'entries',
+        id: section.id,
+        heading: section.heading,
+        detail: section.detail,
+        entries: resolved.filter((entry): entry is EditableEntry => entry !== null),
+        empty:
+          missing.length > 0
+            ? missing.map((slug) => `Entry not found: ${slug}`).join(' ')
+            : undefined,
+      };
+    }),
+  );
 
   return (
     <>
@@ -155,80 +158,16 @@ export default async function AdminPageEditor({ params }: Props) {
       </div>
       <p className="mt-4 max-w-prose text-ink-soft">
         The sections below are in the order they appear on the page. Sections can not be added,
-        removed or moved.
+        removed or moved, and photographs are swapped rather than added.
       </p>
 
-      <div className="mt-8 flex flex-col gap-6">
-        {page.sections.map((section) => {
-          if (section.kind === 'fixed') {
-            return (
-              <Card key={section.id} heading={section.heading} detail={section.detail} muted>
-                <p className="text-sm text-ink-muted">{FIXED_NOTE}</p>
-              </Card>
-            );
-          }
-
-          if (section.kind === 'settings') {
-            return (
-              <Card key={section.id} heading={section.heading} detail={section.detail} muted>
-                <dl className="flex flex-col gap-2 text-sm">
-                  {section.fields.map((field) => (
-                    <div key={field} className="flex flex-wrap gap-2">
-                      <dt className="font-medium text-ink">{labelFor('settings', field).label}</dt>
-                      <dd className="text-ink-soft">{settingValue(settings, field)}</dd>
-                    </div>
-                  ))}
-                </dl>
-                <p className="mt-3 text-sm">
-                  <Link href="/admin/settings/site/" className="underline">
-                    Edit business details
-                  </Link>
-                </p>
-              </Card>
-            );
-          }
-
-          if (section.kind === 'entry') {
-            return (
-              <EntryCard
-                key={section.id}
-                section={section}
-                collection={section.collection}
-                slug={section.slug}
-                media={media}
-                fields={section.fields}
-                heading={section.heading}
-                detail={section.detail}
-              />
-            );
-          }
-
-          if (section.slugs.length === 0) {
-            return (
-              <Card key={section.id} heading={section.heading} detail={section.detail} muted>
-                <p className="text-sm text-ink-muted">Nothing to show here yet.</p>
-              </Card>
-            );
-          }
-
-          return (
-            <Card key={section.id} heading={section.heading} detail={section.detail}>
-              <div className="flex flex-col gap-8">
-                {section.slugs.map((slug) => (
-                  <EntryCard
-                    key={slug}
-                    section={section}
-                    collection={section.collection}
-                    slug={slug}
-                    media={media}
-                    fields={section.fields}
-                    nested
-                  />
-                ))}
-              </div>
-            </Card>
-          );
-        })}
+      <div className="mt-8">
+        <PageEditor
+          pagePath={page.path}
+          sections={sections}
+          media={media}
+          fixedNote={FIXED_NOTE}
+        />
       </div>
     </>
   );
