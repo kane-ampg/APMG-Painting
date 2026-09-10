@@ -262,10 +262,7 @@ export function EntryForm({
   });
   const onChange = (name: string, value: unknown) => setData((d) => ({ ...d, [name]: value }));
 
-  const submission = useMemo(
-    () => buildSubmission(fields, data, initial),
-    [data, fields, initial],
-  );
+  const submission = useMemo(() => buildSubmission(fields, data, initial), [data, fields, initial]);
 
   const slug = String(data.slug ?? initial.slug ?? '');
   const originalSlug = String(initial.slug ?? '');

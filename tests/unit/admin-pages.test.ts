@@ -153,9 +153,7 @@ describe('mediaUsage', () => {
     const office = services.find((service) => service.slug === 'office-painting');
     const card = office?.image?.src;
     expect(card).toBeDefined();
-    expect(usage.get(card as string)).toContainEqual(
-      expect.objectContaining({ pageId: 'home' }),
-    );
+    expect(usage.get(card as string)).toContainEqual(expect.objectContaining({ pageId: 'home' }));
 
     const badge = accreditations.find((entry) => entry.logo)?.logo?.src;
     expect(badge).toBeDefined();
@@ -168,8 +166,10 @@ describe('mediaUsage', () => {
     const { listLocalMedia } = await import('@/lib/media/local-library');
     const [usage, rows] = await Promise.all([mediaUsage(), listLocalMedia()]);
     for (const row of rows) {
-      expect((usage.get(row.public_url) ?? []).length, `${row.public_url} has no placement`)
-        .toBeGreaterThan(0);
+      expect(
+        (usage.get(row.public_url) ?? []).length,
+        `${row.public_url} has no placement`,
+      ).toBeGreaterThan(0);
     }
   });
 });

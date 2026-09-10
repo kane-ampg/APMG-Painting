@@ -1,11 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { listMedia } from '@/app/actions/media';
-import {
-  PageEditor,
-  type EditableEntry,
-  type SectionModel,
-} from '@/components/admin/page-editor';
+import { PageEditor, type EditableEntry, type SectionModel } from '@/components/admin/page-editor';
 import { advancedFields, labelFor } from '@/lib/admin/labels';
 import { FIXED_NOTE, getAdminPage, sectorOptions, type PageSection } from '@/lib/admin/pages';
 import { requireAdmin } from '@/lib/auth/admin';
@@ -39,9 +35,7 @@ function specsFor(
           ...spec,
           kind: 'select' as const,
           options: options.map((option) => option.value),
-          optionLabels: Object.fromEntries(
-            options.map((option) => [option.value, option.label]),
-          ),
+          optionLabels: Object.fromEntries(options.map((option) => [option.value, option.label])),
         },
       ];
     }
@@ -132,10 +126,7 @@ export default async function AdminPageEditor({ params }: Props) {
         heading: section.heading,
         detail: section.detail,
         entries: resolved.filter((entry): entry is EditableEntry => entry !== null),
-        empty:
-          missing.length > 0
-            ? missing.map((slug) => `Entry not found: ${slug}`).join(' ')
-            : undefined,
+        missing,
       };
     }),
   );
@@ -162,12 +153,7 @@ export default async function AdminPageEditor({ params }: Props) {
       </p>
 
       <div className="mt-8">
-        <PageEditor
-          pagePath={page.path}
-          sections={sections}
-          media={media}
-          fixedNote={FIXED_NOTE}
-        />
+        <PageEditor pagePath={page.path} sections={sections} media={media} fixedNote={FIXED_NOTE} />
       </div>
     </>
   );
