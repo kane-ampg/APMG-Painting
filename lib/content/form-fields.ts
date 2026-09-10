@@ -30,6 +30,14 @@ export type FieldSpec = {
   maxLength?: number;
   /** Allowed values for a `select`. */
   options?: string[];
+  /** Human names for those values, where the value itself is a code. */
+  optionLabels?: Record<string, string>;
+  /**
+   * Show only the first photograph of a gallery. Set by the page editor for
+   * the sections that render a card, where the cover is the only photograph
+   * on screen. Never derived from a schema.
+   */
+  coverOnly?: boolean;
   /** Sub-fields of a `group`, or of one row of a `group-list`. */
   children?: FieldSpec[];
   /**

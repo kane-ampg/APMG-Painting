@@ -3,10 +3,12 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { projects } from '@/content/projects';
 import { sectors } from '@/content/sectors';
-import { getAdminPage, getAdminPages, staticPagePaths } from '@/lib/admin/pages';
+import { services } from '@/content/services';
+import { getAdminPage, getAdminPages, mediaUsage, staticPagePaths } from '@/lib/admin/pages';
 import { labelFor, labels } from '@/lib/admin/labels';
 import { fieldsFor } from '@/lib/content/form-fields';
 import { collections } from '@/lib/content/schemas';
+import { accreditations } from '@/lib/site';
 
 const siteRoot = path.join(process.cwd(), 'app', '(site)');
 
@@ -117,6 +119,57 @@ describe('field labels', () => {
         expect(label.toLowerCase()).not.toContain('slug');
         expect(label.toLowerCase()).not.toContain('json');
       }
+    }
+  });
+});
+
+describe('what a section offers is what the editor renders', () => {
+  it('puts every field a section names into a group or into Advanced', async () => {
+    const pages = await getAdminPages();
+    for (const page of pages) {
+      for (const section of page.sections) {
+        if (section.kind === 'fixed' || section.kind === 'settings') continue;
+        const advanced = section.kind === 'entry' ? (section.advanced ?? []) : [];
+        const groups = section.kind === 'entry' ? section.groups : undefined;
+        for (const field of section.fields) {
+          // Without groups every non-advanced field is rendered in order, so
+          // there is nothing to fall through. With groups, a field named by
+          // the section but by no group would be silently invisible.
+          const rendered =
+            !groups ||
+            advanced.includes(field) ||
+            groups.some((group) => group.fields.includes(field));
+          expect(rendered, `${page.id}/${section.id}: ${field} is never rendered`).toBe(true);
+        }
+      }
+    }
+  });
+});
+
+describe('mediaUsage', () => {
+  it('names a page for a service card photograph and for an accreditation badge', async () => {
+    const usage = await mediaUsage();
+
+    const office = services.find((service) => service.slug === 'office-painting');
+    const card = office?.image?.src;
+    expect(card).toBeDefined();
+    expect(usage.get(card as string)).toContainEqual(
+      expect.objectContaining({ pageId: 'home' }),
+    );
+
+    const badge = accreditations.find((entry) => entry.logo)?.logo?.src;
+    expect(badge).toBeDefined();
+    expect(usage.get(badge as string)).toContainEqual(
+      expect.objectContaining({ pageId: 'about-us' }),
+    );
+  });
+
+  it('accounts for every image in the repository, so "not placed" is never a lie', async () => {
+    const { listLocalMedia } = await import('@/lib/media/local-library');
+    const [usage, rows] = await Promise.all([mediaUsage(), listLocalMedia()]);
+    for (const row of rows) {
+      expect((usage.get(row.public_url) ?? []).length, `${row.public_url} has no placement`)
+        .toBeGreaterThan(0);
     }
   });
 });

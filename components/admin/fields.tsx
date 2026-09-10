@@ -62,38 +62,63 @@ function CharCount({ value, limit }: { value: string; limit?: number }) {
 const inputClass =
   'rounded border border-paper-edge bg-white px-3 py-2 text-sm text-ink placeholder:text-ink-muted';
 
-/** The thumbnail, alt text and Swap image control shared by images and galleries. */
+/**
+ * The thumbnail, its description and Swap image, shared by images and
+ * galleries.
+ *
+ * There is no Remove. Where the site places a photograph it always places
+ * one, so emptying the field would leave a hole on a public page that only a
+ * developer could fill; an editor changes which picture it is, not whether
+ * there is one.
+ */
 function ImageControl({
   media,
   value,
   onChange,
-  onRemove,
+  labelledBy,
   altLabel = 'Description of the picture',
   altHelp = 'What the picture shows, for screen readers and Google.',
 }: {
   media: MediaRow[];
   value: MediaRef | undefined;
   onChange: (ref: MediaRef) => void;
-  onRemove?: () => void;
+  /** Id of the element naming this field, so the button says which one it is. */
+  labelledBy?: string;
   altLabel?: string;
   altHelp?: string;
 }) {
   const [open, setOpen] = useState(false);
   const altId = useId();
+  const buttonId = useId();
+  const thumbId = useId();
+  const swapLabel = value?.src ? 'Swap image' : 'Choose an image';
   return (
     <div className="flex flex-col gap-3 rounded border border-paper-edge bg-white p-3 sm:flex-row sm:items-start">
       <div className="sm:w-40 sm:shrink-0">
-        {value?.src ? (
-          <img
-            src={value.src}
-            alt=""
-            className="w-full rounded bg-paper-sunken object-contain sm:h-28"
-          />
-        ) : (
-          <div className="flex h-28 w-full items-center justify-center rounded bg-paper-sunken text-xs text-ink-muted">
-            No picture yet
-          </div>
-        )}
+        {/* The picture is the biggest target on the row, so it opens the same
+            library the button does. */}
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-labelledby={labelledBy ? `${labelledBy} ${thumbId}` : thumbId}
+          className="block w-full rounded border border-transparent hover:border-brand-600"
+        >
+          <span id={thumbId} className="sr-only">
+            Change this picture
+          </span>
+          {value?.src ? (
+            // Plain img: an admin thumbnail, not a public asset.
+            <img
+              src={value.src}
+              alt=""
+              className="h-28 w-full rounded bg-paper-sunken object-contain"
+            />
+          ) : (
+            <span className="flex h-28 w-full items-center justify-center rounded bg-paper-sunken text-xs text-ink-muted">
+              No picture yet
+            </span>
+          )}
+        </button>
       </div>
       <div className="flex flex-1 flex-col gap-2">
         <label htmlFor={altId} className="text-xs font-medium text-ink-soft">
@@ -108,12 +133,17 @@ function ImageControl({
         />
         <Help text={altHelp} />
         <div className="flex flex-wrap items-center gap-3">
+          {/* Both ids on purpose: the field's name, then this button's own
+              text, so the accessible name reads "Cover photograph, Swap
+              image" rather than losing one half to the other. */}
           <button
             type="button"
+            id={buttonId}
             onClick={() => setOpen(true)}
+            aria-labelledby={labelledBy ? `${labelledBy} ${buttonId}` : undefined}
             className="rounded border border-paper-edge bg-paper px-3 py-1.5 text-sm hover:border-brand-600"
           >
-            {value?.src ? 'Swap image' : 'Choose an image'}
+            {swapLabel}
           </button>
           {value?.src && (
             <AiButton
@@ -121,11 +151,6 @@ function ImageControl({
               input={{ imageUrl: value.src }}
               onResult={(result) => onChange({ ...value, alt: result.alt ?? value.alt })}
             />
-          )}
-          {onRemove && (
-            <button type="button" onClick={onRemove} className="text-sm text-ink-soft underline">
-              Remove
-            </button>
           )}
         </div>
         {value?.src && <p className="break-all text-xs text-ink-muted">{fileNameOf(value.src)}</p>}
@@ -196,74 +221,72 @@ function ListControl({
   );
 }
 
+/**
+ * A project's photographs, one row each.
+ *
+ * Swap only. The number of photographs and their order are what the page's
+ * layout is built around, so they are code; which photograph sits in each
+ * slot is content, and that is what this changes. `coverOnly` narrows it to
+ * the first row for the places that only render a card.
+ */
 function GalleryControl({
   media,
   images,
   onChange,
+  labelledBy,
+  coverOnly = false,
 }: {
   media: MediaRow[];
   images: Record<string, unknown>[];
   onChange: (images: Record<string, unknown>[]) => void;
+  labelledBy?: string;
+  coverOnly?: boolean;
 }) {
-  const [adding, setAdding] = useState(false);
+  const shown = coverOnly ? images.slice(0, 1) : images;
   return (
     <div className="flex flex-col gap-3">
-      {images.length === 0 && <p className="text-xs text-ink-soft">No photographs yet.</p>}
-      {images.map((image, index) => (
+      {shown.length === 0 && <p className="text-xs text-ink-soft">No photographs yet.</p>}
+      {shown.map((image, index) => (
         <div key={index} className="flex flex-col gap-2">
-          <p className="text-xs font-medium uppercase tracking-label text-ink-muted">
-            {index === 0 ? 'Cover photograph' : `Photograph ${index + 1}`}
-          </p>
+          {!coverOnly && (
+            <p className="text-xs font-medium uppercase tracking-label text-ink-muted">
+              {index === 0 ? 'Cover photograph' : `Photograph ${index + 1}`}
+            </p>
+          )}
           <ImageControl
             media={media}
+            labelledBy={labelledBy}
             value={image as MediaRef}
             onChange={(ref) => {
               const next = [...images];
               next[index] = { ...images[index], ...ref };
               onChange(next);
             }}
-            onRemove={() => onChange(images.filter((_, i) => i !== index))}
           />
-          <label className="flex items-center gap-2 text-xs text-ink-soft">
-            Stage
-            <select
-              className={inputClass}
-              value={String(image.phase ?? '')}
-              onChange={(event) => {
-                const next = [...images];
-                const phase = event.target.value;
-                const row = { ...images[index] };
-                if (phase === '') delete row.phase;
-                else row.phase = phase;
-                next[index] = row;
-                onChange(next);
-              }}
-            >
-              <option value="">Not marked</option>
-              <option value="before">Before</option>
-              <option value="after">After</option>
-            </select>
-          </label>
+          {!coverOnly && (
+            <label className="flex items-center gap-2 text-xs text-ink-soft">
+              Stage
+              <select
+                className={inputClass}
+                value={String(image.phase ?? '')}
+                onChange={(event) => {
+                  const next = [...images];
+                  const phase = event.target.value;
+                  const row = { ...images[index] };
+                  if (phase === '') delete row.phase;
+                  else row.phase = phase;
+                  next[index] = row;
+                  onChange(next);
+                }}
+              >
+                <option value="">Not marked</option>
+                <option value="before">Before</option>
+                <option value="after">After</option>
+              </select>
+            </label>
+          )}
         </div>
       ))}
-      <button
-        type="button"
-        className="self-start rounded border border-paper-edge bg-paper px-3 py-1.5 text-sm hover:border-brand-600"
-        onClick={() => setAdding(true)}
-      >
-        Add a photograph
-      </button>
-      {adding && (
-        <MediaModal
-          media={media}
-          heading="Add a photograph"
-          onClose={() => setAdding(false)}
-          onSelect={(row) => {
-            onChange([...images, { ...toMediaRef(row) }]);
-            setAdding(false);
-          }}
-        />
-      )}
     </div>
   );
 }
@@ -402,9 +425,9 @@ export function Field({ collection, path, spec, value, onChange, media, errors }
       return wrap(
         <ImageControl
           media={media}
+          labelledBy={inputId}
           value={value as MediaRef | undefined}
           onChange={(ref) => onChange(ref)}
-          onRemove={value ? () => onChange(undefined) : undefined}
         />,
         groupHeading,
       );
@@ -413,6 +436,8 @@ export function Field({ collection, path, spec, value, onChange, media, errors }
       return wrap(
         <GalleryControl
           media={media}
+          labelledBy={inputId}
+          coverOnly={spec.coverOnly}
           images={asArray(value).map((item) => asRecord(item))}
           onChange={(next) => onChange(next)}
         />,
@@ -547,7 +572,7 @@ export function Field({ collection, path, spec, value, onChange, media, errors }
           {!spec.required && <option value="">Not set</option>}
           {(spec.options ?? []).map((option) => (
             <option key={option} value={option}>
-              {option}
+              {spec.optionLabels?.[option] ?? option}
             </option>
           ))}
         </select>,

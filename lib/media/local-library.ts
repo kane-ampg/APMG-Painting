@@ -1,5 +1,6 @@
 import { readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
+import { cache } from 'react';
 import { faqs } from '@/content/faqs';
 import { locations } from '@/content/locations';
 import { projects } from '@/content/projects';
@@ -38,14 +39,15 @@ async function dimensionsOf(absolutePath: string): Promise<{ width: number; heig
 }
 
 /**
- * Alt text the repository already wrote for a given file.
+ * Every `{ src, alt }` pair reachable from the given content.
  *
- * The content files are the only place an image's description is authored, so
- * they are the only honest source for one here. An image nothing references
- * gets an empty string rather than an invented sentence.
+ * One walk, used twice: to give a file in the library the description the
+ * repository already wrote for it, and to work out which pages place it. The
+ * `seen` set makes a shared object (a project referenced from two places)
+ * cost nothing and stops a cycle looping.
  */
-function altIndex(): Map<string, string> {
-  const index = new Map<string, string>();
+export function imageSourcesIn(roots: unknown[]): { src: string; alt: string }[] {
+  const found: { src: string; alt: string }[] = [];
   const seen = new Set<unknown>();
 
   const walk = (value: unknown): void => {
@@ -58,13 +60,37 @@ function altIndex(): Map<string, string> {
     }
     const record = value as Record<string, unknown>;
     const { src, alt } = record;
-    if (typeof src === 'string' && typeof alt === 'string' && !index.has(src)) {
-      index.set(src, alt);
+    if (typeof src === 'string' && src !== '') {
+      found.push({ src, alt: typeof alt === 'string' ? alt : '' });
     }
     for (const item of Object.values(record)) walk(item);
   };
 
-  walk([projects, services, sectors, locations, reviews, faqs, site, accreditations]);
+  walk(roots);
+  return found;
+}
+
+/**
+ * Alt text the repository already wrote for a given file.
+ *
+ * The content files are the only place an image's description is authored, so
+ * they are the only honest source for one here. An image nothing references
+ * gets an empty string rather than an invented sentence.
+ */
+function altIndex(): Map<string, string> {
+  const index = new Map<string, string>();
+  for (const { src, alt } of imageSourcesIn([
+    projects,
+    services,
+    sectors,
+    locations,
+    reviews,
+    faqs,
+    site,
+    accreditations,
+  ])) {
+    if (alt !== '' && !index.has(src)) index.set(src, alt);
+  }
   return index;
 }
 
@@ -79,7 +105,7 @@ async function filesUnder(dir: string): Promise<string[]> {
   return out;
 }
 
-export async function listLocalMedia(): Promise<MediaRow[]> {
+export const listLocalMedia = cache(async function listLocalMedia(): Promise<MediaRow[]> {
   const root = path.join(process.cwd(), 'public', 'images');
   let files: string[];
   try {
@@ -113,4 +139,4 @@ export async function listLocalMedia(): Promise<MediaRow[]> {
   );
 
   return rows;
-}
+});

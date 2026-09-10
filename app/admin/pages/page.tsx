@@ -25,10 +25,19 @@ export default async function AdminPagesList() {
               href={`/admin/pages/${page.id}/`}
               className="flex h-full flex-col overflow-hidden rounded-lg border border-paper-edge bg-white transition-colors hover:border-brand-600"
             >
-              <span className="block aspect-[16/9] bg-paper-sunken">
-                {page.hero?.src && (
+              <span className="flex aspect-[16/9] items-center justify-center bg-paper-sunken">
+                {page.hero?.src ? (
                   // Plain img: an admin thumbnail, not a public asset.
                   <img src={page.hero.src} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  // Pages with no photograph of their own get their initial
+                  // rather than an empty grey rectangle that reads as broken.
+                  <span
+                    aria-hidden="true"
+                    className="font-display text-4xl font-semibold text-ink-muted"
+                  >
+                    {page.title.charAt(0)}
+                  </span>
                 )}
               </span>
               <span className="flex flex-1 flex-col gap-1 p-4">

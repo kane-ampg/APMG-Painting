@@ -58,7 +58,10 @@ export async function uploadMedia(
   // image with AI after it is uploaded — "Describe with AI" needs a public
   // URL, which does not exist until the upload completes.
   if (!alt && !describeLater)
-    return { status: 'error', message: 'Alt text is required. Use "Describe with AI" if stuck.' };
+    return {
+      status: 'error',
+      message: 'A description of the picture is required. Use "Describe with AI" if stuck.',
+    };
 
   // Read the upload once: the buffer is reused for both processing and storage.
   const buffer = Buffer.from(await file.arrayBuffer());

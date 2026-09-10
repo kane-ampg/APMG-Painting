@@ -1,14 +1,16 @@
 'use client';
 
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import type { MediaRow } from '@/app/actions/media';
+import type { MediaPlacement } from '@/lib/admin/pages';
 import { MediaAltEditor } from './media-alt-editor';
 import { dimensionsOf, fileNameOf, filterMedia } from './media-modal';
 
 type Props = {
   media: MediaRow[];
-  /** Which pages place each image, keyed by its URL. */
-  usage: Record<string, string[]>;
+  /** Every placement of each image, keyed by its URL. */
+  usage: Record<string, MediaPlacement[]>;
 };
 
 /**
@@ -90,8 +92,19 @@ export function MediaBrowser({ media, usage }: Props) {
                 </h2>
                 {(usage[selected.public_url] ?? []).length > 0 ? (
                   <ul className="mt-1 flex flex-col gap-1 text-sm text-ink-soft">
-                    {(usage[selected.public_url] ?? []).map((title) => (
-                      <li key={title}>{title}</li>
+                    {(usage[selected.public_url] ?? []).map((placement) => (
+                      <li key={placement.title}>
+                        {placement.pageId ? (
+                          <Link
+                            href={`/admin/pages/${placement.pageId}/`}
+                            className="underline hover:text-brand-700"
+                          >
+                            {placement.title}
+                          </Link>
+                        ) : (
+                          placement.title
+                        )}
+                      </li>
                     ))}
                   </ul>
                 ) : (

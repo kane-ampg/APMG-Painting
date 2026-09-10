@@ -1,7 +1,11 @@
+import { cache } from 'react';
 import { sectors } from '@/content/sectors';
 import type { Collection } from '@/lib/content/schemas';
-import { getPosts, getProjects, getServices } from '@/lib/content/source';
+import { getPosts, getProjects, getServices, getSiteSettings } from '@/lib/content/source';
 import type { MediaRef } from '@/lib/content/types';
+import { imageSourcesIn } from '@/lib/media/local-library';
+import { brandLogoPath } from '@/lib/schema';
+import { accreditations, site } from '@/lib/site';
 
 /**
  * The public site, as the editor sees it.
@@ -20,11 +24,23 @@ import type { MediaRef } from '@/lib/content/types';
 
 export const FIXED_NOTE = 'Fixed copy — ask the developer to change this';
 
+/** components/layout/footer.tsx places this; the header places brandLogoPath. */
+const FOOTER_LOGO = '/images/brand/apmg-logo-white.webp';
+
+/** The sectors a project can be filed under, named the way an editor knows them. */
+export function sectorOptions(): { value: string; label: string }[] {
+  return sectors.map((sector) => ({ value: sector.slug, label: sector.shortTitle }));
+}
+
 export type SectionFieldGroup = { heading: string; fields: readonly string[] };
 
 export type PageSection =
-  /** Copy that lives in code. Shown so the editor sees the whole page. */
-  | { id: string; heading: string; kind: 'fixed'; detail: string }
+  /**
+   * Copy that lives in code. Shown so the editor sees the whole page.
+   * `images` names any photograph the section places from the page's own
+   * source, so the media library can still say where that file is used.
+   */
+  | { id: string; heading: string; kind: 'fixed'; detail: string; images?: readonly string[] }
   /** Several entries of one collection, each editable in place. */
   | {
       id: string;
@@ -59,7 +75,13 @@ export type AdminPage = {
 };
 
 const SERVICE_CARD_FIELDS = ['image', 'title', 'summary', 'includes'] as const;
-const PROJECT_CARD_FIELDS = ['images', 'title', 'location', 'challenge'] as const;
+/**
+ * What a project card actually shows an editor worth changing: the cover
+ * photograph and the title. The suburd, the summary and the rest of the
+ * gallery belong to the project's own page, where the whole case study is in
+ * front of them.
+ */
+const PROJECT_CARD_FIELDS = ['images', 'title'] as const;
 
 const CTA_SECTION: PageSection = {
   id: 'cta',
@@ -133,6 +155,7 @@ function homePage(services: { slug: string }[], featured: { slug: string }[]): A
         heading: 'What actually makes the difference',
         kind: 'fixed',
         detail: 'The Noble Park photograph and the six points beneath it.',
+        images: ['/images/projects/noble-park-factory-02.webp'],
       },
       {
         id: 'featured-projects',
@@ -263,7 +286,7 @@ function officePage(ndisSlug: string | undefined): AdminPage {
         id: 'constraints',
         heading: 'What an office repaint has to work around',
         kind: 'fixed',
-        detail: 'Fixed copy.',
+        detail: 'Four paragraphs on after-hours work, staging and occupied desks.',
       },
       {
         id: 'surfaces',
@@ -311,12 +334,13 @@ const tradePage: AdminPage = {
       heading: 'Making good',
       kind: 'fixed',
       detail: 'The full-width photograph and its caption.',
+      images: ['/images/work/fitout-reveal-making-good.webp'],
     },
     {
       id: 'sequence',
       heading: 'How painting sits in the sequence',
       kind: 'fixed',
-      detail: 'Fixed copy.',
+      detail: 'Where painting falls in a construction programme, in prose.',
     },
     {
       id: 'faqs',
@@ -344,7 +368,12 @@ const aboutPage: AdminPage = {
       detail: 'Heading, introduction and the banner photograph.',
     },
     TRUST_BAR,
-    { id: 'story', heading: 'How the business started', kind: 'fixed', detail: 'Fixed copy.' },
+    {
+      id: 'story',
+      heading: 'How the business started',
+      kind: 'fixed',
+      detail: 'The founding date, the team and how the work is run.',
+    },
     {
       id: 'accreditations',
       heading: 'Accreditations and checks',
@@ -403,7 +432,12 @@ function projectsIndexPage(all: { slug: string }[], featured: { slug: string }[]
     title: 'Projects',
     path: '/projects/',
     sections: [
-      { id: 'intro', heading: 'Heading and introduction', kind: 'fixed', detail: 'Fixed copy.' },
+      {
+        id: 'intro',
+        heading: 'Heading and introduction',
+        kind: 'fixed',
+        detail: '"Projects", and a sentence on what a case study covers.',
+      },
       {
         id: 'documented',
         heading: 'Documented case studies',
@@ -434,7 +468,12 @@ const areasPage: AdminPage = {
   title: 'Areas we service',
   path: '/areas/',
   sections: [
-    { id: 'intro', heading: 'Heading and introduction', kind: 'fixed', detail: 'Fixed copy.' },
+    {
+      id: 'intro',
+      heading: 'Heading and introduction',
+      kind: 'fixed',
+      detail: '"Areas we service", and the suburb we work out from.',
+    },
     {
       id: 'suburbs',
       heading: 'The suburb list',
@@ -566,9 +605,14 @@ function sectorPage(
         id: 'considerations',
         heading: 'What shapes work in this sector',
         kind: 'fixed',
-        detail: 'Fixed copy.',
+        detail: 'The access, compliance and scheduling constraints, one card each.',
       },
-      { id: 'body', heading: 'What the work involves', kind: 'fixed', detail: 'Fixed copy.' },
+      {
+        id: 'body',
+        heading: 'What the work involves',
+        kind: 'fixed',
+        detail: 'Substrates, preparation and sequencing for this sector, at length.',
+      },
       {
         id: 'evidence',
         heading: 'Evidence',
@@ -583,7 +627,7 @@ function sectorPage(
         id: 'faqs',
         heading: `${sector.shortTitle} painting questions`,
         kind: 'fixed',
-        detail: 'Fixed copy.',
+        detail: 'The questions written for this sector.',
       },
       { id: 'related', heading: 'Related', kind: 'fixed', detail: 'Links to the other sectors.' },
       CTA_SECTION,
@@ -597,7 +641,7 @@ function sectorPage(
  * Projects and sectors both produce a page each, so a project added in the
  * CMS gets an editor screen without anybody editing this file.
  */
-export async function getAdminPages(): Promise<AdminPage[]> {
+export const getAdminPages = cache(async function getAdminPages(): Promise<AdminPage[]> {
   const [projects, services, posts] = await Promise.all([getProjects(), getServices(), getPosts()]);
   const featured = projects.filter((project) => project.isFeatured);
   const ndis = projects.find((project) => project.slug === 'ndis-commercial-painting');
@@ -623,30 +667,86 @@ export async function getAdminPages(): Promise<AdminPage[]> {
     ...projects.map((project) => projectPage(project)),
     ...sectors.map((sector) => sectorPage(sector, coverFor(sector.projectSlugs))),
   ];
-}
+});
 
 export async function getAdminPage(id: string): Promise<AdminPage | undefined> {
   return (await getAdminPages()).find((page) => page.id === id);
 }
 
+/** One place an image appears, and where an editor goes to change it. */
+export type MediaPlacement = { title: string; pageId?: string };
+
 /**
- * Which pages place a given image. Answers "where is this used?" in the
- * media library without the editor having to open every page.
+ * Every placement of every image, so "Used on" can be trusted.
+ *
+ * An image the site places but this map missed would show as "Not placed on
+ * any page yet", which is the one thing that answer must never mean. So every
+ * source of an image is walked: each page's hero, project galleries, service
+ * cards, post covers, the accreditation badges and the logos and any other
+ * image named in lib/site.ts and the business details.
+ *
+ * A placement carries a page id where one honestly exists. The header and
+ * footer logos have none — they are on every page — so they are named without
+ * a link rather than pointed at an arbitrary page.
  */
-export async function mediaUsage(): Promise<Map<string, string[]>> {
-  const usage = new Map<string, string[]>();
-  const add = (src: string, title: string) => {
+export const mediaUsage = cache(async function mediaUsage(): Promise<
+  Map<string, MediaPlacement[]>
+> {
+  const usage = new Map<string, MediaPlacement[]>();
+  const add = (src: string, placement: MediaPlacement) => {
+    if (!src) return;
     const existing = usage.get(src) ?? [];
-    if (!existing.includes(title)) existing.push(title);
+    if (!existing.some((entry) => entry.title === placement.title)) existing.push(placement);
     usage.set(src, existing);
   };
-  const pages = await getAdminPages();
+
+  const [pages, projects, services, posts, settings] = await Promise.all([
+    getAdminPages(),
+    getProjects(),
+    getServices(),
+    getPosts(),
+    getSiteSettings(),
+  ]);
+
   for (const page of pages) {
-    if (page.hero?.src) add(page.hero.src, page.title);
+    if (page.hero?.src) add(page.hero.src, { title: page.title, pageId: page.id });
+    for (const section of page.sections) {
+      if (section.kind !== 'fixed') continue;
+      for (const src of section.images ?? []) {
+        add(src, { title: `${page.title} — ${section.heading}`, pageId: page.id });
+      }
+    }
   }
-  const projects = await getProjects();
   for (const project of projects) {
-    for (const image of project.images) add(image.src, project.title);
+    for (const image of project.images) {
+      add(image.src, { title: project.title, pageId: `project-${project.slug}` });
+    }
   }
+  // Service cards are rendered on the homepage; the office and trade pages
+  // use the same entries' words, not their photographs.
+  for (const service of services) {
+    if (service.image) add(service.image.src, { title: `Home — ${service.title}`, pageId: 'home' });
+  }
+  for (const post of posts) {
+    if (post.cover) add(post.cover.src, { title: `Blog — ${post.title}`, pageId: 'blog' });
+  }
+  for (const accreditation of accreditations) {
+    if (accreditation.logo) {
+      add(accreditation.logo.src, {
+        title: `Accreditations — ${accreditation.label}`,
+        pageId: 'about-us',
+      });
+    }
+  }
+  // The site chrome. These two belong to no single page — the header and the
+  // footer put them on all of them — so they are named without a link rather
+  // than pointed at an arbitrary page.
+  add(brandLogoPath, { title: 'Header logo, on every page' });
+  add(FOOTER_LOGO, { title: 'Footer logo, on every page' });
+  // Anything else lib/site.ts or the business details name.
+  for (const { src } of imageSourcesIn([site, settings])) {
+    add(src, { title: 'Named in the business details' });
+  }
+
   return usage;
-}
+});

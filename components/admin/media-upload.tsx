@@ -19,14 +19,14 @@ export function MediaUpload() {
       <label className="text-sm">
         Folder
         <select name="folder" defaultValue="work" className="ml-2 rounded border px-2 py-1">
-          <option value="projects">projects</option>
-          <option value="work">work</option>
-          <option value="blog">blog</option>
-          <option value="hero">hero</option>
+          <option value="projects">Project photos</option>
+          <option value="work">Work in progress</option>
+          <option value="blog">Blog</option>
+          <option value="hero">Hero images</option>
         </select>
       </label>
       <label className="text-sm">
-        Alt text (what the picture shows, for screen readers and Google)
+        Description of the picture (what it shows, for screen readers and Google)
         <textarea
           name="alt"
           required={!describeLater}
