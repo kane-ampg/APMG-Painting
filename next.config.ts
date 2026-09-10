@@ -142,10 +142,15 @@ const nextConfig: NextConfig = {
                 permanent: false,
               },
             ]
-          : [
-              // No editor configured yet: /admin does not exist on the site.
-              { source: '/admin/:path*', destination: '/', permanent: false },
-            ]),
+          : process.env.NODE_ENV === 'production'
+            ? [
+                // No editor configured yet: /admin does not exist on the site.
+                { source: '/admin/:path*', destination: '/', permanent: false },
+              ]
+            : [
+                // Local development runs one server for both halves, so /admin
+                // is served here. Production always needs EDITOR_ORIGIN.
+              ]),
     ];
   },
 };
