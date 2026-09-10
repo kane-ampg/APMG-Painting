@@ -12,10 +12,11 @@ The live WordPress site is untouched.
 
 Two things about this build are deliberate and easy to mistake for bugs.
 
-**1. Enquiries are not delivered.** No email or CRM credentials exist for this project yet, and
-where Contact Form 7 submissions currently land on the WordPress site is unknown. Rather than
-pretend, the app ships a transport adapter whose default implementation delivers nothing and says
-so. Submit a form and you get: _"Your details passed validation — but were not sent."_ See
+**1. Site assessment bookings are not delivered.** No email or CRM credentials exist for this
+project yet, and where Contact Form 7 submissions currently land on the WordPress site is unknown.
+Rather than pretend, the app ships a transport adapter whose default implementation delivers
+nothing and says so. Submit the booking form (or finish the chat) and you get: _"Your details
+passed validation — but were not sent."_ See [Free site assessment](#free-site-assessment) and
 [Enquiry delivery](#enquiry-delivery).
 
 **2. The whole site is `noindex`.** `NEXT_PUBLIC_SANDBOX` defaults to `true`, which forces a
@@ -25,6 +26,11 @@ at go-live, not before.
 
 There is also an orange banner across the top of every page saying the same thing. It is removed by
 setting `NEXT_PUBLIC_SANDBOX="false"`.
+
+**3. The repository is mid-integration.** As of 10 September 2026 the CMS and design work exist on
+two local histories that split on 24 August, and GitHub master has neither. Which branch has what,
+what is pushed, and what is still being built is recorded in
+[docs/PROJECT-STATUS.md](docs/PROJECT-STATUS.md). Read it before switching branches.
 
 ---
 
@@ -48,6 +54,10 @@ npm run dev
 | `npm run test:e2e`  | Playwright end-to-end tests (builds and serves on port 3100)    |
 | `npm run verify`    | lint → typecheck → format check → unit tests → production build |
 
+In development one server serves both the public site and `/admin/`. With no Supabase keys in
+`.env.local` the admin opens in [local preview mode](#local-preview-mode): no login, built-in
+content, saving disabled. Production always splits the two — see [Two deployments](#two-deployments).
+
 ---
 
 ## How it is put together
@@ -62,7 +72,8 @@ app/
   actions/enquiry.ts    Server Action — exports only async functions
   sitemap.ts robots.ts  Generated, excluding noindex URLs
 components/
-  forms/                Field primitives with mandatory labels, plus both forms
+  chat/                 The floating site assessment chat — the form's questions as a script
+  forms/                Field primitives with mandatory labels, plus the booking form
   navigation/           Desktop nav, mobile drawer (the only client component in the header)
   sections/ ui/         Presentation, no content
   seo/                  JSON-LD renderer
@@ -72,7 +83,7 @@ lib/
   content/types.ts      Content models
   schema/               JSON-LD builders
   validation/           Zod schemas, shared client and server
-  enquiry/              Transport adapter, rate limiter, form state
+  enquiry/              Booking options, chat flow, transport adapter, rate limiter, form state
 tests/
   unit/                 Vitest
   e2e/                  Playwright
@@ -143,11 +154,80 @@ alt text until re-picked. To correct a page that is live, re-pick the image on t
 deliberate for phase 1: propagating a library edit needs a reverse index from storage path to
 entry, plus a rule for entries whose alt text an editor overrode on purpose.
 
+### Local preview mode
+
+In development with no `NEXT_PUBLIC_SUPABASE_URL`, `/admin/` opens without a login and shows
+every collection filled from the TypeScript content, read-only. Save, publish, upload and delete
+return _"Local preview: no database is configured, so changes are not saved."_ The switch is
+`isLocalPreview()` in `lib/supabase/env.ts`, which is false whenever `NODE_ENV` is
+`production`, so a deployed site can never open the admin this way. It exists so the editor can
+be looked at before a Supabase project exists.
+
+### Page editor (in progress)
+
+The admin that ships today is a field editor: raw schema keys as labels, nested values as JSON. A
+page-by-page editor for Farbod and Zac is specified in
+[`docs/superpowers/specs/2026-09-10-cms-page-editor.md`](docs/superpowers/specs/2026-09-10-cms-page-editor.md)
+and being built on `feature/cms-page-editor`: every public page listed with a thumbnail, each
+shown as its sections in order, images swapped from a media grid, text in labelled fields, lists as
+items, nothing addable, removable or reorderable. It runs first in local preview mode against the
+repo's photos and works unchanged once Supabase is configured.
+
+### Supabase keys
+
+New Supabase projects disable the legacy JWT keys. Use the **Publishable key**
+(`sb_publishable_…`) as `NEXT_PUBLIC_SUPABASE_ANON_KEY` and the **Secret key**
+(`sb_secret_…`) as `SUPABASE_SERVICE_ROLE_KEY`, from Project Settings → API Keys. The old
+`eyJ…` pair fails with "Legacy API keys are disabled". The Auth redirect allowlist must contain
+the dev server's actual port — locally that has been 3001, not 3000.
+
+---
+
+## Free site assessment
+
+The site has one call to action, **"Get a free site assessment"**, in the header, the mobile menu,
+the home CTA band, the commercial, sector and office pages, both 404 pages and `llms.txt`. Every
+one lands on `/contact-us/#assessment` (`#commercial` still resolves). It replaced "Get a quote"
+on 9 September 2026 because a free assessment gives a facilities manager a reason to talk before
+they have a scope document, and because APMG prices nothing from a photograph anyway.
+
+The form is a **booking, not a quote request**. It asks, in order:
+
+| Field             | Choices / rule                                                                  |
+| ----------------- | ------------------------------------------------------------------------------- |
+| Where is the site | Metropolitan Melbourne · Elsewhere in Victoria · Interstate                     |
+| Assessment type   | **On-site visit** (Melbourne only) · **Online assessment** (a Google Meet call) |
+| Sector            | The eight commercial sectors, or "Something else"                               |
+| Site address      | A suburb is enough for an online assessment                                     |
+| Preferred times   | Two or three windows; the team confirms one by email                            |
+| Notes             | Optional                                                                        |
+| Contact           | Organisation, name, phone, work email                                           |
+
+**On-site is Melbourne-only.** Choosing a region outside Melbourne disables the on-site option with
+a one-line note, and `siteAssessmentSchema` in `lib/validation/enquiry.ts` refuses the
+combination server-side as a cross-field refinement, so neither the form nor the chat can be
+talked around it. **Farbod, Zac and Simon** carry out every assessment and are named on the contact
+page as a trust cue; the form does not ask which — APMG assigns. The names live in `assessors` in
+`lib/site.ts`. No calendar integration exists by design: the team replies by email with a time
+and, for online assessments, the Meet link.
+
+**The floating chat is the same form as a script.** `components/chat/assessment-chat.tsx` asks
+the seven questions defined as data in `lib/enquiry/chat-flow.ts`, withholds the on-site option
+outside Melbourne, and submits through the same Server Action with the same honeypot, timing and
+rate-limit checks. A unit test asserts the flow and the Zod schema agree, so a renamed field cannot
+leave the chat sending payloads the server refuses. It is deliberately not a chatbot; the grounding
+document for when an LLM is wired in is [`docs/chat-knowledge-base.md`](docs/chat-knowledge-base.md).
+
+Choice labels for both surfaces live once, in `lib/enquiry/options.ts`.
+
 ---
 
 ## Enquiry delivery
 
-`lib/enquiry/transport.ts` defines an `EnquiryTransport` interface with two implementations:
+`lib/enquiry/transport.ts` defines an `EnquiryTransport` interface with two implementations.
+A delivered booking becomes an email with the subject
+_"Site assessment request — On-site visit — Name, Organisation"_ and a body that reads back the
+labels the visitor saw (`describeRequest`), not the stored enum values.
 
 | Adapter   | When it runs                       | Behaviour                                                                      |
 | --------- | ---------------------------------- | ------------------------------------------------------------------------------ |
@@ -202,6 +282,37 @@ omitted. You will see these on the page:
 - **Location pages.** Seven of the live site's 68 are modelled here as a representative sample.
   Sorting all 68 into keep / consolidate / noindex / redirect needs APMG's real project list plus
   Search Console impression data.
+
+---
+
+## Brand
+
+The 2025 APMG Services brand guide
+([`docs/superpowers/specs/Brand Guide Web Developers.pdf`](docs/superpowers/specs/Brand%20Guide%20Web%20Developers.pdf))
+is the visual source of truth, applied on 9 September 2026.
+
+- **Type.** Oswald for headings, Roboto for body, the guide's first-choice pair, self-hosted through
+  `next/font` in the three layouts (`app/(site)/layout.tsx`, `app/admin/layout.tsx`,
+  `app/global-not-found.tsx`). Oswald is condensed, so display text carries weight 500 and a hair
+  of positive tracking from one rule in `app/globals.css`; there is no `tracking-tight` on
+  headings anywhere.
+- **Colour.** `ink` is the guide's Industrial Black `#1C1C1C`, with the raised, soft and muted
+  steps re-derived as true neutrals. Brand red `#C8102E` was already exact.
+- **Open Graph card.** `app/(site)/opengraph-image.tsx` renders in Oswald and Roboto on
+  `#1C1C1C`. The image renderer cannot use `next/font`, so the two TTFs it needs are checked in
+  under `public/fonts/og/`.
+- **Statements.** `brand` in `lib/site.ts` holds the group name (APMG Services), the descriptor
+  (Australian Property Maintenance Group), ownership, vision, mission and the four core values —
+  expertise, passion, professionalism, integrity. It feeds the About Us "What we stand for"
+  section, `Organization.alternateName`, `slogan` and `description` in the schema, `llms.txt`
+  and the chat knowledge base.
+
+Two things from the guide were deliberately **not** carried. Its mission and purpose statements
+address homeowners and residential clients; this is the commercial business and a unit test bans
+those words, so the mission is quoted with only the industrial and commercial client types and the
+purpose statement is left out. Its entity name "APMG Services Painting Services Pty Ltd" is not
+used; the site keeps "APMG Painting Services Pty Ltd" from the live site and the trading name from
+the domain and Google Business Profile. Test: `tests/unit/brand.test.ts`.
 
 ---
 
