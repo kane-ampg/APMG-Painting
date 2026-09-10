@@ -36,8 +36,8 @@ export type SectionModel =
       heading: string;
       detail?: string;
       entries: EditableEntry[];
-      /** Shown instead of the entries when there are none. */
-      empty?: string;
+      /** Slugs the section expects but the content does not have. */
+      missing: string[];
     };
 
 type Props = {
@@ -72,8 +72,7 @@ function Chip({ children, tone }: { children: React.ReactNode; tone: 'edited' | 
  */
 export function PageEditor({ pagePath, sections, media, fixedNote }: Props) {
   const entries = useMemo(
-    () =>
-      sections.flatMap((section) => (section.kind === 'entries' ? section.entries : [])),
+    () => sections.flatMap((section) => (section.kind === 'entries' ? section.entries : [])),
     [sections],
   );
 
@@ -206,12 +205,22 @@ export function PageEditor({ pagePath, sections, media, fixedNote }: Props) {
             <section key={section.id} className="rounded-lg border border-paper-edge bg-white p-5">
               <h2 className="font-display text-xl tracking-tight text-ink">{section.heading}</h2>
               {section.detail && <p className="mt-1 text-sm text-ink-soft">{section.detail}</p>}
-              {section.entries.length === 0 ? (
-                <p className="mt-4 text-sm text-ink-muted">
-                  {section.empty ?? 'Nothing to show here yet.'}
-                </p>
+              {section.entries.length === 0 && section.missing.length === 0 ? (
+                <p className="mt-4 text-sm text-ink-muted">Nothing to show here yet.</p>
               ) : (
                 <div className="mt-4 flex flex-col gap-8">
+                  {/* An entry the page expects and the content does not have.
+                      Named by the address it was looked up under, because
+                      that is the only name it has. */}
+                  {section.missing.map((slug) => (
+                    <div
+                      key={slug}
+                      className="rounded border border-paper-edge bg-paper-sunken p-4"
+                    >
+                      <h3 className="font-display text-lg tracking-tight text-ink-soft">{slug}</h3>
+                      <p className="mt-1 text-sm text-ink-muted">Entry not found: {slug}</p>
+                    </div>
+                  ))}
                   {section.entries.map((entry) => {
                     const dirty = dirtyKeys.includes(entry.key);
                     return (
