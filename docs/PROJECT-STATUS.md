@@ -1,5 +1,14 @@
 # Project status — 10 September 2026
 
+> **Update, later on 10 September 2026:** the integration described below is done. `f379252` was
+> replayed onto local `master` as `2aeac68`: the live design (Contact masthead, "How a job runs"
+> rail, `/areas/` VIC + QLD) + the CMS + the 9–10 September work, verified with typecheck, lint,
+> 519 unit tests, a 1,443-page production build and 63 Playwright tests. `master` is 44 commits
+> ahead of GitHub and not pushed. The main folder was left on `feature/headless-cms` because this
+> document and the README edit were uncommitted there; `feature/cms-page-editor` still needs
+> rebasing onto `master`. The scratch merge worktrees and `integrate/design` are gone. The branch
+> map below is the pre-merge state.
+
 Where every piece of work on this site is, which branch holds it, what has reached GitHub, and what
 is still in flight. Written from the git history and the Claude Code session transcripts for this
 folder, so the reasoning behind each decision is recorded alongside the code it produced.
