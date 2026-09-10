@@ -14,14 +14,23 @@ export function hasSupabase(): boolean {
 }
 
 /**
- * Local preview: `next dev` with no database. The admin opens without a
- * login and shows the built-in content read-only, so the editor can be
- * looked at before Supabase exists. Keyed to development specifically, not
- * to "anything but production": the unit tests run with NODE_ENV=test and a
- * mocked Supabase client, and must exercise the real auth and save paths.
+ * Local preview: no database. The admin opens without a login and shows the
+ * built-in content read-only, so the editor can be looked at before Supabase
+ * exists. Keyed to `next dev` specifically, not to "anything but
+ * production": the unit tests run with NODE_ENV=test and a mocked Supabase
+ * client, and must exercise the real auth and save paths.
+ *
+ * CMS_PREVIEW_MODE="true" turns the same read-only preview on in production.
+ * It exists so a deployment can be shown to the client before any backend is
+ * wired, and for nothing else: it publishes the editor with no login. Keys
+ * always win — set Supabase up and the flag stops doing anything — and the
+ * flag must be removed from the deployment once a database is configured.
  */
 export function isLocalPreview(): boolean {
-  return !hasSupabase() && process.env.NODE_ENV === 'development';
+  return (
+    !hasSupabase() &&
+    (process.env.NODE_ENV === 'development' || process.env.CMS_PREVIEW_MODE === 'true')
+  );
 }
 
 export const LOCAL_PREVIEW_MESSAGE =

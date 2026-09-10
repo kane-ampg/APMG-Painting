@@ -142,14 +142,17 @@ const nextConfig: NextConfig = {
                 permanent: false,
               },
             ]
-          : process.env.NODE_ENV === 'production'
+          : process.env.NODE_ENV === 'production' && process.env.CMS_PREVIEW_MODE !== 'true'
             ? [
                 // No editor configured yet: /admin does not exist on the site.
                 { source: '/admin/:path*', destination: '/', permanent: false },
               ]
             : [
                 // Local development runs one server for both halves, so /admin
-                // is served here. Production always needs EDITOR_ORIGIN.
+                // is served here. Production always needs EDITOR_ORIGIN — or,
+                // for a demo with no backend at all, CMS_PREVIEW_MODE="true",
+                // which keeps /admin on this deployment and serves it
+                // read-only (see isLocalPreview in lib/supabase/env.ts).
               ]),
     ];
   },

@@ -124,7 +124,21 @@ contact page (`pages/contact-us`). Sectors, suburbs, FAQs, reviews and accredita
 §2 for why.
 
 Without `NEXT_PUBLIC_SUPABASE_URL` set, the site runs entirely from the TypeScript content files
-and `/admin/` is unavailable. To seed a fresh Supabase project from that same content:
+and `/admin/` is unavailable — except under `next dev`, which opens the editor read-only so it can
+be looked at before a database exists.
+
+### Showing the editor before there is a backend
+
+`CMS_PREVIEW_MODE="true"` turns that same read-only preview on in a production build. The single
+deployment then serves `/admin/*` with no login and no database: the page editor, the media library
+and the entry forms all render from the TypeScript content files, and every save answers that
+changes are not stored. The admin is `noindex` either way.
+
+It is for demonstrating the editor and nothing else. Never set it alongside the Supabase keys —
+they win, and `isLocalPreview()` returns false — and remove it from the deployment as soon as the
+backend is wired, because it publishes the editor to anyone with the URL.
+
+To seed a fresh Supabase project from the TypeScript content:
 
 ```bash
 node --env-file=.env.local scripts/seed-cms.mjs
@@ -271,6 +285,7 @@ Nothing in the repository applies the migration or provisions the Supabase proje
    | `PUBLIC_SITE_ORIGIN`            | unused                             | `https://apmgpainting.com.au`                 |
    | `ANTHROPIC_API_KEY`             | unused                             | required for the AI buttons                   |
    | `SUPABASE_SERVICE_ROLE_KEY`     | never set                          | never set (seed script only)                  |
+   | `CMS_PREVIEW_MODE`              | unset in production once live      | unset in production once live                 |
 
    Generate the secret with `openssl rand -hex 32`. Without Supabase env on the editor, `/admin`
    answers 503 with a one-line explanation rather than looping.
