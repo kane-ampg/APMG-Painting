@@ -21,7 +21,7 @@ export function PostArticle({ post }: { post: Post }) {
           <p className="mb-3 text-xs font-semibold uppercase tracking-label text-brand-600">
             <time dateTime={post.publishedAt}>{published}</time>
           </p>
-          <h1 className="max-w-4xl font-display text-4xl leading-tight tracking-tight sm:text-5xl">
+          <h1 className="max-w-4xl font-display text-4xl leading-tight sm:text-5xl">
             {post.title}
           </h1>
           <p className="mt-4 max-w-prose text-lg text-ink-soft">{post.excerpt}</p>

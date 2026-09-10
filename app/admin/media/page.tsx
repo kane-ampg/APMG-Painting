@@ -9,7 +9,7 @@ export default async function MediaLibraryPage() {
   const rows = await listMedia();
   return (
     <>
-      <h1 className="font-display text-3xl tracking-tight">Media library</h1>
+      <h1 className="font-display text-3xl">Media library</h1>
       <div className="mt-6">
         <MediaUpload />
       </div>

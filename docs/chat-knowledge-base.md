@@ -1,6 +1,6 @@
 # APMG Painting — chat knowledge base
 
-Grounding document for the site's quote chat ([components/chat/quote-chat.tsx](../components/chat/quote-chat.tsx)).
+Grounding document for the site's site assessment chat ([components/chat/assessment-chat.tsx](../components/chat/assessment-chat.tsx)).
 
 Today the chat is scripted: it asks the questions the enquiry forms ask and answers only the five
 quick questions in [lib/enquiry/chat-faqs.ts](../lib/enquiry/chat-faqs.ts), each quoted verbatim from
@@ -49,18 +49,25 @@ does. Do not say "we'll be in touch" while that is true.
 
 Canonical source: [lib/site.ts](../lib/site.ts).
 
-| Field             | Value                                              |
-| ----------------- | -------------------------------------------------- |
-| Trading name      | APMG Painting                                      |
-| Registered entity | APMG Painting Services Pty Ltd                     |
-| ABN               | **Not published.** Do not state one.               |
-| Founded           | 2015                                               |
-| Phone             | 1300 97 97 40 (`tel:1300979740`)                   |
-| Email             | info@apmgpainting.com.au                           |
-| Address           | 1 Turbo Drive, Bayswater North VIC 3153, Australia |
-| Instagram         | https://www.instagram.com/apmgpainting/            |
-| Facebook          | https://www.facebook.com/apmgpainting/             |
-| Google profile    | Place ID `ChIJnV9lqRIw1moRftY3Ankvfdw`             |
+| Field             | Value                                                 |
+| ----------------- | ----------------------------------------------------- |
+| Trading name      | APMG Painting                                         |
+| Registered entity | APMG Painting Services Pty Ltd                        |
+| ABN               | **Not published.** Do not state one.                  |
+| Founded           | 2015                                                  |
+| Phone             | 1300 97 97 40 (`tel:1300979740`)                      |
+| Email             | info@apmgpainting.com.au                              |
+| Address           | 1 Turbo Drive, Bayswater North VIC 3153, Australia    |
+| Instagram         | https://www.instagram.com/apmgpainting/               |
+| Facebook          | https://www.facebook.com/apmgpainting/                |
+| Google profile    | Place ID `ChIJnV9lqRIw1moRftY3Ankvfdw`                |
+| Group             | APMG Services (Australian Property Maintenance Group) |
+| Ownership         | Melbourne-based, Australian-owned                     |
+
+The 2025 brand guide brands the wider group as "APMG Services" with the logo descriptor
+"Australian Property Maintenance Group". Its vision, mission and four core values (expertise,
+passion, professionalism, integrity) are published on `/about-us/` and held in `brand` in
+lib/site.ts. Quote them from there; do not paraphrase the mission into a claim about domestic work.
 
 One name, always: **APMG Painting** in prose. "APMG Painting Services Pty Ltd" only where the legal
 entity is the point. The live WordPress site used four variants plus the typo "AMPG" — none of those
@@ -210,9 +217,16 @@ The chat collects exactly what the enquiry forms collect, because it posts to th
 and is validated by the same schema ([lib/validation/enquiry.ts](../lib/validation/enquiry.ts)).
 Never ask for anything beyond these, and never ask for payment details.
 
-**Commercial** — organisation; sector (the eight in §5, or other); project location; scope summary;
-timeframe (as above plus "going to tender"); operating-hours constraints (optional); whether a site
-assessment is wanted (optional); name, phone, email.
+The enquiry is a booking for a free site assessment, not a quote request. Collect: where the site
+is (metropolitan Melbourne, elsewhere in Victoria, or interstate); on-site visit or online assessment
+— an on-site visit may only be offered when the site is in metropolitan Melbourne, everywhere else is
+offered an online assessment over Google Meet; sector (the eight in §5, or other); the site address
+(a suburb is enough for an online assessment); two or three preferred times (the booking is
+confirmed by email, with a Google Meet link for online assessments — never promise a specific slot);
+optional notes; organisation, name, phone and work email. Do not offer a choice of representative:
+Farbod, Zac and Simon carry out the assessments and APMG assigns one.
+
+Never book a time yourself. The team confirms by email.
 
 Photo and scope-document upload are not enabled: file storage is not provisioned. Say so rather than
 inviting an attachment.

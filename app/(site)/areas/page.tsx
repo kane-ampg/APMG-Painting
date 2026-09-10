@@ -33,7 +33,7 @@ export default async function AreasPage() {
       <Section tone="sunken" className="py-10">
         <Container width="wide">
           <Breadcrumbs crumbs={[{ name: 'Areas we service', path: '/areas/' }]} />
-          <h1 className="font-display text-4xl tracking-tight sm:text-5xl">Areas we service</h1>
+          <h1 className="font-display text-4xl sm:text-5xl">Areas we service</h1>
           <p className="mt-4 max-w-prose text-lg text-ink-soft">
             We work across metropolitan Melbourne from our base at {settings.address.suburb}.
           </p>
@@ -57,7 +57,7 @@ export default async function AreasPage() {
           <div className="flex flex-col gap-10">
             {[...byRegion.entries()].map(([region, locations]) => (
               <div key={region}>
-                <h2 className="mb-4 font-display text-2xl tracking-tight">{region}</h2>
+                <h2 className="mb-4 font-display text-2xl">{region}</h2>
                 <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {locations.map((location) => (
                     <li key={location.slug}>

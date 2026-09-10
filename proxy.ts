@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { isEditor } from '@/lib/app-role';
-import { hasSupabase, supabaseEnv } from '@/lib/supabase/env';
+import { hasSupabase, isLocalPreview, supabaseEnv } from '@/lib/supabase/env';
 
 /**
  * Keeps the Supabase session cookie fresh and bounces anonymous visitors
@@ -23,6 +23,9 @@ export async function proxy(request: NextRequest) {
         { status: 503 },
       );
     }
+    // Local development with no database: let the admin render as a
+    // read-only preview of the built-in content (see isLocalPreview).
+    if (isLocalPreview()) return NextResponse.next({ request });
     // On the public site there is no admin to reach, so the homepage is the
     // right answer and there is no loop to fall into.
     return NextResponse.redirect(new URL('/', request.url));

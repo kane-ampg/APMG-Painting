@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
-import { CommercialEnquiryForm } from '@/components/forms/enquiry-forms';
+import { SiteAssessmentForm } from '@/components/forms/enquiry-forms';
 import { Container, Section, SectionHeading } from '@/components/ui';
 import { getPage, getSiteSettings } from '@/lib/content/source';
-import { addressNote, formatAddress, phoneHref } from '@/lib/site';
+import { addressNote, assessors, formatAddress, phoneHref } from '@/lib/site';
 
 /**
  * Contact page.
@@ -27,13 +27,15 @@ export default async function ContactPage() {
   // Drops itself once settings.address.effectiveFrom passes, so the move
   // notice cannot outlive the move.
   const note = addressNote(settings);
+  // "Farbod, Zac and Simon".
+  const assessorNames = `${assessors.slice(0, -1).join(', ')} and ${assessors[assessors.length - 1]}`;
 
   return (
     <>
       <Section tone="sunken" className="py-10">
         <Container width="wide">
           <Breadcrumbs crumbs={[{ name: 'Contact', path: '/contact-us/' }]} />
-          <h1 className="font-display text-4xl tracking-tight sm:text-5xl">{copy.title}</h1>
+          <h1 className="font-display text-4xl sm:text-5xl">{copy.title}</h1>
           <p className="mt-4 max-w-prose text-lg text-ink-soft">{copy.lede}</p>
 
           <dl className="mt-8 grid gap-6 sm:grid-cols-3">
@@ -92,17 +94,34 @@ export default async function ContactPage() {
         </Container>
       </Section>
 
-      {/* The header's "Get a quote" lands here. `#commercial` stays as the deep
-          link from the service pages. */}
-      <div id="quote" className="scroll-mt-16 sm:scroll-mt-20">
+      {/* Every "Get a free site assessment" CTA lands here. `#commercial` stays
+          as the legacy deep link from older service-page URLs. */}
+      <div id="assessment" className="scroll-mt-16 sm:scroll-mt-20">
         <Section tone="paper" id="commercial">
           <Container width="narrow">
             <p className="mb-2 text-xs font-semibold uppercase tracking-label text-brand-600">
-              For organisations
+              Free for organisations
             </p>
             <SectionHeading className="mb-3">{copy.formHeading}</SectionHeading>
-            <p className="mb-8 text-ink-soft">{copy.formIntro}</p>
-            <CommercialEnquiryForm />
+            <p className="mb-6 text-ink-soft">{copy.formIntro}</p>
+            <ul className="mb-8 grid gap-3 text-sm text-ink-soft sm:grid-cols-3">
+              <li className="rounded-md border border-paper-edge bg-paper-sunken px-4 py-3">
+                <span className="block font-semibold text-ink">On site, in Melbourne</span>
+                We walk the building with you, look at the substrates and talk through access and
+                hours.
+              </li>
+              <li className="rounded-md border border-paper-edge bg-paper-sunken px-4 py-3">
+                <span className="block font-semibold text-ink">Online, anywhere</span>A short Google
+                Meet call at a time you choose, to scope the job and decide what comes next.
+              </li>
+              <li className="rounded-md border border-paper-edge bg-paper-sunken px-4 py-3">
+                <span className="block font-semibold text-ink">
+                  With the people who run the job
+                </span>
+                {assessorNames} carry out every assessment themselves.
+              </li>
+            </ul>
+            <SiteAssessmentForm />
           </Container>
         </Section>
       </div>

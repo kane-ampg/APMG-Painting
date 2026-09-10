@@ -5,8 +5,9 @@ import { usePathname } from 'next/navigation';
 import { useActionState, useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { submitEnquiry } from '@/app/actions/enquiry';
 import { FormStatus } from '@/components/forms/form-status';
-import { QUOTE_HASH, QUOTE_PATH } from '@/components/navigation/quote-cta';
+import { ASSESSMENT_HASH, ASSESSMENT_PATH } from '@/components/navigation/assessment-cta';
 import {
+  availableOptions,
   buildEnquiryFormData,
   flows,
   validateField,
@@ -21,10 +22,10 @@ import { useSiteSettings } from '@/components/providers/site-settings';
 import { cn } from '@/lib/utils';
 
 /**
- * The floating quote assistant.
+ * The floating site assessment assistant.
  *
- * A second route into the enquiry pipeline for visitors who will not start a
- * seven-field form but will answer seven questions one at a time. It asks
+ * A second route into the booking pipeline for visitors who will not start a
+ * full form but will answer seven questions one at a time. It asks
  * exactly what the forms ask, validates with the same Zod rules, and posts to
  * the same Server Action — so it inherits the honeypot, the minimum-completion
  * check, the rate limit, and the refusal to claim a delivery that did not
@@ -43,7 +44,7 @@ const LAYER = 'z-30';
 
 type Turn = { role: 'bot' | 'user'; text: string };
 
-export function QuoteChat() {
+export function AssessmentChat() {
   const pathname = usePathname();
   const settings = useSiteSettings();
 
@@ -51,7 +52,7 @@ export function QuoteChat() {
   const [stepIndex, setStepIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
-  /** Question-and-answer turns the visitor asked for, before the quote starts. */
+  /** Question-and-answer turns the visitor asked for, before the booking starts. */
   const [asked, setAsked] = useState<Turn[]>([]);
   /** The list folds away after the first answer to make room for it. */
   const [questionsOpen, setQuestionsOpen] = useState(true);
@@ -133,9 +134,9 @@ export function QuoteChat() {
 
   /**
    * Hidden where it would compete with the real thing: the contact page shows
-   * both full forms already.
+   * the full booking form already.
    */
-  if (pathname === QUOTE_PATH || pathname === '/contact-us') return null;
+  if (pathname === ASSESSMENT_PATH || pathname === '/contact-us') return null;
 
   /* --- transitions ----------------------------------------------------- */
 
@@ -233,7 +234,7 @@ export function QuoteChat() {
   const isChoiceStep = step?.fields.every((f) => f.kind === 'choice' || f.kind === 'confirm');
 
   /**
-   * Progress through the quote. Answered FAQs are not questions APMG asked, so
+   * Progress through the booking. Answered FAQs are not questions APMG asked, so
    * they do not count. Clamped, because once submitted `stepIndex` sits one
    * past the last step.
    */
@@ -276,12 +277,12 @@ export function QuoteChat() {
         {open ? (
           <>
             <CloseIcon />
-            <span className="sr-only">Close quote chat</span>
+            <span className="sr-only">Close site assessment chat</span>
           </>
         ) : (
           <>
             <ChatIcon />
-            Get a quote
+            Free site assessment
           </>
         )}
       </button>
@@ -291,7 +292,7 @@ export function QuoteChat() {
           ref={panelRef}
           id={panelId}
           role="dialog"
-          aria-label="Get a quote"
+          aria-label="Free site assessment"
           tabIndex={-1}
           className={cn(
             'fixed inset-x-0 bottom-0 flex flex-col overflow-hidden border-paper-edge bg-white shadow-2xl',
@@ -310,7 +311,7 @@ export function QuoteChat() {
         >
           <header className="flex items-start justify-between gap-3 bg-ink px-4 py-3 text-white">
             <div>
-              <h2 className="font-display text-base font-bold">Get a quote</h2>
+              <h2 className="font-display text-base font-bold">Free site assessment</h2>
               <p className="text-xs text-white/70">{subtitle}</p>
             </div>
             <button
@@ -379,6 +380,7 @@ export function QuoteChat() {
                     <ChoiceButtons
                       key={field.name}
                       field={field}
+                      answers={answers}
                       onChoose={(value) => choose(field, value)}
                     />
                   ))}
@@ -415,7 +417,7 @@ export function QuoteChat() {
                         type="submit"
                         className="rounded-md bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 active:scale-95"
                       >
-                        {stepIndex + 1 >= steps.length ? 'Send enquiry' : 'Next'}
+                        {stepIndex + 1 >= steps.length ? 'Book my assessment' : 'Next'}
                       </button>
 
                       {step.fields.every((field) => field.optional) && (
@@ -458,11 +460,11 @@ export function QuoteChat() {
               {settings.phone}
             </a>
             <Link
-              href={`${QUOTE_PATH}${QUOTE_HASH}`}
+              href={`${ASSESSMENT_PATH}${ASSESSMENT_HASH}`}
               onClick={close}
               className="font-semibold text-ink-soft underline decoration-ink-muted/40 underline-offset-2 hover:decoration-ink-soft"
             >
-              Full enquiry form
+              Full booking form
             </Link>
           </footer>
 
@@ -472,12 +474,12 @@ export function QuoteChat() {
             `company_website` and two elements must not share one.
           */}
           <div aria-hidden="true" className="absolute left-[-9999px] top-0 h-0 w-0 overflow-hidden">
-            <label htmlFor="quote-chat-company-website">
+            <label htmlFor="assessment-chat-company-website">
               Company website — leave this field empty
             </label>
             <input
               ref={honeypotRef}
-              id="quote-chat-company-website"
+              id="assessment-chat-company-website"
               name="company_website"
               type="text"
               tabIndex={-1}
@@ -496,9 +498,12 @@ export function QuoteChat() {
 
 function ChoiceButtons({
   field,
+  answers,
   onChoose,
 }: {
   field: ChatField;
+  /** Earlier answers: an option can depend on one (on-site needs Melbourne). */
+  answers: Readonly<Record<string, string>>;
   onChoose: (value: string) => void;
 }) {
   const options =
@@ -507,7 +512,7 @@ function ChoiceButtons({
           { value: 'true', label: 'Yes, please' },
           { value: '', label: 'No thanks' },
         ]
-      : (field.options ?? []);
+      : availableOptions(field, answers);
 
   return (
     <div role="group" aria-label={field.label} className="flex flex-col gap-2">
@@ -518,9 +523,12 @@ function ChoiceButtons({
           type="button"
           data-chat-focus={index === 0 ? '' : undefined}
           onClick={() => onChoose(option.value)}
-          className="rounded-md border border-paper-edge bg-white px-3 py-2.5 text-left text-sm font-semibold text-ink transition hover:border-brand-600 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 active:scale-[0.98]"
+          className="flex flex-col rounded-md border border-paper-edge bg-white px-3 py-2.5 text-left text-sm font-semibold text-ink transition hover:border-brand-600 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 active:scale-[0.98]"
         >
           {option.label}
+          {'description' in option && option.description && (
+            <span className="mt-0.5 text-xs font-normal text-ink-muted">{option.description}</span>
+          )}
         </button>
       ))}
     </div>
@@ -528,7 +536,7 @@ function ChoiceButtons({
 }
 
 /**
- * The five things visitors ask before they are ready to start a quote.
+ * The five things visitors ask before they are ready to book an assessment.
  *
  * Offered only on the opening turn: once someone is answering questions, a list
  * of other questions is noise. Every answer is quoted from the site's published

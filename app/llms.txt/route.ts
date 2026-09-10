@@ -1,4 +1,4 @@
-import { accreditations, formatAddress, isSandbox, site, siteUrl } from '@/lib/site';
+import { accreditations, brand, formatAddress, isSandbox, site, siteUrl } from '@/lib/site';
 import { googleAggregate, googleReviews } from '@/content/reviews';
 import { getPosts, getProjects, getServices, getSiteSettings } from '@/lib/content/source';
 import { sectors } from '@/content/sectors';
@@ -43,13 +43,21 @@ export async function GET(): Promise<Response> {
 
 > ${site.tagline}. ${site.legalName}, founded ${site.founded}, based at ${formatAddress(settings.address)}. Work is carried out across ${settings.serviceAreaPrimary}, within roughly ${site.serviceArea.radiusKm} km of the ${settings.address.suburb} base.
 
-APMG Painting is a commercial painting and property maintenance contractor. The work is painting programmes in buildings that stay open while they are painted — schools, clinics, aged care, strata, retail, hospitality and industrial sites.
+APMG Painting is a ${brand.ownership} commercial painting and property maintenance contractor, part of ${brand.groupName} (${brand.descriptor}). The work is painting programmes in buildings that stay open while they are painted — schools, clinics, aged care, strata, retail, hospitality and industrial sites.
 
 Contact: ${settings.phone} · ${settings.email}
 
+## Mission
+
+${brand.mission}
+
+Core values: ${brand.values.map((v) => v.name.toLowerCase()).join(', ')}.
+
 ## How the work is quoted
 
-Every enquiry begins with a site assessment that establishes scope, substrate condition, access and permitted working hours before a price is given. Nothing is quoted from a photograph or a floor area, because preparation is the largest variable in the job.
+Every enquiry begins with a free site assessment that establishes scope, substrate condition, access and permitted working hours before a price is given. Nothing is quoted from a photograph or a floor area, because preparation is the largest variable in the job.
+
+Assessments are booked at ${siteUrl}/contact-us/#assessment. On-site visits are offered in metropolitan Melbourne; organisations elsewhere are offered an online assessment over Google Meet first. Assessments are carried out by Farbod, Zac or Simon.
 
 ## Services
 

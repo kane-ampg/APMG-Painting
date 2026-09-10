@@ -69,9 +69,12 @@ export function MobileMenu() {
 
       if (event.key !== 'Tab' || !panelRef.current) return;
 
-      const focusable = panelRef.current.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled])',
-      );
+      // Collapsed accordion sections stay in the DOM so they can animate, and
+      // are made inert. Inert elements are unfocusable, so the trap must not
+      // treat one as the first or last stop or Tab would wrap onto nothing.
+      const focusable = Array.from(
+        panelRef.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled])'),
+      ).filter((element) => !element.closest('[inert]'));
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
       if (!first || !last) return;
@@ -241,8 +244,27 @@ export function MobileMenu() {
                                 <span aria-hidden="true">{isExpanded ? '−' : '+'}</span>
                               </button>
                             </div>
-                            {isExpanded && (
-                              <ul className="mb-2 ml-3 flex flex-col gap-0.5 border-l border-paper-edge pl-3">
+                            {/*
+                              Always rendered, so the section can slide open and
+                              closed: a grid row animating between 0fr and 1fr is
+                              the one height transition CSS can run without
+                              knowing the height. `inert` while collapsed keeps
+                              the hidden links out of the tab order and away from
+                              assistive technology, which is what unmounting used
+                              to do for free.
+                            */}
+                            <div
+                              inert={!isExpanded}
+                              className="grid transition-[grid-template-rows] duration-200 ease-decel"
+                              style={{ gridTemplateRows: isExpanded ? '1fr' : '0fr' }}
+                            >
+                              <ul
+                                className={cn(
+                                  'ml-3 flex min-h-0 flex-col gap-0.5 overflow-hidden border-l border-paper-edge pl-3',
+                                  'transition-[opacity,margin] duration-200 ease-decel',
+                                  isExpanded ? 'mb-2 opacity-100' : 'mb-0 opacity-0',
+                                )}
+                              >
                                 {item.children.map((child) => {
                                   const isCurrent = isCurrentPage(pathname, child.href);
                                   // The "Overview" child repeats its own section's
@@ -268,7 +290,7 @@ export function MobileMenu() {
                                   );
                                 })}
                               </ul>
-                            )}
+                            </div>
                           </>
                         ) : (
                           <Link
@@ -288,11 +310,11 @@ export function MobileMenu() {
 
               <div className="mt-auto flex flex-col gap-3 border-t border-paper-edge pt-6">
                 <Link
-                  href="/contact-us/#commercial"
+                  href="/contact-us/#assessment"
                   onClick={() => setOpen(false)}
                   className="rounded-md bg-brand-700 px-5 py-3 text-center text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
                 >
-                  Request a site assessment
+                  Get a free site assessment
                 </Link>
                 <a
                   href={phoneHref(settings.phone)}

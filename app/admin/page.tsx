@@ -6,7 +6,7 @@ export default async function AdminHome() {
   const { email } = await requireAdmin();
   return (
     <>
-      <h1 className="font-display text-3xl tracking-tight">Signed in as {email}</h1>
+      <h1 className="font-display text-3xl">Signed in as {email}</h1>
       <ul className="mt-6 grid gap-3 sm:grid-cols-2">
         {collections
           .filter((c) => !isSingleton(c))

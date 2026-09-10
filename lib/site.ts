@@ -140,6 +140,64 @@ export const site = {
 } as const;
 
 /**
+ * The people who carry out site assessments. Named on the contact page as a
+ * trust cue — the visitor meets one of these three, not a sales desk. The
+ * booking form does not ask which; APMG assigns internally.
+ */
+export const assessors = ['Farbod', 'Zac', 'Simon'] as const;
+
+/**
+ * Brand statements, from the 2025 APMG Services brand guide
+ * (docs/superpowers/specs/Brand Guide Web Developers.pdf, pages 2–4).
+ *
+ * The guide brands the group as "APMG Services" with the logo descriptor
+ * "Australian Property Maintenance Group". This site keeps `site.name` as the
+ * trading name because it matches the domain and the Google Business Profile;
+ * the group names travel as alternate names in the Organization schema and in
+ * the About Us copy, so search engines resolve one entity rather than two.
+ *
+ * Statements are quoted verbatim where the site's positioning allows it. The
+ * guide's mission lists a third, domestic client type and its purpose statement
+ * is addressed to private households; this is the commercial business, so the
+ * mission is carried with only the two client types this site serves and the
+ * purpose statement is not carried at all. The core values are the guide's
+ * four, in its order; the one-line glosses are ours, written in the site's own
+ * terms rather than invented as claims.
+ *
+ * The guide spells the descriptor both "Australia" and "Australian". The logo
+ * artwork reads "Australian", so that is the spelling used.
+ */
+export const brand = {
+  groupName: 'APMG Services',
+  descriptor: 'Australian Property Maintenance Group',
+  alternateNames: ['APMG Services', 'Australian Property Maintenance Group'],
+  /** "Melbourne-based, Australian-owned Group" — the guide's own words. */
+  ownership: 'Melbourne-based, Australian-owned',
+  vision:
+    'To be the most trusted and versatile property maintenance partner, setting the benchmark for quality, reliability, and customer care across every trade we deliver.',
+  mission:
+    'At APMG Services, our mission is to provide professional, end-to-end trade solutions that simplify property maintenance for industrial and commercial clients. We are committed to delivering exceptional workmanship, clear communication, and dependable service through a team of highly trained specialists who genuinely care about the spaces we improve.',
+  values: [
+    {
+      name: 'Expertise',
+      body: 'Trained specialists, the right coating system for the substrate, and around 30 years of combined industry experience behind every scope.',
+    },
+    {
+      name: 'Passion',
+      body: 'Genuine care for the spaces we improve, on a single tenancy as much as on a multi-site programme.',
+    },
+    {
+      name: 'Professionalism',
+      body: 'Clear communication, tidy sites, and work sequenced around how the building actually runs.',
+    },
+    {
+      name: 'Integrity',
+      body: 'Transparent scope, honest pricing, and anything found on site reported and priced before it is done.',
+    },
+  ],
+} as const;
+
+/**
  * Accreditations.
  *
  * `verified` means APMG has confirmed the credential and it may be published.
@@ -318,13 +376,13 @@ export const defaultSiteSettings: SiteSettings = {
 export const defaultContactPage: ContactPageCopy = {
   slug: 'contact-us',
   title: 'Contact us',
-  lede: 'Tell us about the site and we will get back to you — or just call.',
-  formHeading: 'Request a site assessment',
+  lede: 'Book a free site assessment, on site in Melbourne or online anywhere — or just call.',
+  formHeading: 'Get a free site assessment',
   formIntro:
-    'For schools, clinics, aged care, strata, retail, hospitality, offices and industrial sites. The operating-hours question matters more than any other — tell us when we are allowed on site.',
-  metaTitle: 'Contact APMG Painting | Melbourne Painters',
+    'For schools, clinics, aged care, strata, retail, hospitality, offices and industrial sites. Tell us where the site is and when suits, and we confirm a time by email. No scope document needed — that is what the assessment is for.',
+  metaTitle: 'Free Site Assessment | APMG Painting Melbourne',
   metaDescription:
-    'Contact APMG Painting. Tell us about the site and the scope, or call 1300 97 97 40 for a commercial site assessment.',
+    'Book a free commercial painting site assessment with APMG Painting — on site in Melbourne or online anywhere. Or call 1300 97 97 40.',
 };
 
 /**

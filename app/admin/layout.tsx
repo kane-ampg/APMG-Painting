@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Fraunces } from 'next/font/google';
+import { Oswald, Roboto } from 'next/font/google';
 import Link from 'next/link';
 import '../globals.css';
 import { signOut } from '@/app/actions/auth';
@@ -15,18 +15,17 @@ import { siteUrl } from '@/lib/site';
  * around the login form and running `getServices()` on every admin request.
  */
 
-// The same two faces the public layout uses, so the editor looks like the
-// site it edits. Self-hosted and subset by next/font at build time.
-const sans = Inter({
+// The same two brand faces the public layout uses, so the editor looks like
+// the site it edits. Self-hosted and subset by next/font at build time.
+const sans = Roboto({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-sans',
 });
 
-const display = Fraunces({
+const display = Oswald({
   subsets: ['latin'],
   display: 'swap',
-  weight: ['600', '700'],
   variable: '--font-display',
 });
 

@@ -71,7 +71,7 @@ export function Hero({
         >
           <div>
             {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-            <h1 className="text-balance font-display text-4xl leading-[1.08] tracking-tight text-ink sm:text-5xl">
+            <h1 className="text-balance font-display text-4xl leading-[1.08] text-ink sm:text-5xl">
               {heading}
             </h1>
             <p className="mt-5 max-w-prose text-lg text-ink-soft">{lede}</p>
@@ -218,7 +218,7 @@ export function HomeHero({
                * hazy skyline and the fluorescent-lit office, either of which
                * can sit behind the descenders when the loop restarts.
                */}
-              <h1 className="mt-4 text-balance font-display text-[2.15rem] leading-[1.05] tracking-tight [text-shadow:0_2px_28px_rgba(15,17,19,0.6)] sm:text-[3rem] lg:text-[3.3rem] xl:text-[3.7rem] short:text-[2.5rem] sm:short:text-[3rem] tight:text-[1.85rem]">
+              <h1 className="mt-4 text-balance font-display text-[2.15rem] leading-[1.05] [text-shadow:0_2px_28px_rgba(15,17,19,0.6)] sm:text-[3rem] lg:text-[3.3rem] xl:text-[3.7rem] short:text-[2.5rem] sm:short:text-[3rem] tight:text-[1.85rem]">
                 {heading} <span className="text-brand-400">{headingAccent}</span>
               </h1>
 
@@ -283,9 +283,7 @@ export function HomeHero({
                   key={item.label}
                   className="flex flex-col sm:flex-row sm:items-baseline sm:gap-2"
                 >
-                  <span className="font-display text-base tracking-tight sm:text-lg">
-                    {item.figure}
-                  </span>
+                  <span className="font-display text-base sm:text-lg">{item.figure}</span>
                   <span className={cn(microLabel, 'text-[0.625rem] text-white/70 sm:text-xs')}>
                     {item.label}
                   </span>
@@ -416,7 +414,7 @@ export function ServiceGrid({ services }: { services: readonly Service[] }) {
               </div>
             )}
             <div className="flex flex-1 flex-col gap-3 p-5">
-              <h3 className="font-display text-lg tracking-tight">{service.title}</h3>
+              <h3 className="font-display text-lg">{service.title}</h3>
               <p className="flex-1 text-sm text-ink-soft">{service.summary}</p>
               <ul className="mt-1 flex flex-wrap gap-1.5">
                 {service.includes.slice(0, 4).map((item) => (
@@ -455,7 +453,7 @@ export function SectorGrid({ sectors }: { sectors: readonly Sector[] }) {
           <span className="flex h-12 w-12 items-center justify-center rounded-md bg-brand-50 text-brand-600 ring-1 ring-inset ring-brand-100">
             <SectorIcon slug={sector.slug} className="h-7 w-7" />
           </span>
-          <h3 className="font-display text-lg tracking-tight">
+          <h3 className="font-display text-lg">
             <Link
               href={sector.legacyPath}
               className="rounded after:absolute after:inset-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
@@ -500,7 +498,7 @@ export function ProjectGrid({ projects }: { projects: readonly Project[] }) {
                 <p className="text-xs font-semibold uppercase tracking-label text-brand-600">
                   {project.location}
                 </p>
-                <h3 className="font-display text-lg leading-snug tracking-tight">
+                <h3 className="font-display text-lg leading-snug">
                   <Link
                     href={`/projects/${project.slug}/`}
                     className="rounded hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
@@ -526,12 +524,12 @@ export function FaqList({ items }: { items: readonly Faq[] }) {
   return (
     <div className="divide-y divide-paper-edge border-y border-paper-edge">
       {items.map((faq) => (
-        <details key={faq.question} className="group py-4">
+        <details key={faq.question} className="faq-item group py-4">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded font-semibold text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600">
             {faq.question}
             <span
               aria-hidden="true"
-              className="shrink-0 text-ink-muted transition-transform group-open:rotate-45 motion-reduce:transition-none"
+              className="shrink-0 text-ink-muted transition-transform duration-[260ms] ease-decel group-open:rotate-45 motion-reduce:transition-none"
             >
               +
             </span>
@@ -681,15 +679,29 @@ export function ContentBlock({
 /**
  * Frame proportions for a captioned photograph.
  *
- * `band` is the full-bleed pause between two blocks of prose. `inset` is for a
- * photograph that sits inside a block which already owns its section: shorter
- * on desktop so the block's own content still reads as the point of it, and
- * squarer on a phone so a shot with people in it does not lose their heads to
- * the crop.
+ * `band` is the full-bleed pause between two blocks of prose. It used to run
+ * to 21:9, which on a 16:9 source cropped a quarter of the height off — and
+ * the quarter it took was the top, where a tradesperson's head is. 2:1 is as
+ * wide as the band can go without doing that. `inset` is for a photograph
+ * that sits inside a block which already owns its section: shorter on desktop
+ * so the block's own content still reads as the point of it. `side` is for a
+ * photograph in a column beside prose, where the frame is narrow and a squarer
+ * crop keeps the subject.
  */
 const MEDIA_ASPECT = {
-  band: 'aspect-[16/10] sm:aspect-[21/9]',
+  band: 'aspect-[16/10] sm:aspect-[2/1]',
   inset: 'aspect-[4/3] sm:aspect-[16/9]',
+  side: 'aspect-[4/3]',
+} as const;
+
+/**
+ * Where the crop should hold on when the frame is wider than the photograph.
+ * `top` for a shot with a person standing in it; the default centre crop takes
+ * their head before it takes the floor.
+ */
+const MEDIA_FOCUS = {
+  center: 'object-center',
+  top: 'object-top',
 } as const;
 
 /**
@@ -703,22 +715,36 @@ const MEDIA_ASPECT = {
  * The caption is where the photograph is explained rather than captioned: a
  * process shot only earns its place if it shows the thing the surrounding
  * paragraphs are claiming, and the caption is what ties the two together.
+ *
+ * It is set in two parts for that reason. `caption` is the one line in the
+ * display face that says what is in the frame; `detail` is the sentence or
+ * two in body type that says why it matters. A hairline rule across the full
+ * width of the photograph sits above both, so the caption reads as the plate
+ * under a figure rather than as a stray paragraph that happens to follow one.
+ * Under a wide frame the two parts sit side by side on the same grid the
+ * schedule lists use; in a narrow column they stack.
  */
 export function MediaFigure({
   src,
   alt,
   caption,
+  detail,
   aspect = 'band',
+  focus = 'center',
   sizes = '(min-width: 1280px) 1216px, 100vw',
   className,
 }: {
   src: string;
   alt: string;
   caption?: string;
+  detail?: string;
   aspect?: keyof typeof MEDIA_ASPECT;
+  focus?: keyof typeof MEDIA_FOCUS;
   sizes?: string;
   className?: string;
 }) {
+  const stacked = aspect === 'side';
+
   return (
     <figure className={cn('group', className)}>
       <div
@@ -730,11 +756,19 @@ export function MediaFigure({
           fill
           loading="lazy"
           sizes={sizes}
-          className={`object-cover ${mediaZoom}`}
+          className={cn('object-cover', MEDIA_FOCUS[focus], mediaZoom)}
         />
       </div>
       {caption && (
-        <figcaption className="mt-3 max-w-prose text-sm text-ink-soft">{caption}</figcaption>
+        <figcaption
+          className={cn(
+            'mt-4 grid gap-x-10 gap-y-1.5 border-t border-ink pt-3 sm:items-baseline',
+            !stacked && 'sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]',
+          )}
+        >
+          <span className="font-display text-lg leading-snug text-ink">{caption}</span>
+          {detail && <span className="text-sm leading-relaxed text-ink-soft">{detail}</span>}
+        </figcaption>
       )}
     </figure>
   );
@@ -753,19 +787,100 @@ export function MediaBand({
   src,
   alt,
   caption,
+  detail,
+  focus,
   tone = 'paper',
 }: {
   src: string;
   alt: string;
   caption?: string;
+  detail?: string;
+  focus?: keyof typeof MEDIA_FOCUS;
   tone?: 'paper' | 'sunken';
 }) {
   return (
     <Section tone={tone} className="py-10 sm:py-12">
       <Container width="wide">
-        <MediaFigure src={src} alt={alt} caption={caption} />
+        <MediaFigure src={src} alt={alt} caption={caption} detail={detail} focus={focus} />
       </Container>
     </Section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Prose beside a photograph                                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * A run of paragraphs with a photograph alongside.
+ *
+ * For the sections that are mostly reading — four or five paragraphs of how a
+ * job is sequenced — and would otherwise be a column of grey text with nothing
+ * to hold the eye. Two columns from `lg`: the prose keeps its measure on the
+ * left, the photograph takes the right and stays pinned as the reader scrolls
+ * the text past it, so the picture is still in view when the paragraph it
+ * illustrates arrives.
+ *
+ * Below `lg` the photograph comes first, then the prose — the magazine order,
+ * and the one that puts the picture where a phone reader will actually see it
+ * rather than seven hundred words down. Neither side carries a control, so the
+ * DOM and visual orders diverging at `lg` costs nothing in focus order.
+ */
+export function ProseWithFigure({
+  figure,
+  children,
+  className,
+}: {
+  figure: ReactNode;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        'grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-14',
+        className,
+      )}
+    >
+      <div className="lg:sticky lg:top-24">{figure}</div>
+      <div className="lg:order-first">{children}</div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Schedule list                                                        */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Named items with a line of explanation each, set as a ruled schedule.
+ *
+ * The alternative was a grid of cards, and five items in three columns leaves
+ * a row of two with a hole beside it. A schedule has no orphan row: every item
+ * is a full-width line between rules, the name in the display face on the
+ * left and the note on the right, on the same 2:3 split the figure captions
+ * use. It also happens to be how a builder reads a scope — as a list of line
+ * items, not a wall of tiles.
+ */
+export function ScheduleList({
+  items,
+  className,
+}: {
+  items: readonly { name: string; body: string }[];
+  className?: string;
+}) {
+  return (
+    <dl className={cn('border-t border-ink', className)}>
+      {items.map((item) => (
+        <div
+          key={item.name}
+          className="grid gap-x-10 gap-y-1 border-b border-paper-edge py-4 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:items-baseline"
+        >
+          <dt className="font-display text-lg leading-snug text-ink">{item.name}</dt>
+          <dd className="text-sm leading-relaxed text-ink-soft">{item.body}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 
@@ -794,7 +909,7 @@ export function ProcessSteps({
           <span className="text-xs font-semibold uppercase tracking-label text-brand-600">
             {stepLabel} {index + 1}
           </span>
-          <h3 className="font-display text-lg tracking-tight">{item.step}</h3>
+          <h3 className="font-display text-lg">{item.step}</h3>
           <p className="text-sm text-ink-soft">{item.body}</p>
         </Card>
       ))}
@@ -829,7 +944,7 @@ export function FactStrip({
                 {fact.label}
               </dt>
               <dd className="mt-2">
-                <span className="font-display text-3xl font-semibold leading-none tracking-tight text-brand-400">
+                <span className="font-display text-3xl font-semibold leading-none text-brand-400">
                   {fact.figure}
                 </span>
                 <span className="mt-2 block text-sm leading-relaxed text-white/70">
@@ -871,7 +986,7 @@ export function FeatureGrid({
               <ApproachIcon name={item.icon} className="h-7 w-7" />
             </span>
           )}
-          <h3 className="font-display text-lg tracking-tight">{item.heading}</h3>
+          <h3 className="font-display text-lg">{item.heading}</h3>
           <p className="text-sm leading-relaxed text-ink-soft">{item.body}</p>
         </Card>
       ))}

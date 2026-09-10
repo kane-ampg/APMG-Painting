@@ -93,7 +93,7 @@ export default async function OfficePaintersPage() {
         eyebrow="Commercial painting"
         heading="Office painters in Melbourne"
         lede="Office work is judged on disruption as much as finish. Most programmes run after hours or in staged zones, so desks stay occupied and the business keeps operating."
-        primaryCta={{ label: 'Request a site assessment', href: '/contact-us/#commercial' }}
+        primaryCta={{ label: 'Get a free site assessment', href: '/contact-us/#assessment' }}
         secondaryCta={{ label: 'All commercial work', href: '/commercial/' }}
         crumbs={[
           { name: 'Commercial painting', path: '/commercial/' },
@@ -172,7 +172,7 @@ export default async function OfficePaintersPage() {
       <CtaBand
         heading="Repainting your workplace?"
         body="Tell us the floor area and the hours we are allowed in, and we will come and look."
-        cta={{ label: 'Request a site assessment', href: '/contact-us/#commercial' }}
+        cta={{ label: 'Get a free site assessment', href: '/contact-us/#assessment' }}
         phone={settings.phone}
       />
     </>

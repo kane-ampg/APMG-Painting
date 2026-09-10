@@ -25,7 +25,7 @@ export default async function ProjectsPage() {
       <Section tone="sunken" className="py-10">
         <Container width="wide">
           <Breadcrumbs crumbs={[{ name: 'Projects', path: '/projects/' }]} />
-          <h1 className="font-display text-4xl tracking-tight sm:text-5xl">Projects</h1>
+          <h1 className="font-display text-4xl sm:text-5xl">Projects</h1>
           <p className="mt-4 max-w-prose text-lg text-ink-soft">
             Completed work, written up properly — what the site was, what constrained the job, how
             access was managed, and what was delivered.

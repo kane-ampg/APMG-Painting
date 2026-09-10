@@ -222,7 +222,8 @@ export default async function HomePage() {
         <MediaFigure
           src="/images/projects/noble-park-factory-02.webp"
           alt="Two APMG team members standing on the roof of the Noble Park factory during the site assessment, one pointing out a section of the elevation"
-          caption="Noble Park: the site walked before the scope was written. Access on that factory ended up split three ways — boom lifts for the high runs, scissor lifts across mid-level walls, scaffolding into the tight corners — and none of that is decidable from a floor area."
+          caption="Noble Park: the site walked before the scope was written."
+          detail="Access on that factory ended up split three ways — boom lifts for the high runs, scissor lifts across mid-level walls, scaffolding into the tight corners — and none of that is decidable from a floor area."
           aspect="inset"
           sizes="(min-width: 1152px) 1088px, 100vw"
           className="mb-10"
@@ -290,9 +291,9 @@ export default async function HomePage() {
       </ContentBlock>
 
       <CtaBand
-        heading="Tell us what needs painting"
-        body="Commercial enquiries get a site assessment before a number."
-        cta={{ label: 'Request a quote', href: '/contact-us/' }}
+        heading="Start with a free site assessment"
+        body="On site in Melbourne or online anywhere. We look before we put a number on anything."
+        cta={{ label: 'Get a free site assessment', href: '/contact-us/#assessment' }}
         phone={settings.phone}
       />
     </>

@@ -80,7 +80,7 @@ export default async function CommercialPage() {
         eyebrow="Commercial painting"
         heading="Commercial painters in Melbourne"
         lede="Painting commercial buildings is mostly a coordination problem. The coating matters, but what decides whether a project works is how well it is staged around the people still using the building."
-        primaryCta={{ label: 'Request a site assessment', href: '/contact-us/#commercial' }}
+        primaryCta={{ label: 'Get a free site assessment', href: '/contact-us/#assessment' }}
         secondaryCta={{ label: 'See our projects', href: '/projects/' }}
         image={{
           src: '/images/work/ewp-tilt-panel-cutting-in.webp',
@@ -151,7 +151,7 @@ export default async function CommercialPage() {
       <CtaBand
         heading="Request a site assessment"
         body="Tell us the sector, the location and the hours we are allowed on site. We will come and look before quoting."
-        cta={{ label: 'Start a commercial enquiry', href: '/contact-us/#commercial' }}
+        cta={{ label: 'Get a free site assessment', href: '/contact-us/#assessment' }}
         phone={settings.phone}
       />
     </>

@@ -1,11 +1,17 @@
 import type { z } from 'zod';
-import { COMMERCIAL_PROPERTY_TYPES, COMMERCIAL_TIMEFRAMES, type EnquiryOption } from './options';
-import { commercialEnquirySchema } from '@/lib/validation/enquiry';
+import {
+  ASSESSMENT_TYPES,
+  COMMERCIAL_PROPERTY_TYPES,
+  SITE_REGIONS,
+  availableOptions as filterOptions,
+  type EnquiryOption,
+} from './options';
+import { siteAssessmentFields } from '@/lib/validation/enquiry';
 
 /**
- * The quote chat, as data.
+ * The site assessment chat, as data.
  *
- * The floating chat asks the same questions as the enquiry forms and submits
+ * The floating chat asks the same questions as the booking form and submits
  * through the same Server Action — it is a second way through one pipeline, not
  * a second pipeline. Keeping the conversation as plain data (rather than as JSX
  * branches) means the flow can be checked against the Zod schema in a unit
@@ -13,9 +19,9 @@ import { commercialEnquirySchema } from '@/lib/validation/enquiry';
  * sending payloads the server will refuse.
  *
  * Deliberately not a chatbot. It answers nothing and claims nothing: every
- * turn is a question APMG needs answered in order to quote. A site that
- * refuses to render an unverified accreditation has no business generating
- * prose about warranties.
+ * turn is a question APMG needs answered in order to book an assessment. A
+ * site that refuses to render an unverified accreditation has no business
+ * generating prose about warranties.
  */
 
 /**
@@ -36,7 +42,7 @@ export type ChatFieldKind =
   | 'confirm';
 
 export type ChatField = {
-  /** Must be a field name the enquiry schema accepts. */
+  /** Must be a field name the booking schema accepts. */
   name: string;
   /** The visible <label>. Never placeholder-only. */
   label: string;
@@ -56,47 +62,69 @@ export type ChatStep = {
   prompt: string;
   /**
    * Usually one field. Grouped only where splitting them would be worse for
-   * the visitor — name, phone and email belong on one turn, not three.
+   * the visitor — organisation, name, phone and email belong on one turn, not
+   * four.
    */
   fields: readonly ChatField[];
 };
 
 export type ChatFlow = {
   formType: EnquiryFormType;
-  /** Names the flow in the transcript, e.g. "Commercial painting". */
+  /** Names the flow in the transcript, e.g. "Site assessment". */
   label: string;
   steps: readonly ChatStep[];
 };
 
 const SCHEMAS = {
-  commercial: commercialEnquirySchema,
+  commercial: siteAssessmentFields,
 } as const;
 
 /** The closing turn every branch ends on. */
 const CONTACT_STEP: ChatStep = {
   id: 'contact',
-  prompt: 'Last one — how should we reach you?',
+  prompt: 'Last one — who should we confirm the booking with?',
   fields: [
+    { name: 'organisation', label: 'Organisation', kind: 'text', autoComplete: 'organization' },
     { name: 'name', label: 'Your name', kind: 'text', autoComplete: 'name' },
     { name: 'phone', label: 'Phone', kind: 'text', inputType: 'tel', autoComplete: 'tel' },
-    { name: 'email', label: 'Email', kind: 'text', inputType: 'email', autoComplete: 'email' },
+    {
+      name: 'email',
+      label: 'Work email',
+      kind: 'text',
+      inputType: 'email',
+      autoComplete: 'email',
+      hint: 'We send the confirmation, and the Google Meet link, here.',
+    },
   ],
 };
 
 export const flows: Record<EnquiryFormType, ChatFlow> = {
   commercial: {
     formType: 'commercial',
-    label: 'Commercial painting',
+    label: 'Site assessment',
     steps: [
       {
-        id: 'organisation',
-        prompt: 'Which organisation are you with?',
+        id: 'site-region',
+        prompt: 'Where is the site?',
         fields: [
           {
-            name: 'organisation',
-            label: 'Organisation',
-            kind: 'text',
-            autoComplete: 'organization',
+            name: 'siteRegion',
+            label: 'Site region',
+            kind: 'choice',
+            options: SITE_REGIONS,
+          },
+        ],
+      },
+      {
+        id: 'assessment-type',
+        prompt: 'How would you like us to do the assessment?',
+        fields: [
+          {
+            name: 'assessmentType',
+            label: 'Assessment type',
+            kind: 'choice',
+            options: ASSESSMENT_TYPES,
+            hint: 'On-site visits are Melbourne-only for now. Everywhere else we start with a call.',
           },
         ],
       },
@@ -113,64 +141,40 @@ export const flows: Record<EnquiryFormType, ChatFlow> = {
         ],
       },
       {
-        id: 'project-location',
-        prompt: 'Where is the work?',
+        id: 'site-address',
+        prompt: 'Where exactly is the site?',
         fields: [
           {
-            name: 'projectLocation',
-            label: 'Project location',
+            name: 'siteAddress',
+            label: 'Site address',
             kind: 'text',
-            hint: 'Suburb, or multiple sites.',
+            autoComplete: 'street-address',
+            hint: 'Street address for an on-site visit. A suburb is enough for an online assessment.',
           },
         ],
       },
       {
-        id: 'scope',
-        prompt: 'What is the scope, roughly?',
+        id: 'preferred-times',
+        prompt: 'When suits you?',
         fields: [
           {
-            name: 'scopeSummary',
-            label: 'Scope summary',
+            name: 'preferredTimes',
+            label: 'Preferred times',
             kind: 'textarea',
-            hint: 'Areas involved, interior or exterior, approximate size, and anything already specified.',
+            hint: 'Two or three windows, e.g. Tuesday morning or Thursday after 2pm. We confirm by email.',
           },
         ],
       },
       {
-        id: 'timeframe',
-        prompt: 'What timeframe are you working to?',
+        id: 'notes',
+        prompt: 'Anything we should know before we come?',
         fields: [
           {
-            name: 'timeframe',
-            label: 'Desired timeframe',
-            kind: 'choice',
-            options: COMMERCIAL_TIMEFRAMES,
-          },
-        ],
-      },
-      {
-        id: 'operating-hours',
-        prompt: 'Anything that limits when we can be on site?',
-        fields: [
-          {
-            name: 'operatingHoursConstraints',
-            label: 'Operating-hours constraints',
+            name: 'notes',
+            label: 'Notes',
             kind: 'textarea',
             optional: true,
-            hint: 'Trading hours, term dates, shift patterns, after-hours access.',
-          },
-        ],
-      },
-      {
-        id: 'site-assessment',
-        prompt: 'Would you like us to attend site before quoting?',
-        fields: [
-          {
-            name: 'siteAssessmentRequested',
-            label: 'Request a site assessment',
-            kind: 'confirm',
-            optional: true,
-            hint: 'We attend site before quoting commercial work wherever possible.',
+            hint: 'Access, sign-in, what needs painting — whatever helps.',
           },
         ],
       },
@@ -178,6 +182,18 @@ export const flows: Record<EnquiryFormType, ChatFlow> = {
     ],
   },
 };
+
+/**
+ * The options a visitor may tap for a choice field, given their earlier
+ * answers. The on-site visit disappears outside Melbourne rather than being
+ * offered and then refused by the server.
+ */
+export function availableOptions(
+  field: ChatField,
+  answers: Readonly<Record<string, string | undefined>>,
+): readonly EnquiryOption[] {
+  return filterOptions(field.options, answers);
+}
 
 /** Every question in a branch, opening turn included, in order. */
 export function stepsFor(formType: EnquiryFormType): readonly ChatStep[] {

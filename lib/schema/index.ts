@@ -1,4 +1,4 @@
-import { site, siteUrl, verifiedAccreditations } from '@/lib/site';
+import { brand, site, siteUrl, verifiedAccreditations } from '@/lib/site';
 import { averageRating, firstPartyReviews } from '@/content/reviews';
 import { locations } from '@/content/locations';
 import type { Post, Project, Service, SiteSettings } from '@/lib/content/types';
@@ -33,6 +33,12 @@ export function organizationSchema(settings: SiteSettings): JsonLdValue {
     '@id': `${siteUrl}/#organization`,
     name: site.name,
     legalName: site.legalName,
+    // The group names from the brand guide. Google reconciles "APMG Services"
+    // mentions and the logo descriptor onto this one entity instead of
+    // treating them as a second, half-described business.
+    alternateName: [...brand.alternateNames],
+    slogan: brand.descriptor,
+    description: `${site.name} is a ${brand.ownership} commercial painting and property maintenance contractor established in ${site.founded}, part of ${brand.groupName} (${brand.descriptor}).`,
     url: `${siteUrl}/`,
     // The mark the header renders, so the entity Google resolves and the
     // entity a visitor sees are the same one.

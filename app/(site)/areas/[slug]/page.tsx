@@ -60,9 +60,7 @@ export default async function LocationPage({ params }: Props) {
           </p>
           {/* One H1, and it names the suburb correctly. The live pages render
               "Painters Painters Armadale" and "Painting Brighton". */}
-          <h1 className="font-display text-4xl tracking-tight sm:text-5xl">
-            Painters in {location.suburb}
-          </h1>
+          <h1 className="font-display text-4xl sm:text-5xl">Painters in {location.suburb}</h1>
         </Container>
       </Section>
 

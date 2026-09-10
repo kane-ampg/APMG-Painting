@@ -1,8 +1,14 @@
 import 'server-only';
 import type { Enquiry } from '@/lib/validation/enquiry';
+import {
+  ASSESSMENT_TYPES,
+  COMMERCIAL_PROPERTY_TYPES,
+  SITE_REGIONS,
+  type EnquiryOption,
+} from '@/lib/enquiry/options';
 
 /**
- * Enquiry delivery.
+ * Booking delivery.
  *
  * No production email or CRM credentials exist for this project yet, and where
  * Contact Form 7 submissions currently land on the WordPress site is unknown.
@@ -30,6 +36,7 @@ export interface EnquiryTransport {
 function redact(enquiry: Enquiry): Record<string, unknown> {
   return {
     formType: enquiry.formType,
+    assessmentType: enquiry.assessmentType,
     // A count, not the content.
     fieldsSubmitted: Object.keys(enquiry).length,
   };
@@ -55,6 +62,8 @@ const resendTransport: EnquiryTransport = {
       return { delivered: false, reason: 'not-configured' };
     }
 
+    const { subject, body } = describeRequest(enquiry);
+
     try {
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -62,12 +71,7 @@ const resendTransport: EnquiryTransport = {
           Authorization: `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          from,
-          to,
-          subject: `New ${enquiry.formType} enquiry — ${enquiry.name}`,
-          text: formatEnquiry(enquiry),
-        }),
+        body: JSON.stringify({ from, to, subject, text: body }),
       });
 
       if (!response.ok) {
@@ -84,13 +88,36 @@ const resendTransport: EnquiryTransport = {
   },
 };
 
-function formatEnquiry(enquiry: Enquiry): string {
-  const lines: string[] = [`Enquiry type: ${enquiry.formType}`, ''];
-  for (const [key, value] of Object.entries(enquiry)) {
-    if (key === 'company_website' || key === 'renderedAt' || key === 'formType') continue;
-    lines.push(`${key}: ${String(value)}`);
-  }
-  return lines.join('\n');
+function labelOf(options: readonly EnquiryOption[], value: string): string {
+  return options.find((option) => option.value === value)?.label ?? value;
+}
+
+/**
+ * The email a booking becomes.
+ *
+ * The subject is how the team triages an inbox, so it says what was booked
+ * and by whom. The body reads back the labels the visitor saw rather than the
+ * enum values the server stored — `On-site visit`, not `onsite`.
+ */
+export function describeRequest(enquiry: Enquiry): { subject: string; body: string } {
+  const assessmentType = labelOf(ASSESSMENT_TYPES, enquiry.assessmentType);
+
+  const subject = `Site assessment request — ${assessmentType} — ${enquiry.name}, ${enquiry.organisation}`;
+
+  const lines: (readonly [string, string])[] = [
+    ['Assessment type', assessmentType],
+    ['Site region', labelOf(SITE_REGIONS, enquiry.siteRegion)],
+    ['Sector', labelOf(COMMERCIAL_PROPERTY_TYPES, enquiry.propertyType)],
+    ['Site address', enquiry.siteAddress],
+    ['Preferred times', enquiry.preferredTimes],
+    ['Notes', enquiry.notes || '—'],
+    ['Organisation', enquiry.organisation],
+    ['Name', enquiry.name],
+    ['Phone', enquiry.phone],
+    ['Email', enquiry.email],
+  ];
+
+  return { subject, body: lines.map(([key, value]) => `${key}: ${value}`).join('\n') };
 }
 
 export function getEnquiryTransport(): EnquiryTransport {

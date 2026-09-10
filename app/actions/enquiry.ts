@@ -5,7 +5,7 @@ import { getSiteSettings } from '@/lib/content/source';
 import { checkRateLimit } from '@/lib/enquiry/rate-limit';
 import type { EnquiryState } from '@/lib/enquiry/state';
 import { getEnquiryTransport } from '@/lib/enquiry/transport';
-import { MIN_COMPLETION_SECONDS, commercialEnquirySchema } from '@/lib/validation/enquiry';
+import { MIN_COMPLETION_SECONDS, siteAssessmentSchema } from '@/lib/validation/enquiry';
 
 async function clientKey(): Promise<string> {
   const headerList = await headers();
@@ -18,7 +18,7 @@ export async function submitEnquiry(
   _previous: EnquiryState,
   formData: FormData,
 ): Promise<EnquiryState> {
-  const parsed = commercialEnquirySchema.safeParse(Object.fromEntries(formData));
+  const parsed = siteAssessmentSchema.safeParse(Object.fromEntries(formData));
 
   if (!parsed.success) {
     // Honeypot rejections look identical to validation failures from outside.
@@ -73,7 +73,7 @@ export async function submitEnquiry(
     status: 'success',
     delivered: result.delivered,
     message: result.delivered
-      ? 'Thanks — your enquiry is with us. We will be in touch shortly.'
+      ? 'Thanks — your site assessment request is with us. We will confirm a time by email.'
       : undefined,
   };
 }

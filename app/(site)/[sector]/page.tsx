@@ -76,7 +76,7 @@ export default async function SectorPage({ params }: Props) {
         eyebrow="Commercial painting"
         heading={sector.title}
         lede={sector.intro}
-        primaryCta={{ label: 'Request a site assessment', href: '/contact-us/#commercial' }}
+        primaryCta={{ label: 'Get a free site assessment', href: '/contact-us/#assessment' }}
         secondaryCta={{ label: 'All commercial work', href: '/commercial/' }}
         crumbs={[
           { name: 'Commercial painting', path: '/commercial/' },
@@ -95,7 +95,7 @@ export default async function SectorPage({ params }: Props) {
           <ul className="grid gap-4 md:grid-cols-2">
             {sector.considerations.map((item) => (
               <Card as="li" key={item.heading} className="gap-2">
-                <h3 className="font-display text-lg tracking-tight">{item.heading}</h3>
+                <h3 className="font-display text-lg">{item.heading}</h3>
                 <p className="text-sm text-ink-soft">{item.body}</p>
               </Card>
             ))}
@@ -147,7 +147,7 @@ export default async function SectorPage({ params }: Props) {
       <CtaBand
         heading={`Talk to us about ${sector.shortTitle.toLowerCase()} work`}
         body="Tell us the site, the constraints and when we are allowed on it."
-        cta={{ label: 'Request a site assessment', href: '/contact-us/#commercial' }}
+        cta={{ label: 'Get a free site assessment', href: '/contact-us/#assessment' }}
         phone={settings.phone}
       />
     </>

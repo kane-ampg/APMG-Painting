@@ -11,6 +11,7 @@ import {
 } from '@/lib/content/schemas';
 import { contentTag } from '@/lib/content/tags';
 import { notifyPublicSite } from '@/lib/revalidate/notify';
+import { LOCAL_PREVIEW_MESSAGE, isLocalPreview } from '@/lib/supabase/env';
 import { createServerSupabase } from '@/lib/supabase/server';
 
 export type SaveState = {
@@ -42,6 +43,7 @@ function pathsFor(collection: string, slug: string): string[] {
 
 export async function saveEntry(_prev: SaveState, formData: FormData): Promise<SaveState> {
   const { email } = await requireAdmin();
+  if (isLocalPreview()) return { status: 'error', message: LOCAL_PREVIEW_MESSAGE };
 
   const collection = String(formData.get('collection') ?? '');
   if (!isCollection(collection)) return { status: 'error', message: 'Unknown collection.' };
@@ -190,6 +192,7 @@ export async function saveEntry(_prev: SaveState, formData: FormData): Promise<S
 
 export async function deleteEntry(collection: string, slug: string): Promise<void> {
   await requireAdmin();
+  if (isLocalPreview()) throw new Error(LOCAL_PREVIEW_MESSAGE);
   if (!isCollection(collection)) throw new Error('Unknown collection');
   // There is nothing to fall back to: a deleted settings row would take the
   // site's phone number with it until somebody re-created it.
