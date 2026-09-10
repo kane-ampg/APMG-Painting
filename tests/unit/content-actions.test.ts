@@ -5,6 +5,13 @@ const revalidatePath = vi.fn();
 vi.mock('next/cache', () => ({ updateTag, revalidatePath }));
 vi.mock('@/lib/auth/admin', () => ({ requireAdmin: async () => ({ email: 'kaner@simple.biz' }) }));
 
+// These exercise the Supabase-backed path. With no keys configured the code
+// under test correctly short-circuits into local preview and writes nothing,
+// so the environment is set here rather than being inherited from whatever
+// .env.local a developer happens to have.
+vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://project.supabase.co');
+vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'test-anon-key');
+
 const upsert = vi.fn(async () => ({ error: null }));
 const match = vi.fn(async () => ({ error: null }));
 const update = vi.fn(() => ({ match }));

@@ -5,6 +5,13 @@ const redirect = vi.fn((to: string) => {
 });
 vi.mock('next/navigation', () => ({ redirect: (to: string) => redirect(to) }));
 
+// These exercise the Supabase-backed path. With no keys configured the code
+// under test correctly short-circuits into local preview and writes nothing,
+// so the environment is set here rather than being inherited from whatever
+// .env.local a developer happens to have.
+vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://project.supabase.co');
+vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'test-anon-key');
+
 function mockSupabase(user: { email: string } | null, allowlisted: boolean) {
   vi.doMock('@/lib/supabase/server', () => ({
     createServerSupabase: async () => ({
