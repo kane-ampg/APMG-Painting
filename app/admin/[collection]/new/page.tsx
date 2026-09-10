@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { listMedia } from '@/app/actions/media';
 import { EntryForm } from '@/components/admin/entry-form';
+import { advancedFields } from '@/lib/admin/labels';
 import { requireAdmin } from '@/lib/auth/admin';
 import { fieldsFor } from '@/lib/content/form-fields';
 import { isCollection, isSingleton, type Collection } from '@/lib/content/schemas';
@@ -70,6 +71,7 @@ export default async function NewEntryPage({ params }: Props) {
           initial={blank[collection]}
           initialStatus="draft"
           media={media}
+          advanced={advancedFields[collection]}
         />
       </div>
     </>

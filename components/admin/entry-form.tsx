@@ -4,9 +4,11 @@ import { useActionState, useMemo, useState } from 'react';
 import { saveEntry, type SaveState } from '@/app/actions/content';
 import type { MediaRow } from '@/app/actions/media';
 import type { FieldSpec } from '@/lib/content/form-fields';
-import type { MediaRef } from '@/lib/content/types';
-import { MediaPicker } from './media-picker';
+import { isPlaceholder } from '@/lib/content/types';
+import { Field } from './fields';
 import { AiButton } from './ai-button';
+
+export type FieldGroup = { heading: string; fields: readonly string[] };
 
 type Props = {
   collection: string;
@@ -14,116 +16,186 @@ type Props = {
   initial: Record<string, unknown>;
   initialStatus: 'draft' | 'published';
   media: MediaRow[];
+  /** Field names to tuck into the collapsed Advanced group at the bottom. */
+  advanced?: readonly string[];
+  /** Optional headings that split the fields into labelled sets, in order. */
+  groups?: readonly FieldGroup[];
+  /** Where Preview should go. Defaults to the draft preview for this entry. */
+  previewHref?: string;
+  /** Extra note above the buttons, e.g. which page this form is editing. */
+  note?: string;
 };
 
-/** Renders a `lines` field's initial array as one item per line. */
-function linesToText(value: unknown): string {
-  return Array.isArray(value) ? (value as unknown[]).map(String).join('\n') : '';
+function asArray(value: unknown): unknown[] {
+  return Array.isArray(value) ? [...value] : [];
 }
 
-/** Renders a `json` field's initial value as pretty-printed JSON, or blank. */
-function jsonToText(value: unknown): string {
-  return value === undefined ? '' : JSON.stringify(value, null, 2);
+function asRecord(value: unknown): Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : {};
 }
 
-export function EntryForm({ collection, fields, initial, initialStatus, media }: Props) {
-  const [data, setData] = useState<Record<string, unknown>>(initial);
-  // Raw textarea text for `lines` and `json` fields, tracked separately from
-  // `data`. Deriving the array/object on every keystroke and feeding it back
-  // as a controlled `value` fights the user: a `lines` textarea whose value
-  // is `array.join('\n')` cannot end on a blank line (the trailing empty
-  // item gets filtered before React ever renders it back), so pressing
-  // Enter to start a new line is silently undone. Keeping the textarea's own
-  // text as the source of truth — and deriving the submitted array/object
-  // only at save time — lets the field behave like an ordinary textarea.
-  const [text, setText] = useState<Record<string, string>>(() => {
-    const initialText: Record<string, string> = {};
-    for (const field of fields) {
-      if (field.kind === 'lines') initialText[field.name] = linesToText(initial[field.name]);
-      else if (field.kind === 'json') initialText[field.name] = jsonToText(initial[field.name]);
+/**
+ * What actually gets submitted for one field.
+ *
+ * The controls keep whatever is easiest to type — an empty list row, a
+ * half-filled testimonial, a number as text — and this turns that into the
+ * shape the schema expects, once, at save time. An editorial placeholder the
+ * editor did not replace is handed back untouched rather than dropped: it is
+ * copy somebody wrote on purpose.
+ */
+export function cleanField(spec: FieldSpec, value: unknown, original: unknown): unknown {
+  if (spec.allowsPlaceholder && isPlaceholder(original)) {
+    const emptied =
+      value === undefined ||
+      value === '' ||
+      isPlaceholder(value) ||
+      (spec.kind === 'testimonial' && !String(asRecord(value).quote ?? '').trim());
+    if (emptied) return original;
+  }
+
+  switch (spec.kind) {
+    case 'lines':
+      return asArray(value)
+        .map((item) => String(item ?? '').trim())
+        .filter((item) => item !== '');
+
+    case 'gallery':
+      return asArray(value)
+        .map((item) => asRecord(item))
+        .filter((item) => typeof item.src === 'string' && item.src !== '');
+
+    case 'image':
+      return value && typeof asRecord(value).src === 'string' && asRecord(value).src !== ''
+        ? value
+        : undefined;
+
+    case 'testimonial': {
+      if (value === undefined || value === null) return undefined;
+      if (isPlaceholder(value)) return value;
+      const record = asRecord(value);
+      const quote = String(record.quote ?? '').trim();
+      const attribution = String(record.attribution ?? '').trim();
+      if (quote === '' && attribution === '') return undefined;
+      const out: Record<string, unknown> = { quote, attribution };
+      for (const key of ['role', 'organisation']) {
+        const text = String(record[key] ?? '').trim();
+        if (text !== '') out[key] = text;
+      }
+      return out;
     }
-    return initialText;
-  });
-  // Parse errors for `json` fields, keyed by field name. Non-empty blocks
-  // both submit buttons — publishing (or saving a draft of) a field whose
-  // visible text does not match what would actually be sent is exactly the
-  // "silently discards the edit" failure this replaces.
-  const [jsonErrors, setJsonErrors] = useState<Record<string, string>>({});
+
+    case 'group': {
+      if (value === null && spec.nullable) return null;
+      const record = asRecord(value);
+      const out: Record<string, unknown> = {};
+      for (const child of spec.children ?? []) {
+        const cleaned = cleanField(child, record[child.name], asRecord(original)[child.name]);
+        if (cleaned !== undefined) out[child.name] = cleaned;
+      }
+      return out;
+    }
+
+    case 'group-list': {
+      const rows = asArray(value).map((row) => {
+        const record = asRecord(row);
+        const out: Record<string, unknown> = {};
+        for (const child of spec.children ?? []) {
+          const cleaned = cleanField(child, record[child.name], undefined);
+          if (cleaned !== undefined) out[child.name] = cleaned;
+        }
+        return out;
+      });
+      if (rows.length === 0 && spec.nullable) return null;
+      return rows;
+    }
+
+    case 'number': {
+      if (value === null || value === undefined || value === '')
+        return spec.nullable ? null : undefined;
+      const parsed = Number(value);
+      return Number.isNaN(parsed) ? value : parsed;
+    }
+
+    case 'boolean':
+      return Boolean(value);
+
+    default: {
+      if (isPlaceholder(value)) return value;
+      const text = value === null || value === undefined ? '' : String(value);
+      // An emptied input on a nullable field means "there is none", which the
+      // schema spells `null`. Submitting '' would fail validation instead.
+      if (text === '' && spec.nullable) return null;
+      if (text === '' && !spec.required) return undefined;
+      return text;
+    }
+  }
+}
+
+export function EntryForm({
+  collection,
+  fields,
+  initial,
+  initialStatus,
+  media,
+  advanced = [],
+  groups,
+  previewHref,
+  note,
+}: Props) {
+  const [data, setData] = useState<Record<string, unknown>>(initial);
   const [state, action, pending] = useActionState<SaveState, FormData>(saveEntry, {
     status: 'idle',
   });
   const set = (name: string, value: unknown) => setData((d) => ({ ...d, [name]: value }));
 
-  const setLinesText = (name: string, raw: string) => setText((t) => ({ ...t, [name]: raw }));
-
-  const setJsonText = (name: string, raw: string) => {
-    setText((t) => ({ ...t, [name]: raw }));
-    const trimmed = raw.trim();
-    if (trimmed === '') {
-      setJsonErrors((errors) => {
-        if (!(name in errors)) return errors;
-        const next = { ...errors };
-        delete next[name];
-        return next;
-      });
-      return;
-    }
-    try {
-      JSON.parse(trimmed);
-      setJsonErrors((errors) => {
-        if (!(name in errors)) return errors;
-        const next = { ...errors };
-        delete next[name];
-        return next;
-      });
-    } catch (parseError) {
-      setJsonErrors((errors) => ({
-        ...errors,
-        [name]: parseError instanceof Error ? parseError.message : 'Invalid JSON.',
-      }));
-    }
-  };
-
-  // What actually gets submitted: `data` for ordinary fields, with `lines`
-  // and `json` fields derived from their raw text right here rather than on
-  // every keystroke. A `json` field currently showing invalid text keeps its
-  // last valid parsed value here — harmless, because `hasJsonErrors` below
-  // disables both submit buttons whenever that is the case.
+  /**
+   * The payload. Every field the form shows is cleaned; everything else in
+   * the entry rides along untouched, which is what lets a page-level form
+   * edit four fields of a project without dropping the other fifteen.
+   */
   const submission = useMemo(() => {
     const out: Record<string, unknown> = { ...data };
     for (const field of fields) {
-      if (field.kind === 'lines') {
-        out[field.name] = (text[field.name] ?? '')
-          .split('\n')
-          .map((line) => line.trim())
-          .filter((line) => line !== '');
-      } else if (field.kind === 'json') {
-        const raw = (text[field.name] ?? '').trim();
-        if (raw === '') {
-          // Cleared: `null` where the schema accepts it (coords, openingHours),
-          // `undefined` where the field is merely optional, so it is omitted
-          // rather than sent as an explicit null the schema would reject.
-          out[field.name] = field.nullable ? null : undefined;
-        } else {
-          try {
-            out[field.name] = JSON.parse(raw);
-          } catch {
-            // Invalid text: keep whatever was last valid. hasJsonErrors
-            // disables the buttons, so this value is never actually sent.
-            out[field.name] = data[field.name];
-          }
-        }
-      }
-      // An emptied input on a nullable field means "there is none", which the
-      // schema spells `null`. Submitting '' would fail validation instead.
-      if (field.nullable && out[field.name] === '') out[field.name] = null;
+      const cleaned = cleanField(field, data[field.name], initial[field.name]);
+      if (cleaned === undefined) delete out[field.name];
+      else out[field.name] = cleaned;
     }
     return out;
-  }, [data, text, fields]);
+  }, [data, fields, initial]);
 
-  const hasJsonErrors = Object.keys(jsonErrors).length > 0;
-  const slug = String(data.slug ?? '');
+  const byName = new Map(fields.map((field) => [field.name, field]));
+  const isAdvanced = (name: string) => advanced.includes(name);
+  const mainFields = fields.filter((field) => !isAdvanced(field.name));
+  const advancedFieldSpecs = fields.filter((field) => isAdvanced(field.name));
+
+  const slug = String(data.slug ?? initial.slug ?? '');
   const originalSlug = String(initial.slug ?? '');
+  const preview = previewHref ?? (slug ? `/admin/preview/${collection}/${slug}/` : null);
+
+  const renderField = (field: FieldSpec) => (
+    <div key={field.name}>
+      <Field
+        collection={collection}
+        path={field.name}
+        spec={field}
+        value={data[field.name]}
+        onChange={(value) => set(field.name, value)}
+        media={media}
+        errors={state.fieldErrors?.[field.name]}
+      />
+      {collection === 'posts' && field.name === 'excerpt' && (
+        <div className="mt-2">
+          <AiButton
+            task="post-summary"
+            input={{ title: String(data.title ?? ''), body: String(data.body ?? '') }}
+            onResult={(result) => setData((d) => ({ ...d, ...result }))}
+          />
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <form action={action} className="flex flex-col gap-6">
@@ -133,126 +205,43 @@ export function EntryForm({ collection, fields, initial, initialStatus, media }:
       <input type="hidden" name="previousStatus" value={initialStatus} />
       <input type="hidden" name="data" value={JSON.stringify(submission)} />
 
-      {fields.map((field) => {
-        const errors = state.fieldErrors?.[field.name];
-        const value = data[field.name];
-        const inputId = `field-${field.name}`;
-        const labelId = `label-${field.name}`;
-        const label = (
-          <label htmlFor={inputId} className="text-sm font-medium">
-            {field.name}
-            {field.required && <span aria-hidden="true"> *</span>}
-          </label>
-        );
-        // An `image` field has no form control for a label to point at — the
-        // picker is a disclosure button and a grid of thumbnails — so a
-        // `<label for>` there would be a dangling reference. The name is a
-        // plain span instead, and reaches the picker's button through
-        // `aria-labelledby`.
-        const pickerLabel = (
-          <span id={labelId} className="text-sm font-medium">
-            {field.name}
-            {field.required && <span aria-hidden="true"> *</span>}
-          </span>
-        );
-        return (
-          <div key={field.name} className="flex flex-col gap-1">
-            {field.kind === 'boolean' ? (
-              <label className="flex items-center gap-2">
-                <input
-                  id={inputId}
-                  type="checkbox"
-                  checked={Boolean(value)}
-                  onChange={(e) => set(field.name, e.target.checked)}
-                />
-                <span className="text-sm font-medium">
-                  {field.name}
-                  {field.required && <span aria-hidden="true"> *</span>}
-                </span>
-              </label>
-            ) : field.kind === 'image' ? (
-              <>
-                {pickerLabel}
-                <MediaPicker
-                  media={media}
-                  value={value as MediaRef | undefined}
-                  onChange={(r) => set(field.name, r)}
-                  labelledBy={labelId}
-                />
-              </>
-            ) : field.kind === 'lines' ? (
-              <>
-                {label}
-                <textarea
-                  id={inputId}
-                  rows={6}
-                  className="rounded border border-paper-edge px-2 py-1 font-mono text-sm"
-                  value={text[field.name] ?? ''}
-                  onChange={(e) => setLinesText(field.name, e.target.value)}
-                />
-                <span className="text-xs text-ink-soft">One item per line.</span>
-              </>
-            ) : field.kind === 'json' ? (
-              <>
-                {label}
-                <textarea
-                  id={inputId}
-                  rows={8}
-                  className="rounded border border-paper-edge px-2 py-1 font-mono text-xs"
-                  value={text[field.name] ?? ''}
-                  onChange={(e) => setJsonText(field.name, e.target.value)}
-                />
-                {jsonErrors[field.name] && (
-                  <p className="text-xs text-red-700">Invalid JSON: {jsonErrors[field.name]}</p>
-                )}
-              </>
-            ) : field.kind === 'textarea' ? (
-              <>
-                <div className="flex items-center justify-between">
-                  {label}
-                  {collection === 'posts' && field.name === 'excerpt' && (
-                    <AiButton
-                      task="post-summary"
-                      input={{ title: String(data.title ?? ''), body: String(data.body ?? '') }}
-                      onResult={(r) => setData((d) => ({ ...d, ...r }))}
-                    />
-                  )}
-                </div>
-                <textarea
-                  id={inputId}
-                  rows={field.name === 'body' ? 20 : 4}
-                  className="rounded border border-paper-edge px-2 py-1"
-                  value={String(value ?? '')}
-                  onChange={(e) => set(field.name, e.target.value)}
-                />
-                {field.name === 'metaDescription' && (
-                  <span className="text-xs text-ink-soft">{String(value ?? '').length}/160</span>
-                )}
-              </>
-            ) : (
-              <>
-                {label}
-                <input
-                  id={inputId}
-                  type={field.kind === 'date' ? 'date' : 'text'}
-                  className="rounded border border-paper-edge px-2 py-1"
-                  value={String(value ?? '')}
-                  onChange={(e) => set(field.name, e.target.value)}
-                />
-              </>
-            )}
-            {errors && <p className="text-xs text-red-700">{errors.join(' ')}</p>}
-          </div>
-        );
-      })}
+      {groups
+        ? groups.map((group) => {
+            const specs = group.fields.flatMap((name) => {
+              const spec = byName.get(name);
+              return spec && !isAdvanced(spec.name) ? [spec] : [];
+            });
+            if (specs.length === 0) return null;
+            return (
+              <fieldset key={group.heading} className="flex flex-col gap-5">
+                <legend className="font-display text-lg tracking-tight text-ink">
+                  {group.heading}
+                </legend>
+                {specs.map(renderField)}
+              </fieldset>
+            );
+          })
+        : mainFields.map(renderField)}
 
-      <div className="flex items-center gap-3 border-t border-paper-edge pt-4">
+      {advancedFieldSpecs.length > 0 && (
+        <details className="rounded border border-paper-edge bg-paper-sunken p-4">
+          <summary className="cursor-pointer text-sm font-medium">Advanced</summary>
+          <p className="mt-2 text-xs text-ink-soft">
+            Links, listings and dates. Changing these can move or hide the page.
+          </p>
+          <div className="mt-4 flex flex-col gap-5">{advancedFieldSpecs.map(renderField)}</div>
+        </details>
+      )}
+
+      {note && <p className="text-xs text-ink-soft">{note}</p>}
+
+      <div className="flex flex-wrap items-center gap-3 border-t border-paper-edge pt-4">
         <button
           type="submit"
           name="status"
           value="draft"
-          disabled={pending || hasJsonErrors}
-          className="rounded border px-4 py-2"
+          disabled={pending}
+          className="rounded border border-paper-edge px-4 py-2 text-sm"
         >
           Save draft
         </button>
@@ -260,18 +249,13 @@ export function EntryForm({ collection, fields, initial, initialStatus, media }:
           type="submit"
           name="status"
           value="published"
-          disabled={pending || hasJsonErrors}
-          className="rounded bg-brand-600 px-4 py-2 text-white"
+          disabled={pending}
+          className="rounded bg-brand-600 px-4 py-2 text-sm text-white hover:bg-brand-700"
         >
           Publish
         </button>
-        {slug ? (
-          <a
-            href={`/admin/preview/${collection}/${slug}/`}
-            target="_blank"
-            rel="noreferrer"
-            className="text-sm underline"
-          >
+        {preview ? (
+          <a href={preview} target="_blank" rel="noreferrer" className="text-sm underline">
             Preview
           </a>
         ) : (
@@ -279,7 +263,9 @@ export function EntryForm({ collection, fields, initial, initialStatus, media }:
             Preview
           </span>
         )}
-        <span className="text-xs text-ink-soft">Currently: {initialStatus}</span>
+        <span className="text-xs text-ink-soft">
+          Currently {initialStatus === 'published' ? 'published' : 'a draft'}
+        </span>
       </div>
       {state.message && (
         <p role="status" className={state.status === 'error' ? 'text-red-700' : 'text-ink-soft'}>
