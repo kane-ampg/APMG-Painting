@@ -1,5 +1,6 @@
 import 'server-only';
 import { redirect } from 'next/navigation';
+import { isLocalPreview } from '@/lib/supabase/env';
 import { createServerSupabase } from '@/lib/supabase/server';
 
 /**
@@ -14,6 +15,7 @@ import { createServerSupabase } from '@/lib/supabase/server';
  * copy has to live on the login page instead of in an error boundary.
  */
 export async function requireAdmin(): Promise<{ email: string }> {
+  if (isLocalPreview()) return { email: 'local-preview@localhost' };
   const supabase = await createServerSupabase();
   const {
     data: { user },

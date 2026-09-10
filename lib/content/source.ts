@@ -120,6 +120,34 @@ export async function getPost(slug: string): Promise<Post | undefined> {
 // --- Admin -----------------------------------------------------------------
 
 /** Uncached. Includes drafts. Only the admin preview and editor call this. */
+export type AdminEntryRow = {
+  slug: string;
+  status: 'draft' | 'published';
+  updated_at: string;
+  updated_by: string | null;
+};
+
+/** The admin list view. Without a database it lists the built-in content. */
+export async function listEntriesForAdmin(collection: Collection): Promise<AdminEntryRow[]> {
+  if (!hasSupabase()) {
+    return seeds[collection].map((entry) => ({
+      slug: 'slug' in entry ? entry.slug : singletonSlug[collection as keyof typeof singletonSlug],
+      status: 'published' as const,
+      updated_at: new Date(0).toISOString(),
+      updated_by: 'built-in',
+    }));
+  }
+  const { createServerSupabase } = await import('@/lib/supabase/server');
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase
+    .from('content_entries')
+    .select('slug, status, updated_at, updated_by')
+    .eq('collection', collection)
+    .order('updated_at', { ascending: false });
+  if (error) throw new Error(`[content] ${collection}: ${error.message}`);
+  return (data ?? []) as AdminEntryRow[];
+}
+
 export async function getEntryForPreview<C extends Collection>(
   collection: C,
   slug: string,

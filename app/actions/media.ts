@@ -5,6 +5,7 @@ import { requireAdmin } from '@/lib/auth/admin';
 import { processImage } from '@/lib/media/process';
 import type { MediaRow } from '@/lib/media/to-media-ref';
 import { publicUrlFor } from '@/lib/media/url';
+import { LOCAL_PREVIEW_MESSAGE, isLocalPreview } from '@/lib/supabase/env';
 import { createServerSupabase } from '@/lib/supabase/server';
 
 // The pure MediaRow -> MediaRef mapper lives in lib/media/to-media-ref.ts —
@@ -24,6 +25,7 @@ const FOLDERS = new Set(['projects', 'work', 'blog', 'hero']);
 
 export async function listMedia(): Promise<MediaRow[]> {
   await requireAdmin();
+  if (isLocalPreview()) return [];
   const supabase = await createServerSupabase();
   const { data, error } = await supabase
     .from('media')
@@ -38,6 +40,7 @@ export async function uploadMedia(
   formData: FormData,
 ): Promise<MediaActionState> {
   const { email } = await requireAdmin();
+  if (isLocalPreview()) return { status: 'error', message: LOCAL_PREVIEW_MESSAGE };
   const file = formData.get('file');
   const folder = String(formData.get('folder') ?? 'work');
   const alt = String(formData.get('alt') ?? '').trim();
@@ -105,6 +108,7 @@ export async function uploadMedia(
 
 export async function updateMediaAlt(id: string, alt: string): Promise<void> {
   await requireAdmin();
+  if (isLocalPreview()) throw new Error(LOCAL_PREVIEW_MESSAGE);
   const supabase = await createServerSupabase();
   const { error } = await supabase.from('media').update({ alt: alt.trim() }).eq('id', id);
   if (error) throw new Error(error.message);
