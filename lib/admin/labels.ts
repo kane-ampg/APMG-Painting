@@ -96,7 +96,6 @@ const settings: LabelMap = {
     label: 'Occupied from',
     help: 'Leave empty if we are already there. A date here tells the site the move is coming.',
   },
-  previousAddress: { label: 'Previous address', help: 'Shown until the date above passes.' },
   abn: { label: 'ABN' },
   coords: { label: 'Map coordinates' },
   'coords.latitude': { label: 'Latitude' },

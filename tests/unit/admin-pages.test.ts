@@ -162,14 +162,41 @@ describe('mediaUsage', () => {
     );
   });
 
-  it('accounts for every image in the repository, so "not placed" is never a lie', async () => {
+  /**
+   * Photographs the repository carries that no public page places: unused
+   * stock, and the assessment chat's portrait, which belongs to a component
+   * on every page rather than to a section of one. Naming them keeps the
+   * assertion below honest — an image that drops out of the page map fails
+   * the test rather than quietly joining this list.
+   */
+  const UNPLACED = [
+    '/images/company/apmg-crew-onsite.webp',
+    '/images/company/apmg-van-street.webp',
+    '/images/company/simon-taranek.webp',
+    '/images/work/column-spray-respirator.webp',
+    '/images/work/office-ceiling-cut-in.webp',
+    '/images/work/office-corridor-rolling.webp',
+    '/images/work/painter-extension-roller.webp',
+    '/images/work/planter-wall-cutting-in.webp',
+    '/images/work/tapware-refit-detail.webp',
+  ];
+
+  it('accounts for every placed image, so "not placed" is never a lie', async () => {
     const { listLocalMedia } = await import('@/lib/media/local-library');
     const [usage, rows] = await Promise.all([mediaUsage(), listLocalMedia()]);
     for (const row of rows) {
+      if (UNPLACED.includes(row.public_url)) continue;
       expect(
         (usage.get(row.public_url) ?? []).length,
         `${row.public_url} has no placement`,
       ).toBeGreaterThan(0);
+    }
+  });
+
+  it('keeps the unplaced list exact, so it cannot hide a page that lost its photograph', async () => {
+    const usage = await mediaUsage();
+    for (const src of UNPLACED) {
+      expect((usage.get(src) ?? []).length, `${src} is placed after all`).toBe(0);
     }
   });
 });

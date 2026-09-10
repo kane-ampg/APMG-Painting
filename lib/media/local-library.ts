@@ -2,11 +2,11 @@ import { readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { cache } from 'react';
 import { faqs } from '@/content/faqs';
-import { locations } from '@/content/locations';
 import { projects } from '@/content/projects';
 import { reviews } from '@/content/reviews';
 import { sectors } from '@/content/sectors';
 import { services } from '@/content/services';
+import { allLocalities } from '@/lib/locations';
 import { accreditations, site } from '@/lib/site';
 import type { MediaRow } from './to-media-ref';
 
@@ -83,7 +83,7 @@ function altIndex(): Map<string, string> {
     projects,
     services,
     sectors,
-    locations,
+    allLocalities(),
     reviews,
     faqs,
     site,

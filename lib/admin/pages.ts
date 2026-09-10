@@ -254,10 +254,7 @@ function officePage(ndisSlug: string | undefined): AdminPage {
     id: 'office-painting',
     title: 'Office painting',
     path: '/office-painters/',
-    hero: {
-      src: '/images/work/office-roller-occupied.webp',
-      alt: 'An APMG painter running a pole roller down an office wall beside occupied desks',
-    },
+    // No banner photograph: the office hero is words and two buttons.
     sections: [
       { id: 'hero', heading: 'Hero', kind: 'fixed', detail: 'Heading and introduction.' },
       TRUST_BAR,
@@ -310,8 +307,8 @@ const tradePage: AdminPage = {
   title: 'Trade services',
   path: '/trade-services/',
   hero: {
-    src: '/images/work/office-partition-cutting-in.webp',
-    alt: 'An APMG painter cutting in above a glazed partition in an open-plan office',
+    src: '/images/work/supervisor-roof-walkthrough.webp',
+    alt: 'An APMG supervisor walking a roof with one of the painting crew, pointing out the next area of work',
   },
   sections: [
     {
@@ -328,6 +325,13 @@ const tradePage: AdminPage = {
       slug: 'builders-and-head-contractors',
       fields: ['body'],
       detail: 'The opening paragraphs come from the builders and head contractors service.',
+    },
+    {
+      id: 'programme-photograph',
+      heading: 'Priming photograph',
+      kind: 'fixed',
+      detail: 'The photograph and caption beside the paragraphs above.',
+      images: ['/images/work/new-build-trim-priming.webp'],
     },
     {
       id: 'media-band',
@@ -410,6 +414,13 @@ const contactPage: AdminPage = {
       ],
     },
     {
+      id: 'depot-photograph',
+      heading: 'Depot photograph',
+      kind: 'fixed',
+      detail: 'The photograph beside the heading at the top of the page.',
+      images: ['/images/company/apmg-fleet-depot.webp'],
+    },
+    {
       id: 'contact-details',
       heading: 'Contact details',
       kind: 'settings',
@@ -421,6 +432,19 @@ const contactPage: AdminPage = {
       heading: 'Enquiry form',
       kind: 'fixed',
       detail: 'The form fields and their validation are code.',
+    },
+    {
+      id: 'where-we-work-from',
+      heading: 'Where we work from',
+      kind: 'fixed',
+      detail: 'The paragraphs about the depot and the areas served.',
+    },
+    {
+      id: 'team-photograph',
+      heading: 'Team photograph',
+      kind: 'fixed',
+      detail: 'The full-width photograph of the team above the footer.',
+      images: ['/images/company/apmg-team-lineup.webp'],
     },
   ],
 };
