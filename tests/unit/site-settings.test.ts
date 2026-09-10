@@ -144,6 +144,6 @@ describe('getSiteSettings fallback', () => {
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', '');
     const { getSiteSettings, getPage } = await import('@/lib/content/source');
     expect((await getSiteSettings()).phone).toBe('1300 97 97 40');
-    expect((await getPage('contact-us')).title).toBe('Talk to us about the site');
+    expect((await getPage('contact-us')).title).toBe('Contact us');
   });
 });

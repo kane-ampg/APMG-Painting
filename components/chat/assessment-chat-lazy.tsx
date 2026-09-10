@@ -4,9 +4,9 @@ import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 
 /**
- * Defers the floating quote chat.
+ * Defers the floating site assessment chat.
  *
- * QuoteChat was statically imported by the root layout, which put its entire
+ * AssessmentChat was statically imported by the root layout, which put its entire
  * client module graph — the zod runtime, the chat flow and the chat FAQ
  * content — into the first-load JavaScript of every page on the site. The
  * full forms on /contact-us/ are the primary, no-JavaScript route (the layout
@@ -14,11 +14,14 @@ import { useEffect, useState } from 'react';
  * needed" case: it loads as its own chunk once the browser is idle, after
  * hydration and the LCP have had the bandwidth.
  */
-const QuoteChat = dynamic(() => import('./quote-chat').then((mod) => mod.QuoteChat), {
-  ssr: false,
-});
+const AssessmentChat = dynamic(
+  () => import('./assessment-chat').then((mod) => mod.AssessmentChat),
+  {
+    ssr: false,
+  },
+);
 
-export function QuoteChatLazy() {
+export function AssessmentChatLazy() {
   const [load, setLoad] = useState(false);
 
   useEffect(() => {
@@ -32,5 +35,5 @@ export function QuoteChatLazy() {
     return () => window.clearTimeout(id);
   }, []);
 
-  return load ? <QuoteChat /> : null;
+  return load ? <AssessmentChat /> : null;
 }

@@ -13,6 +13,20 @@ export function hasSupabase(): boolean {
   return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 }
 
+/**
+ * Local preview: `next dev` with no database. The admin opens without a
+ * login and shows the built-in content read-only, so the editor can be
+ * looked at before Supabase exists. Keyed to development specifically, not
+ * to "anything but production": the unit tests run with NODE_ENV=test and a
+ * mocked Supabase client, and must exercise the real auth and save paths.
+ */
+export function isLocalPreview(): boolean {
+  return !hasSupabase() && process.env.NODE_ENV === 'development';
+}
+
+export const LOCAL_PREVIEW_MESSAGE =
+  'Local preview: no database is configured, so changes are not saved.';
+
 export function supabaseEnv(): { url: string; anonKey: string } {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

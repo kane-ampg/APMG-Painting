@@ -3,12 +3,19 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
-import { CommercialEnquiryForm } from '@/components/forms/enquiry-forms';
+import { SiteAssessmentForm } from '@/components/forms/enquiry-forms';
 import { GoogleMark } from '@/components/sections/review-parts';
 import { ButtonLink, Container, microLabel, Section, SectionHeading } from '@/components/ui';
 import { googleAggregate } from '@/content/reviews';
 import { getPage, getSiteSettings } from '@/lib/content/source';
-import { accreditationLogos, directionsUrl, formatAddress, phoneHref, site } from '@/lib/site';
+import {
+  accreditationLogos,
+  assessors,
+  directionsUrl,
+  formatAddress,
+  phoneHref,
+  site,
+} from '@/lib/site';
 import type { SiteSettings } from '@/lib/content/types';
 import { cn } from '@/lib/utils';
 
@@ -101,12 +108,12 @@ function channelsFor(settings: SiteSettings) {
  */
 const NEXT_STEPS = [
   {
-    heading: 'We come back with questions',
-    body: 'Access, hours and scope, mostly. Those are quicker to settle before anyone attends than to discover on site.',
+    heading: 'We confirm a time by email',
+    body: 'Pick on site or online and give us two or three windows that suit you. We confirm one by email, with a Google Meet link for online assessments.',
   },
   {
-    heading: 'We attend before we quote',
-    body: 'Preparation is the largest variable in any painting job, and it cannot be judged from a photograph or a floor area.',
+    heading: 'We look before we quote',
+    body: 'On site we walk the building with you; online we scope it on the call. Preparation is the largest variable in any painting job, and it cannot be judged from a photograph or a floor area.',
   },
   {
     heading: 'You get an itemised scope',
@@ -117,6 +124,8 @@ const NEXT_STEPS = [
 export default async function ContactPage() {
   const [copy, settings] = await Promise.all([getPage('contact-us'), getSiteSettings()]);
   const channels = channelsFor(settings);
+  // "Farbod, Zac and Simon".
+  const assessorNames = `${assessors.slice(0, -1).join(', ')} and ${assessors[assessors.length - 1]}`;
 
   return (
     <>
@@ -138,13 +147,13 @@ export default async function ContactPage() {
         <div className="lg:grid lg:grid-cols-[1.08fr_1fr] lg:items-stretch">
           <div className="flex flex-col justify-center px-5 py-12 sm:px-8 lg:py-24 lg:pl-[max(2rem,calc((100vw-80rem)/2+2rem))] lg:pr-16">
             <Breadcrumbs crumbs={[{ name: 'Contact', path: '/contact-us/' }]} tone="ink" />
-            <h1 className="mt-2 text-balance font-display text-4xl leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
+            <h1 className="mt-2 text-balance font-display text-4xl leading-[1.05] sm:text-5xl lg:text-6xl">
               {copy.title}
             </h1>
             <p className="mt-6 max-w-prose text-lg leading-relaxed text-white/75">{copy.lede}</p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <ButtonLink href="#quote" variant="accent">
-                Send an enquiry
+              <ButtonLink href="#assessment" variant="accent">
+                Get a free site assessment
               </ButtonLink>
               <ButtonLink href={phoneHref(settings.phone)} variant="ghostLight">
                 {settings.phone}
@@ -196,7 +205,7 @@ export default async function ContactPage() {
                   <span className={cn(microLabel, 'text-ink-muted')}>{channel.label}</span>
                   <span
                     className={cn(
-                      'break-words font-display tracking-tight text-ink decoration-brand-600 decoration-2 underline-offset-4 group-hover:underline',
+                      'break-words font-display text-ink decoration-brand-600 decoration-2 underline-offset-4 group-hover:underline',
                       channel.lead ? 'text-2xl sm:text-3xl' : 'text-lg sm:text-xl',
                     )}
                   >
@@ -217,17 +226,38 @@ export default async function ContactPage() {
         </Container>
       </section>
 
-      {/* The header's "Get a quote" lands here. `#commercial` stays as the deep
-          link from the service pages. */}
-      <div id="quote" className="scroll-mt-16 sm:scroll-mt-20">
+      {/* Every "Get a free site assessment" CTA lands here. `#commercial` stays
+          as the legacy deep link from older service-page URLs. */}
+      <div id="assessment" className="scroll-mt-16 sm:scroll-mt-20">
         <Section tone="sunken" id="commercial">
           <Container width="wide">
             <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
               <div className="lg:col-span-7">
+                <p className={cn(microLabel, 'mb-2 text-brand-600')}>Free for organisations</p>
                 <SectionHeading className="mb-3">{copy.formHeading}</SectionHeading>
-                <p className="mb-8 max-w-prose text-ink-soft">{copy.formIntro}</p>
+                <p className="mb-6 max-w-prose text-ink-soft">{copy.formIntro}</p>
+                {/* The three ways an assessment runs, stated before the form asks
+                    the visitor to choose one of them. */}
+                <ul className="mb-8 grid gap-3 text-sm text-ink-soft sm:grid-cols-3">
+                  <li className="border border-paper-edge bg-white px-4 py-3">
+                    <span className="block font-semibold text-ink">On site, in Melbourne</span>
+                    We walk the building with you, look at the substrates and talk through access
+                    and hours.
+                  </li>
+                  <li className="border border-paper-edge bg-white px-4 py-3">
+                    <span className="block font-semibold text-ink">Online, anywhere</span>A short
+                    Google Meet call at a time you choose, to scope the job and decide what comes
+                    next.
+                  </li>
+                  <li className="border border-paper-edge bg-white px-4 py-3">
+                    <span className="block font-semibold text-ink">
+                      With the people who run the job
+                    </span>
+                    {assessorNames} carry out every assessment themselves.
+                  </li>
+                </ul>
                 <div className="border border-paper-edge bg-white p-5 sm:p-8 lg:p-10">
-                  <CommercialEnquiryForm />
+                  <SiteAssessmentForm />
                 </div>
               </div>
 
@@ -263,9 +293,7 @@ export default async function ContactPage() {
                         >
                           {index + 1}
                         </span>
-                        <h3 className="font-display text-lg tracking-tight text-ink">
-                          {step.heading}
-                        </h3>
+                        <h3 className="font-display text-lg text-ink">{step.heading}</h3>
                         <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">{step.body}</p>
                       </li>
                     ))}
@@ -280,7 +308,7 @@ export default async function ContactPage() {
                     >
                       <GoogleMark className="h-6 w-6 shrink-0" />
                       <span className="text-sm text-ink-soft">
-                        <span className="font-display text-lg tracking-tight text-ink group-hover:underline">
+                        <span className="font-display text-lg text-ink group-hover:underline">
                           {googleAggregate.rating.toFixed(1)} on Google
                         </span>{' '}
                         from {googleAggregate.count} reviews
@@ -342,7 +370,7 @@ export default async function ContactPage() {
             <div className="lg:col-span-6">
               <SectionHeading className="mb-6">Where we work from</SectionHeading>
               <address className="not-italic">
-                <p className="font-display text-2xl leading-snug tracking-tight text-ink sm:text-3xl">
+                <p className="font-display text-2xl leading-snug text-ink sm:text-3xl">
                   {settings.address.street}
                   <br />
                   {settings.address.suburb} {settings.address.state} {settings.address.postcode}

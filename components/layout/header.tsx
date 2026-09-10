@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { DesktopNav } from '@/components/navigation/desktop-nav';
 import { MobileMenu } from '@/components/navigation/mobile-menu';
-import { QuoteCta } from '@/components/navigation/quote-cta';
+import { AssessmentCta } from '@/components/navigation/assessment-cta';
 import { Container } from '@/components/ui';
 import { phoneHref } from '@/lib/site';
 import type { SiteSettings } from '@/lib/content/types';
@@ -42,9 +42,9 @@ export function Header({ settings }: { settings: SiteSettings }) {
               <span className="sr-only">Call </span>
               {settings.phone}
             </a>
-            <QuoteCta className="hidden rounded-md bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 lg:inline-block">
-              Get a quote
-            </QuoteCta>
+            <AssessmentCta className="hidden rounded-md bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 lg:inline-block">
+              Get a free site assessment
+            </AssessmentCta>
             <MobileMenu />
           </div>
         </div>

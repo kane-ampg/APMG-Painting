@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
-import { Inter, Fraunces } from 'next/font/google';
+import { Oswald, Roboto } from 'next/font/google';
 import '../globals.css';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
-import { QuoteChatLazy } from '@/components/chat/quote-chat-lazy';
+import { AssessmentChatLazy } from '@/components/chat/assessment-chat-lazy';
 import { ScrollReveal } from '@/components/motion/scroll-reveal';
 import { SiteSettingsProvider } from '@/components/providers/site-settings';
 import { JsonLd } from '@/components/seo/json-ld';
@@ -12,19 +12,20 @@ import { getServices, getSiteSettings } from '@/lib/content/source';
 import { noindexAll, site, siteUrl } from '@/lib/site';
 
 /**
- * Fonts are self-hosted and subset by next/font at build time — no runtime
- * request to a font CDN, and no layout shift from a late swap.
+ * The brand guide's faces: Oswald for headlines, Roboto for body text. Both
+ * are variable fonts, so every weight the utilities ask for resolves without a
+ * separate file per cut. Self-hosted and subset by next/font at build time —
+ * no runtime request to a font CDN, and no layout shift from a late swap.
  */
-const sans = Inter({
+const sans = Roboto({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-sans',
 });
 
-const display = Fraunces({
+const display = Oswald({
   subsets: ['latin'],
   display: 'swap',
-  weight: ['600', '700'],
   variable: '--font-display',
 });
 
@@ -69,7 +70,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             reaches the page's own content first, and the panel is additive — the
             full forms on /contact-us/ remain the primary, no-JavaScript route.
           */}
-          <QuoteChatLazy />
+          <AssessmentChatLazy />
         </SiteSettingsProvider>
 
         <ScrollReveal />

@@ -98,12 +98,7 @@ export function SectionHeading({
   className?: string;
 }) {
   return (
-    <Tag
-      className={cn(
-        'text-balance font-display text-3xl leading-tight tracking-tight sm:text-4xl',
-        className,
-      )}
-    >
+    <Tag className={cn('text-balance font-display text-3xl leading-tight sm:text-4xl', className)}>
       {children}
     </Tag>
   );

@@ -11,13 +11,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // APMG black. The dominant dark surface *and* the body text colour, so
-        // it stays a true neutral — no blue or green cast to fight the red.
+        // APMG Industrial Black, #1C1C1C in the 2025 brand guide. The dominant
+        // dark surface *and* the body text colour, so every step stays a true
+        // neutral — no blue or green cast to fight the red. `muted` is the
+        // lightest step and still clears 4.5:1 on both paper surfaces.
         ink: {
-          DEFAULT: '#0F1113',
-          raised: '#1B1E21',
-          soft: '#3A3E42',
-          muted: '#6B7075',
+          DEFAULT: '#1C1C1C',
+          raised: '#262626',
+          soft: '#3F3F3F',
+          muted: '#6F6F6F',
         },
         paper: {
           DEFAULT: '#FFFFFF',
@@ -46,7 +48,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-display)', 'Georgia', 'serif'],
+        display: ['var(--font-display)', 'Arial Narrow', 'sans-serif'],
       },
       screens: {
         // Height-keyed, not width-keyed. The homepage fold has to hold its
@@ -100,6 +102,12 @@ const config: Config = {
           '0%': { opacity: '0', transform: 'translateY(10px) scale(0.96)' },
           '55%': { opacity: '1' },
           '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
+        // A menu hanging from its trigger drops a few pixels from where the
+        // trigger is, so the movement says where it came from.
+        'dropdown-in': {
+          from: { opacity: '0', transform: 'translateY(-6px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
         },
         // The mobile panel is a bottom sheet, so it comes from the edge it is
         // attached to rather than fading in place.
@@ -159,8 +167,18 @@ const config: Config = {
         'sheet-in': 'sheet-in 300ms cubic-bezier(0.16, 1, 0.3, 1)',
         'panel-out': 'panel-out 170ms cubic-bezier(0.4, 0, 1, 1) forwards',
         'sheet-out': 'sheet-out 200ms cubic-bezier(0.4, 0, 1, 1) forwards',
+        'dropdown-in': 'dropdown-in 180ms cubic-bezier(0.16, 1, 0.3, 1)',
         'drawer-in': 'drawer-in 300ms cubic-bezier(0.16, 1, 0.3, 1)',
         'scrim-in': 'scrim-in 220ms ease-out',
+      },
+      /*
+       * The shared decelerating curve, named. The keyframe animations above
+       * each carry it as a literal; a plain CSS transition had no way to reach
+       * the same motion without hand-rolling the value a sixth time, which is
+       * how one easing language turns into several.
+       */
+      transitionTimingFunction: {
+        decel: 'cubic-bezier(0.16, 1, 0.3, 1)',
       },
       /*
        * Corners.

@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 import { ContentBlock, CtaBand, Hero } from '@/components/sections';
-import { Container, Prose, Section, SectionHeading } from '@/components/ui';
-import { accreditations, directionsUrl, formatAddress, site } from '@/lib/site';
+import { Card, Container, Eyebrow, Prose, Section, SectionHeading } from '@/components/ui';
+import { accreditations, brand, directionsUrl, formatAddress, site } from '@/lib/site';
 import { getSiteSettings } from '@/lib/content/source';
 
 export const metadata: Metadata = buildMetadata({
@@ -21,7 +21,7 @@ export default async function AboutPage() {
       <Hero
         eyebrow="About"
         heading="A painting contractor built around how sites actually run"
-        lede={`Founded in ${site.founded} and based in ${settings.address.suburb}, APMG Painting works across commercial and industrial projects throughout metropolitan Melbourne.`}
+        lede={`Melbourne-based and Australian-owned. Founded in ${site.founded} and based in ${settings.address.suburb}, APMG Painting works across commercial and industrial projects throughout metropolitan Melbourne.`}
         primaryCta={{ label: 'See our projects', href: '/projects/' }}
         secondaryCta={{ label: 'Get in touch', href: '/contact-us/' }}
         image={{
@@ -54,7 +54,45 @@ export default async function AboutPage() {
         </Prose>
       </ContentBlock>
 
-      <Section tone="sunken">
+      {/* Brand statements from the 2025 brand guide — see `brand` in lib/site.ts
+          for what is quoted, what is adapted, and why. */}
+      <Section tone="sunken" id="what-we-stand-for">
+        <Container>
+          <Eyebrow>{brand.descriptor}</Eyebrow>
+          <SectionHeading className="mb-6">What we stand for</SectionHeading>
+          <Prose className="mb-10">
+            <p>
+              APMG Painting is the painting business of {brand.groupName}, a {brand.ownership} group
+              established in {site.founded}. The group has grown from a painting contractor into a
+              property maintenance partner across several trades, and the standard the painting
+              crews work to has not moved.
+            </p>
+          </Prose>
+
+          <div className="mb-10 grid gap-5 lg:grid-cols-2">
+            <Card as="div" className="gap-3 border-l-4 border-l-brand-600">
+              <h3 className="font-display text-lg">Our vision</h3>
+              <p className="text-ink-soft">{brand.vision}</p>
+            </Card>
+            <Card as="div" className="gap-3 border-l-4 border-l-brand-600">
+              <h3 className="font-display text-lg">Our mission</h3>
+              <p className="text-ink-soft">{brand.mission}</p>
+            </Card>
+          </div>
+
+          <h3 className="mb-4 font-display text-xl">Core values</h3>
+          <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {brand.values.map((value) => (
+              <Card as="li" key={value.name} className="gap-2">
+                <h4 className="font-display text-lg">{value.name}</h4>
+                <p className="text-sm leading-relaxed text-ink-soft">{value.body}</p>
+              </Card>
+            ))}
+          </ul>
+        </Container>
+      </Section>
+
+      <Section tone="paper">
         <Container>
           <SectionHeading className="mb-3">Accreditations and checks</SectionHeading>
           <p className="mb-6 max-w-prose text-ink-soft">
@@ -82,7 +120,7 @@ export default async function AboutPage() {
         </Container>
       </Section>
 
-      <ContentBlock heading="Where we are">
+      <ContentBlock tone="sunken" heading="Where we are">
         <Prose>
           <p>
             {formatAddress(settings.address)}. We work across metropolitan Melbourne from there —{' '}

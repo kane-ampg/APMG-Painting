@@ -1,4 +1,4 @@
-import { internationalPhone, site, siteUrl, verifiedAccreditations } from '@/lib/site';
+import { brand, internationalPhone, site, siteUrl, verifiedAccreditations } from '@/lib/site';
 import { averageRating, firstPartyReviews } from '@/content/reviews';
 import type { Post, Project, Service, SiteSettings } from '@/lib/content/types';
 
@@ -152,6 +152,11 @@ export function localBusinessSchema(
     '@id': `${siteUrl}/#organization`,
     name: site.name,
     legalName: site.legalName,
+    // The group names from the brand guide. Google reconciles "APMG Services"
+    // mentions and the logo descriptor onto this one entity instead of
+    // treating them as a second, half-described business.
+    alternateName: [...brand.alternateNames],
+    slogan: brand.descriptor,
     url: `${siteUrl}/`,
     // The mark the header renders, so the entity Google resolves and the
     // entity a visitor sees are the same one.
@@ -180,7 +185,7 @@ export function localBusinessSchema(
     // The description states the same footprint areaServed declares — it
     // used to say Melbourne only while areaServed listed three Queensland
     // regions, a contradiction inside a single node.
-    description: `${site.name} is a commercial painting contractor based in ${settings.address.suburb}, serving metropolitan Melbourne and South East Queensland.`,
+    description: `${site.name} is a ${brand.ownership} commercial painting and property maintenance contractor established in ${site.founded}, part of ${brand.groupName} (${brand.descriptor}). Based in ${settings.address.suburb}, it serves metropolitan Melbourne and South East Queensland.`,
     ...(knowsAbout.length > 0 ? { knowsAbout } : {}),
     ...offerCatalogFragment(services),
     ...openingHoursFragment(settings),

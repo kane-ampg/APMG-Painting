@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireAdmin } from '@/lib/auth/admin';
 import { collectionTitles, isCollection, isSingleton } from '@/lib/content/schemas';
-import { createServerSupabase } from '@/lib/supabase/server';
+import { listEntriesForAdmin } from '@/lib/content/source';
 
 type Props = { params: Promise<{ collection: string }> };
 
@@ -11,12 +11,7 @@ export default async function CollectionPage({ params }: Props) {
   const { collection } = await params;
   if (!isCollection(collection)) notFound();
 
-  const supabase = await createServerSupabase();
-  const { data } = await supabase
-    .from('content_entries')
-    .select('slug, status, updated_at, updated_by')
-    .eq('collection', collection)
-    .order('updated_at', { ascending: false });
+  const data = await listEntriesForAdmin(collection);
 
   // A singleton has exactly one row at a fixed slug, so there is nothing to
   // create and nothing to delete.
@@ -25,7 +20,7 @@ export default async function CollectionPage({ params }: Props) {
   return (
     <>
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-3xl tracking-tight">{collectionTitles[collection]}</h1>
+        <h1 className="font-display text-3xl">{collectionTitles[collection]}</h1>
         {canCreate && (
           <Link
             href={`/admin/${collection}/new/`}

@@ -1,20 +1,28 @@
 'use client';
 
-import { useActionState, useEffect, useRef } from 'react';
+import { useActionState, useEffect, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { submitEnquiry } from '@/app/actions/enquiry';
 import { initialEnquiryState } from '@/lib/enquiry/state';
-import { CheckboxField, Honeypot, SelectField, TextAreaField, TextField } from './fields';
+import { Honeypot, RadioGroupField, SelectField, TextAreaField, TextField } from './fields';
 import { FormStatus } from './form-status';
-import { COMMERCIAL_PROPERTY_TYPES, COMMERCIAL_TIMEFRAMES } from '@/lib/enquiry/options';
+import {
+  ASSESSMENT_TYPES,
+  COMMERCIAL_PROPERTY_TYPES,
+  SITE_REGIONS,
+  availableOptions,
+} from '@/lib/enquiry/options';
 import { Button } from '@/components/ui';
 
 /**
- * The commercial enquiry form.
+ * The free site assessment booking form.
  *
  * Built on a Server Action via useActionState, so it submits and validates
  * with JavaScript disabled — the progressive-enhancement requirement. The
- * client adds a pending state and focus management, nothing load-bearing.
+ * client adds a pending state, focus management and one convenience: the
+ * on-site option is disabled the moment a visitor says the site is outside
+ * Melbourne, instead of being accepted here and refused by the server. With
+ * JavaScript off the server's own rule still applies.
  */
 
 /**
@@ -49,40 +57,61 @@ function SubmitButton({ children }: { children: string }) {
   );
 }
 
-export function CommercialEnquiryForm() {
+const ONSITE_NOTE =
+  'On-site visits are Melbourne-only for now. Everywhere else we start with an online assessment and take it from there.';
+
+export function SiteAssessmentForm() {
   const [state, formAction] = useActionState(submitEnquiry, initialEnquiryState);
+  const [region, setRegion] = useState('');
+  const [assessmentType, setAssessmentType] = useState('');
+
+  const offered = availableOptions(ASSESSMENT_TYPES, { siteRegion: region }).map((o) => o.value);
+  // Nothing is withheld until a region is chosen: the server decides then.
+  const withheld =
+    region === '' ? [] : ASSESSMENT_TYPES.map((o) => o.value).filter((v) => !offered.includes(v));
+
+  function chooseRegion(next: string) {
+    setRegion(next);
+    const stillOffered = availableOptions(ASSESSMENT_TYPES, { siteRegion: next }).map(
+      (o) => o.value,
+    );
+    if (assessmentType !== '' && !stillOffered.includes(assessmentType)) {
+      setAssessmentType(stillOffered[0] ?? '');
+    }
+  }
+
+  const addressHint =
+    assessmentType === 'online'
+      ? 'A suburb is enough for an online assessment.'
+      : 'Street address, suburb and postcode, so we know exactly where to come.';
 
   return (
-    <form action={formAction} className="relative flex flex-col gap-5" noValidate>
+    <form action={formAction} className="relative flex flex-col gap-6" noValidate>
       <input type="hidden" name="formType" value="commercial" />
       <RenderedAtField />
       <Honeypot />
 
       <FormStatus status={state.status} message={state.message} delivered={state.delivered} />
 
-      <div className="grid gap-5 sm:grid-cols-2">
-        <TextField label="Your name" name="name" autoComplete="name" errors={state.errors?.name} />
-        <TextField
-          label="Organisation"
-          name="organisation"
-          autoComplete="organization"
-          errors={state.errors?.organisation}
-        />
-        <TextField
-          label="Phone"
-          name="phone"
-          type="tel"
-          autoComplete="tel"
-          errors={state.errors?.phone}
-        />
-        <TextField
-          label="Email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          errors={state.errors?.email}
-        />
-      </div>
+      <RadioGroupField
+        label="Where is the site?"
+        name="siteRegion"
+        options={SITE_REGIONS}
+        value={region}
+        onChange={chooseRegion}
+        errors={state.errors?.siteRegion}
+      />
+
+      <RadioGroupField
+        label="How would you like us to do the assessment?"
+        name="assessmentType"
+        options={ASSESSMENT_TYPES}
+        value={assessmentType}
+        onChange={setAssessmentType}
+        disabledValues={withheld}
+        disabledNote={ONSITE_NOTE}
+        errors={state.errors?.assessmentType}
+      />
 
       <div className="grid gap-5 sm:grid-cols-2">
         <SelectField
@@ -92,48 +121,57 @@ export function CommercialEnquiryForm() {
           options={COMMERCIAL_PROPERTY_TYPES}
         />
         <TextField
-          label="Project location"
-          name="projectLocation"
-          hint="Suburb, or multiple sites."
-          errors={state.errors?.projectLocation}
+          label="Site address"
+          name="siteAddress"
+          autoComplete="street-address"
+          hint={addressHint}
+          errors={state.errors?.siteAddress}
         />
       </div>
 
       <TextAreaField
-        label="Scope summary"
-        name="scopeSummary"
-        hint="Areas involved, interior or exterior, approximate size, and anything already specified."
-        errors={state.errors?.scopeSummary}
-      />
-
-      <SelectField
-        label="Desired timeframe"
-        name="timeframe"
-        errors={state.errors?.timeframe}
-        options={COMMERCIAL_TIMEFRAMES}
+        label="Preferred times"
+        name="preferredTimes"
+        rows={3}
+        hint="Two or three windows that suit you, e.g. Tuesday morning or Thursday after 2pm. We confirm by email, with a Google Meet link for online assessments."
+        errors={state.errors?.preferredTimes}
       />
 
       <TextAreaField
-        label="Operating-hours constraints"
-        name="operatingHoursConstraints"
+        label="Notes"
+        name="notes"
         required={false}
         rows={3}
-        hint="Trading hours, term dates, shift patterns, after-hours access — whatever limits when we can work."
-        errors={state.errors?.operatingHoursConstraints}
+        hint="Access, sign-in, what needs painting — whatever helps us arrive prepared."
+        errors={state.errors?.notes}
       />
 
-      <CheckboxField
-        label="Request a site assessment"
-        name="siteAssessmentRequested"
-        hint="We attend site before quoting commercial work wherever possible."
-      />
+      <div className="grid gap-5 sm:grid-cols-2">
+        <TextField
+          label="Organisation"
+          name="organisation"
+          autoComplete="organization"
+          errors={state.errors?.organisation}
+        />
+        <TextField label="Your name" name="name" autoComplete="name" errors={state.errors?.name} />
+        <TextField
+          label="Phone"
+          name="phone"
+          type="tel"
+          autoComplete="tel"
+          errors={state.errors?.phone}
+        />
+        <TextField
+          label="Work email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          hint="Where we send the confirmation."
+          errors={state.errors?.email}
+        />
+      </div>
 
-      <p className="rounded-md border border-dashed border-paper-edge bg-paper-sunken px-4 py-3 text-xs text-ink-muted">
-        Scope document upload is not enabled in this preview. It ships once file storage is
-        provisioned, with server-side type and size checks.
-      </p>
-
-      <SubmitButton>Send enquiry</SubmitButton>
+      <SubmitButton>Book my assessment</SubmitButton>
     </form>
   );
 }

@@ -114,7 +114,13 @@ export function DesktopNav() {
                 className={cn(trigger, 'flex items-center gap-1.5')}
               >
                 {item.label}
-                <span aria-hidden="true" className="text-xs text-ink-muted">
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'inline-block text-xs text-ink-muted transition-transform duration-200 ease-decel',
+                    isOpen && 'rotate-180',
+                  )}
+                >
                   ▾
                 </span>
                 {marker}
@@ -127,7 +133,7 @@ export function DesktopNav() {
               <div
                 id={panelId}
                 hidden={!isOpen}
-                className="absolute left-0 top-full z-40 w-64 pt-1"
+                className="absolute left-0 top-full z-40 w-64 origin-top animate-dropdown-in pt-1"
               >
                 <ul className="rounded-lg border border-paper-edge bg-white p-2 shadow-lg">
                   {item.children.map((child) => {

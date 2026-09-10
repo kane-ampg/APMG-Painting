@@ -61,7 +61,7 @@ export default async function AreasPage() {
       <Section tone="sunken" className="py-10" reveal={false}>
         <Container width="wide">
           <Eyebrow>Coverage</Eyebrow>
-          <h1 className="font-display text-4xl tracking-tight sm:text-5xl">Areas we service</h1>
+          <h1 className="font-display text-4xl sm:text-5xl">Areas we service</h1>
           <Lede className="mt-4">
             {localities.length.toLocaleString('en-AU')} suburbs across{' '}
             {regionsInState('VIC').length + regionsInState('QLD').length} regions in two states.
@@ -80,7 +80,7 @@ export default async function AreasPage() {
                   key={state.key}
                   className="gap-3 transition-colors duration-300 focus-within:border-brand-600 hover:border-brand-600 motion-reduce:transition-none"
                 >
-                  <h2 className="font-display text-2xl tracking-tight">
+                  <h2 className="font-display text-2xl">
                     <Link
                       href={`/areas/${state.slug}/`}
                       className="rounded before:absolute before:inset-0 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"

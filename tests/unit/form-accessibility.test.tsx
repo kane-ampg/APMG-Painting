@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { SelectField, TextAreaField, TextField } from '@/components/forms/fields';
+import { RadioGroupField, SelectField, TextAreaField, TextField } from '@/components/forms/fields';
 
 /**
  * The live WordPress enquiry form has zero <label> elements and zero
@@ -31,6 +31,22 @@ describe('form fields are labelled', () => {
     expect(screen.getByLabelText(/property type/i)).toBeInTheDocument();
   });
 
+  it('groups radios under a legend and labels each option', () => {
+    render(
+      <RadioGroupField
+        label="Assessment type"
+        name="assessmentType"
+        options={[
+          { value: 'onsite', label: 'On-site visit' },
+          { value: 'online', label: 'Online assessment' },
+        ]}
+      />,
+    );
+    expect(screen.getByRole('group', { name: /assessment type/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/on-site visit/i)).toHaveAttribute('type', 'radio');
+    expect(screen.getByLabelText(/online assessment/i)).toHaveAttribute('type', 'radio');
+  });
+
   it('marks optional fields so required is unambiguous', () => {
     render(<TextField label="Notes" name="notes" required={false} />);
     expect(screen.getByText(/\(optional\)/i)).toBeInTheDocument();
@@ -51,6 +67,20 @@ describe('form errors are announced, not just coloured', () => {
   it('does not mark a valid field as invalid', () => {
     render(<TextField label="Email" name="email" />);
     expect(screen.getByLabelText(/email/i)).not.toHaveAttribute('aria-invalid');
+  });
+
+  it('announces a radio group error against the group', () => {
+    render(
+      <RadioGroupField
+        label="Assessment type"
+        name="assessmentType"
+        options={[{ value: 'online', label: 'Online assessment' }]}
+        errors={['Choose an on-site visit or an online assessment.']}
+      />,
+    );
+    const group = screen.getByRole('group', { name: /assessment type/i });
+    const message = screen.getByText('Choose an on-site visit or an online assessment.');
+    expect(group.getAttribute('aria-describedby')).toContain(message.id);
   });
 
   it('exposes hint text to assistive technology', () => {

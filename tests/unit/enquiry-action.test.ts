@@ -45,16 +45,16 @@ function validForm(): FormData {
   const fd = new FormData();
   const fields: Record<string, string> = {
     formType: 'commercial',
-    name: 'Alex Chen',
+    siteRegion: 'melbourne',
+    assessmentType: 'onsite',
+    propertyType: 'education-and-childcare',
+    siteAddress: '12 Canterbury Road, Vermont VIC 3133',
+    preferredTimes: 'Tuesday or Wednesday morning.',
+    notes: 'Term breaks only.',
     organisation: 'Vermont Secondary College',
+    name: 'Alex Chen',
     phone: '(03) 9000 0000',
     email: 'facilities@example.edu.au',
-    propertyType: 'education-and-childcare',
-    projectLocation: 'Vermont',
-    scopeSummary: 'Internal common areas plus two external elevations.',
-    timeframe: 'planning',
-    operatingHoursConstraints: 'Term breaks only.',
-    siteAssessmentRequested: 'true',
     renderedAt: String(Date.now() - 60_000),
     company_website: '',
   };
@@ -109,6 +109,29 @@ describe('submitEnquiry failure messages', () => {
     const failed = await submitEnquiry({ status: 'idle' }, validForm());
     expect(failed.message).toContain('1300 00 00 00');
     expect(failed.message).not.toContain(defaultSiteSettings.phone);
+  });
+
+  it('confirms the booking, not a quote, when the request is delivered', async () => {
+    settings.current = defaultSiteSettings;
+    const { submitEnquiry } = await import('@/app/actions/enquiry');
+
+    const result = await submitEnquiry({ status: 'idle' }, validForm());
+
+    expect(result.status).toBe('success');
+    expect(result.message).toMatch(/site assessment request is with us/i);
+    expect(result.message).toMatch(/confirm a time by email/i);
+  });
+
+  it('refuses an on-site visit outside Melbourne with a field error, not a crash', async () => {
+    settings.current = defaultSiteSettings;
+    const { submitEnquiry } = await import('@/app/actions/enquiry');
+
+    const fd = validForm();
+    fd.set('siteRegion', 'interstate');
+    const result = await submitEnquiry({ status: 'idle' }, fd);
+
+    expect(result.status).toBe('error');
+    expect(result.errors?.assessmentType?.[0]).toMatch(/melbourne/i);
   });
 
   it('still reports a delivered submission as success', async () => {

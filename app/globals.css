@@ -36,11 +36,14 @@
 }
 
 @layer components {
-  /* Fraunces ships here at 600 and 700 only. Anything using the display face
-     must resolve to one of them; 600 is the default and `font-bold` opts into
-     700. Without this, headings inherit 400 and the browser substitutes. */
+  /* Oswald, the brand guide's headline face, ships here at 500, 600 and 700.
+     500 is the default weight for every heading; `font-semibold` and
+     `font-bold` opt into the heavier cuts. Oswald is a condensed face with
+     tight sidebearings of its own, so display elements set no negative
+     tracking — a fraction of positive tracking keeps large headings open. */
   .font-display {
-    font-weight: 600;
+    font-weight: 500;
+    letter-spacing: 0.01em;
   }
 
   /*
@@ -580,6 +583,115 @@
 @media (prefers-reduced-motion: reduce) {
   .faq-accordion::details-content,
   .faq-accordion[open]::details-content {
+    transition-duration: 0s !important;
+  }
+}
+
+/*
+ * ---------------------------------------------------------------------------
+ * Form select
+ * ---------------------------------------------------------------------------
+ *
+ * Outside every @layer for the same reason as the accordion above: `::picker`
+ * is a browser-generated box, and nothing here should be reachable by
+ * accident from a utility class.
+ *
+ * A native <select> opens its list in one frame, drawn by the operating
+ * system, and no CSS can touch it. `appearance: base-select` is the opt-in to
+ * the customisable select: the browser keeps the element, its keyboard
+ * handling and its accessibility tree, but hands the list — `::picker(select)`
+ * — back to the page as an ordinary box. That is what lets it fade and drop
+ * from under the field instead of appearing.
+ *
+ * The motion is the header's `dropdown-in`, 180ms on the shared decelerating
+ * curve, because both are a list hanging from the thing that opened it and
+ * one gesture should read at one speed. `@starting-style` supplies the frame
+ * the list animates in from; `allow-discrete` on `display` and `overlay` is
+ * what holds it visible while it animates back out.
+ *
+ * `::picker-icon` is hidden because the field draws its own chevron in
+ * fields.tsx, where the `group-has-[select:open]` variant turns it. Everything
+ * in this block is dropped by browsers without the feature, which keep their
+ * own list; the trigger is fully styled by utilities either way.
+ */
+@supports (appearance: base-select) {
+  .select-control,
+  .select-control::picker(select) {
+    appearance: base-select;
+  }
+
+  .select-control::picker-icon {
+    display: none;
+  }
+
+  .select-control::picker(select) {
+    box-sizing: border-box;
+    margin-block-start: 0.25rem;
+    padding: 0.25rem;
+    border: 1px solid theme('colors.paper.edge');
+    border-radius: theme('borderRadius.md');
+    background: theme('colors.white');
+    color: theme('colors.ink.DEFAULT');
+    box-shadow: theme('boxShadow.lg');
+    opacity: 0;
+    transform: translateY(-6px);
+    transition:
+      opacity 180ms cubic-bezier(0.16, 1, 0.3, 1),
+      transform 180ms cubic-bezier(0.16, 1, 0.3, 1),
+      display 180ms allow-discrete,
+      overlay 180ms allow-discrete;
+  }
+
+  /* The open state lives on the select, not the pseudo-element: a state
+     pseudo-class after `::picker()` is rejected by the CSS parser Next uses. */
+  .select-control:open::picker(select) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @starting-style {
+    .select-control:open::picker(select) {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+
+  .select-control option {
+    padding: 0.5rem 0.75rem;
+    border-radius: theme('borderRadius.sm');
+    font-size: 0.9375rem;
+    line-height: 1.4;
+    cursor: pointer;
+  }
+
+  .select-control option:hover,
+  .select-control option:focus-visible {
+    outline: none;
+    background: theme('colors.brand.50');
+  }
+
+  /* `:not(:disabled)` keeps the "Please choose…" placeholder, which is the
+     selected option until a choice is made, from reading as a choice. */
+  .select-control option:checked:not(:disabled) {
+    background: theme('colors.brand.50');
+    color: theme('colors.brand.700');
+    font-weight: 600;
+  }
+
+  .select-control option:disabled {
+    color: theme('colors.ink.muted');
+    cursor: default;
+  }
+
+  .select-control option::checkmark {
+    display: none;
+  }
+}
+
+/* As with the accordion: `::picker` is not in the tree, so the global
+   reduced-motion override cannot reach it. Zeroed here so the list snaps. */
+@media (prefers-reduced-motion: reduce) {
+  .select-control::picker(select) {
     transition-duration: 0s !important;
   }
 }

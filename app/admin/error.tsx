@@ -15,7 +15,7 @@ export default function AdminError({
 }) {
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-4 px-6 text-center">
-      <h1 className="font-display text-2xl tracking-tight">Something went wrong</h1>
+      <h1 className="font-display text-2xl">Something went wrong</h1>
       <p className="text-ink-soft">Please try again in a moment.</p>
       <button
         type="button"

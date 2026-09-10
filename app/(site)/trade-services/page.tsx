@@ -1,10 +1,18 @@
 import type { Metadata } from 'next';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
-import { ContentBlock, CtaBand, FaqList, Hero, MediaBand } from '@/components/sections';
+import {
+  ContentBlock,
+  CtaBand,
+  FaqList,
+  Hero,
+  MediaFigure,
+  ProseWithFigure,
+  ScheduleList,
+} from '@/components/sections';
 import { JsonLd } from '@/components/seo/json-ld';
 import { faqSchema, serviceSchema } from '@/lib/schema';
-import { Card, Container, Prose } from '@/components/ui';
+import { Container, Prose } from '@/components/ui';
 import { getService, getSiteSettings } from '@/lib/content/source';
 import { tradeFaqs } from '@/content/faqs';
 
@@ -53,6 +61,9 @@ const SEQUENCE = [
   'What cannot be seen cannot be priced firm. Water damage, unstable render and previous poor repairs are usually hidden under a coating and only surface once preparation starts. The honest way to handle that is a labelled provisional sum against the areas that cannot be assessed until they are opened, with anything found reported and priced before it is carried out.',
 ];
 
+/** Rendered inside a column beside the prose, so the frame is half the page. */
+const SIDE_FIGURE_SIZES = '(min-width: 1152px) 544px, (min-width: 1024px) 50vw, 100vw';
+
 export default async function TradeServicesPage() {
   const [service, settings] = await Promise.all([
     getService('builders-and-head-contractors'),
@@ -89,40 +100,54 @@ export default async function TradeServicesPage() {
       />
 
       <ContentBlock heading="Painting on a construction programme">
-        <Prose className="mb-8">
-          {service?.body.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
-          <p>
-            On commercial sites this matters more than it sounds. A finish held up waiting on the
-            trade ahead of it is a zone the head contractor cannot hand over, and on a staged
-            programme one delay moves everything behind it.
-          </p>
-        </Prose>
+        <ProseWithFigure
+          figure={
+            <MediaFigure
+              src="/images/work/new-build-trim-priming.webp"
+              alt="An APMG painter rolling primer onto a length of trim laid across trestles on a site still under construction, the rest of the run stacked alongside"
+              caption="Trim primed off the wall, on a new build still in progress."
+              detail="Priming the run on trestles while the carpenters are still fixing means the finish coats can follow them straight in, instead of the painter waiting on a finished room."
+              aspect="side"
+              sizes={SIDE_FIGURE_SIZES}
+            />
+          }
+        >
+          <Prose>
+            {service?.body.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+            <p>
+              On commercial sites this matters more than it sounds. A finish held up waiting on the
+              trade ahead of it is a zone the head contractor cannot hand over, and on a staged
+              programme one delay moves everything behind it.
+            </p>
+          </Prose>
+        </ProseWithFigure>
 
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {TRADES.map((trade) => (
-            <Card as="li" key={trade.name} className="gap-2">
-              <h3 className="font-display text-lg tracking-tight">{trade.name}</h3>
-              <p className="text-sm text-ink-soft">{trade.body}</p>
-            </Card>
-          ))}
-        </ul>
+        <h3 className="mb-4 mt-14 font-display text-xl">What the package can include</h3>
+        <ScheduleList items={TRADES} />
       </ContentBlock>
 
-      <MediaBand
-        tone="ink"
-        src="/images/work/office-corridor-rolling.webp"
-        alt="An APMG painter rolling out a partition wall in an office fit-out, drop sheets down and the glazed partitions either side already in place"
-        caption="A tenancy fit-out ahead of practical completion. Bringing fixings, partition heads and previous patching to a consistent, paintable surface is frequently more work than the coating that follows it."
-      />
-
       <ContentBlock tone="sunken" heading="How painting sits in the sequence">
-        <Prose>
-          {SEQUENCE.map((paragraph) => (
-            <p key={paragraph.slice(0, 48)}>{paragraph}</p>
-          ))}
-        </Prose>
+        <ProseWithFigure
+          figure={
+            <MediaFigure
+              src="/images/work/fitout-reveal-making-good.webp"
+              alt="An APMG tradesperson marking out a newly framed timber window reveal against existing brickwork on a fit-out, before the surface is filled and primed"
+              caption="Making good where new work meets an existing wall."
+              detail="A fit-out still in progress. Preparation gets measured and priced at this stage, before a brush is opened — and it is the stage a construction programme most often leaves too little room for."
+              aspect="side"
+              focus="top"
+              sizes={SIDE_FIGURE_SIZES}
+            />
+          }
+        >
+          <Prose>
+            {SEQUENCE.map((paragraph) => (
+              <p key={paragraph.slice(0, 48)}>{paragraph}</p>
+            ))}
+          </Prose>
+        </ProseWithFigure>
       </ContentBlock>
 
       <ContentBlock heading="Builder and head contractor questions">

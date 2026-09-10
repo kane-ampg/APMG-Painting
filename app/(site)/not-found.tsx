@@ -34,7 +34,11 @@ export default async function NotFound() {
       body: 'Coordinating the work that runs alongside a painting programme.',
     },
     { label: 'Projects', href: '/projects/', body: 'Documented case studies from completed work.' },
-    { label: 'Contact', href: '/contact-us/', body: 'Site assessments and quotes.' },
+    {
+      label: 'Contact',
+      href: '/contact-us/',
+      body: 'Book a free site assessment, on site or online.',
+    },
   ];
 
   return (
@@ -43,7 +47,7 @@ export default async function NotFound() {
         <p className="mb-3 text-xs font-semibold uppercase tracking-label text-brand-600">
           Page not found
         </p>
-        <h1 className="font-display text-4xl tracking-tight sm:text-5xl">That page is not here</h1>
+        <h1 className="font-display text-4xl sm:text-5xl">That page is not here</h1>
         <p className="mt-4 text-lg text-ink-soft">
           The link may be out of date, or the address may have a typo in it. Here is where most
           people are heading.

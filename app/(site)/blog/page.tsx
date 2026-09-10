@@ -44,7 +44,7 @@ export default async function BlogIndexPage() {
                       />
                     </Link>
                   )}
-                  <h2 className="font-display text-2xl tracking-tight">
+                  <h2 className="font-display text-2xl">
                     <Link href={`/blog/${post.slug}/`}>{post.title}</Link>
                   </h2>
                   <p className="text-ink-soft">{post.excerpt}</p>

@@ -62,7 +62,7 @@ export default async function NewEntryPage({ params }: Props) {
   const media = await listMedia();
   return (
     <>
-      <h1 className="font-display text-3xl tracking-tight">New {collection.slice(0, -1)}</h1>
+      <h1 className="font-display text-3xl">New {collection.slice(0, -1)}</h1>
       <div className="mt-6">
         <EntryForm
           collection={collection}

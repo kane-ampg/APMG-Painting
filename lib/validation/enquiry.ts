@@ -1,14 +1,17 @@
 import { z } from 'zod';
 
 /**
- * Enquiry schema.
+ * Site assessment booking schema.
  *
- * Commercial only. The live WordPress site ran one generic Contact Form 7
- * instance on every page — name, phone, email, address, suburb, a service
- * dropdown and a message — which asked a facilities manager useful questions
- * for almost none of that. This schema asks what a commercial enquiry
- * actually needs: organisation, sector, project location, scope, timeframe
- * and operating-hours constraints.
+ * The site's one call to action is a free site assessment, so the form asks
+ * what is needed to book one rather than what is needed to price a job: where
+ * the site is, whether the visitor wants us there or on a call, when suits,
+ * and how to reach them. Scope is a conversation, not a required essay.
+ *
+ * On-site visits are offered in metropolitan Melbourne only — that is the
+ * area APMG can evidence and staff. Everywhere else is offered an online
+ * scoping call over Google Meet. The rule lives here, as a cross-field
+ * refinement, so neither the form nor the chat can be talked around it.
  *
  * Shared by the client and the server. The server always re-validates; client
  * validation is a convenience, never a control.
@@ -19,7 +22,7 @@ const name = z.string().trim().min(2, 'Enter your name.').max(100, 'That name is
 const email = z
   .string()
   .trim()
-  .min(1, 'Enter your email address.')
+  .min(1, 'Enter your work email address.')
   .email('Enter a valid email address, like name@example.com.')
   .max(254);
 
@@ -32,7 +35,7 @@ const phone = z
   .regex(/^[0-9+()\s-]+$/, 'Use digits, spaces, and + ( ) - only.');
 
 /**
- * Anti-spam fields, present on both forms.
+ * Anti-spam fields, present on every route into the pipeline.
  * `company_website` is a honeypot — hidden from users, so any value means a bot.
  * `renderedAt` supports a minimum-completion-time check on the server.
  */
@@ -41,13 +44,30 @@ const antiSpam = {
   renderedAt: z.coerce.number().int().nonnegative(),
 };
 
-export const commercialEnquirySchema = z.object({
+export const SITE_REGIONS = ['melbourne', 'regional-victoria', 'interstate'] as const;
+export const ASSESSMENT_TYPES = ['onsite', 'online'] as const;
+
+/** The region an on-site visit is offered in. Everywhere else is online only. */
+export const ONSITE_REGION = 'melbourne';
+
+export const ONSITE_OUTSIDE_MELBOURNE_MESSAGE =
+  'On-site assessments are Melbourne-only for now. Choose an online assessment and we will call you.';
+
+/**
+ * The fields, as a plain object schema.
+ *
+ * Kept separate from the refined schema below because the chat validates one
+ * answer at a time against `.shape`, and a refined schema has no shape.
+ */
+export const siteAssessmentFields = z.object({
   ...antiSpam,
   formType: z.literal('commercial'),
-  name,
-  organisation: z.string().trim().min(2, 'Enter your organisation.').max(150),
-  phone,
-  email,
+  siteRegion: z.enum(SITE_REGIONS, {
+    errorMap: () => ({ message: 'Tell us where the site is.' }),
+  }),
+  assessmentType: z.enum(ASSESSMENT_TYPES, {
+    errorMap: () => ({ message: 'Choose an on-site visit or an online assessment.' }),
+  }),
   propertyType: z.enum(
     [
       'education-and-childcare',
@@ -63,28 +83,41 @@ export const commercialEnquirySchema = z.object({
     ],
     { errorMap: () => ({ message: 'Choose a property or sector type.' }) },
   ),
-  projectLocation: z.string().trim().min(2, 'Enter the project location.').max(150),
-  scopeSummary: z
+  siteAddress: z
     .string()
     .trim()
-    .min(10, 'Give us a short scope summary — 10 characters or more.')
-    .max(4000, 'Please keep this under 4000 characters.'),
-  timeframe: z.enum(['asap', '1-3-months', '3-plus-months', 'planning', 'tender'], {
-    errorMap: () => ({ message: 'Choose a desired timeframe.' }),
-  }),
-  operatingHoursConstraints: z
+    .min(3, 'Enter the site address — a suburb is enough for an online assessment.')
+    .max(200, 'Please keep this under 200 characters.'),
+  preferredTimes: z
+    .string()
+    .trim()
+    .min(3, 'Tell us two or three times that suit you.')
+    .max(500, 'Please keep this under 500 characters.'),
+  notes: z
     .string()
     .trim()
     .max(1000, 'Please keep this under 1000 characters.')
     .optional()
     .default(''),
-  siteAssessmentRequested: z.coerce.boolean().optional().default(false),
+  organisation: z.string().trim().min(2, 'Enter your organisation.').max(150),
+  name,
+  phone,
+  email,
 });
 
-export type CommercialEnquiry = z.infer<typeof commercialEnquirySchema>;
-/** One schema now — kept as its own alias so callers describe the payload
- *  generically rather than naming the (single) audience it comes from. */
-export type Enquiry = CommercialEnquiry;
+export const siteAssessmentSchema = siteAssessmentFields.superRefine((data, ctx) => {
+  if (data.assessmentType === 'onsite' && data.siteRegion !== ONSITE_REGION) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['assessmentType'],
+      message: ONSITE_OUTSIDE_MELBOURNE_MESSAGE,
+    });
+  }
+});
+
+export type SiteAssessmentRequest = z.infer<typeof siteAssessmentSchema>;
+/** Kept as its own alias so callers describe the payload generically. */
+export type Enquiry = SiteAssessmentRequest;
 
 /** Minimum seconds between form render and submit. Below this it is a bot. */
 export const MIN_COMPLETION_SECONDS = 3;

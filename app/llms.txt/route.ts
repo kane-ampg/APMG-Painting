@@ -1,4 +1,4 @@
-import { accreditations, formatAddress, noindexAll, site, siteUrl } from '@/lib/site';
+import { accreditations, brand, formatAddress, noindexAll, site, siteUrl } from '@/lib/site';
 import { googleAggregate, googleReviews } from '@/content/reviews';
 import { servicePath } from '@/content/services';
 import { sectors } from '@/content/sectors';
@@ -72,9 +72,21 @@ export async function GET(): Promise<Response> {
 
 > ${site.tagline}. ${site.legalName}, founded ${site.founded}, based at ${formatAddress(settings.address)}. Victorian work is carried out across ${settings.serviceAreaPrimary}, within roughly ${site.serviceArea.radiusKm} km of the ${settings.address.suburb} base. APMG also lists ${qldRegions} South East Queensland regions as areas served — there is no Queensland office, address, phone number or completed project, and no suburb-level Queensland page on this site is indexed.
 
-APMG Painting is a commercial painting and property maintenance contractor. The work is painting programmes in buildings that stay open while they are painted — schools, clinics, aged care, strata, retail, hospitality and industrial sites.
+APMG Painting is a ${brand.ownership} commercial painting and property maintenance contractor, part of ${brand.groupName} (${brand.descriptor}). The work is painting programmes in buildings that stay open while they are painted — schools, clinics, aged care, strata, retail, hospitality and industrial sites.
 
 Contact: ${settings.phone} · ${settings.email}
+
+## Mission
+
+${brand.mission}
+
+Core values: ${brand.values.map((v) => v.name.toLowerCase()).join(', ')}.
+
+## How the work is quoted
+
+Every enquiry begins with a free site assessment that establishes scope, substrate condition, access and permitted working hours before a price is given. Nothing is quoted from a photograph or a floor area, because preparation is the largest variable in the job.
+
+Assessments are booked at ${siteUrl}/contact-us/#assessment. On-site visits are offered in metropolitan Melbourne; organisations elsewhere are offered an online assessment over Google Meet first. Assessments are carried out by Farbod, Zac or Simon.
 
 ## Choosing a commercial painter in Melbourne
 

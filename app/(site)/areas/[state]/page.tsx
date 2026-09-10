@@ -78,7 +78,7 @@ export default async function StatePage({ params }: Props) {
       <Section tone="sunken" className="py-10" reveal={false}>
         <Container width="wide">
           <Eyebrow>Areas we service</Eyebrow>
-          <h1 className="font-display text-4xl tracking-tight sm:text-5xl">
+          <h1 className="font-display text-4xl sm:text-5xl">
             {vic ? 'Commercial painters in Victoria' : 'Commercial painting in Queensland'}
           </h1>
           <Lede className="mt-4">
@@ -132,7 +132,7 @@ export default async function StatePage({ params }: Props) {
                   key={region.slug}
                   className="group gap-2 transition-colors duration-300 focus-within:border-brand-600 hover:border-brand-600 motion-reduce:transition-none"
                 >
-                  <h3 className="font-display text-xl tracking-tight">
+                  <h3 className="font-display text-xl">
                     <Link
                       href={`/areas/${state}/${region.slug}/`}
                       className="rounded before:absolute before:inset-0 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"

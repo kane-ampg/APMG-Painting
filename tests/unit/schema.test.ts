@@ -57,6 +57,25 @@ describe('structured data', () => {
     expect(data.email).toBe('hello@apmgpainting.com.au');
   });
 
+  it('carries the brand names from the 2025 brand guide as alternate names', () => {
+    // The guide brands the group as "APMG Services" and expands the acronym in
+    // the logo descriptor. Both are names the entity is known by; neither
+    // replaces the trading name this site uses.
+    const schema = localBusinessSchema(services, defaultSiteSettings);
+    expect(schema.name).toBe('APMG Painting');
+    expect(schema.alternateName).toEqual([
+      'APMG Services',
+      'Australian Property Maintenance Group',
+    ]);
+  });
+
+  it('describes the business in brand-guide terms without residential claims', () => {
+    const schema = localBusinessSchema(services, defaultSiteSettings);
+    expect(String(schema.description)).toMatch(/Melbourne-based, Australian-owned/);
+    expect(String(schema.description)).toMatch(/2015/);
+    expect(String(schema.slogan)).toBe('Australian Property Maintenance Group');
+    expect(JSON.stringify(schema)).not.toMatch(/residential|homeowner/i);
+  });
   it('scopes the service area to Melbourne', () => {
     expect(JSON.stringify(localBusinessSchema(services, defaultSiteSettings))).toContain(
       'Melbourne',

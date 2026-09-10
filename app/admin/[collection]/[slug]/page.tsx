@@ -28,7 +28,7 @@ export default async function EditEntryPage({ params }: Props) {
 
   return (
     <>
-      <h1 className="font-display text-3xl tracking-tight">{heading}</h1>
+      <h1 className="font-display text-3xl">{heading}</h1>
       <div className="mt-6">
         <EntryForm
           collection={collection}

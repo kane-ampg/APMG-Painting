@@ -224,9 +224,9 @@ export default async function HomePage() {
       </ContentBlock>
 
       <CtaBand
-        heading="Tell us what needs painting"
-        body="Commercial enquiries get a site assessment before a number."
-        cta={{ label: 'Request a quote', href: '/contact-us/' }}
+        heading="Start with a free site assessment"
+        body="On site in Melbourne or online anywhere. We look before we put a number on anything."
+        cta={{ label: 'Get a free site assessment', href: '/contact-us/#assessment' }}
         phone={settings.phone}
       />
     </>

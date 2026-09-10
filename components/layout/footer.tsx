@@ -77,7 +77,7 @@ function FooterFacts() {
             {fact.label}
           </dt>
           <dd className="mt-2">
-            <span className="font-display text-3xl font-semibold leading-none tracking-tight text-brand-400">
+            <span className="font-display text-3xl font-semibold leading-none text-brand-400">
               {fact.figure}
             </span>
             <span className="mt-2 block text-sm leading-relaxed text-white/70">{fact.detail}</span>

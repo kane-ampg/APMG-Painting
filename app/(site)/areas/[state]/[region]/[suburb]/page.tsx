@@ -91,7 +91,7 @@ export default async function SuburbPage({ params }: Props) {
           <Eyebrow>{regionName}</Eyebrow>
           {/* One H1, and it names the suburb once. The live pages render
               "Painters Painters Armadale" and "Painting Brighton". */}
-          <h1 className="font-display text-4xl tracking-tight sm:text-5xl">
+          <h1 className="font-display text-4xl sm:text-5xl">
             {`Commercial ${vic ? 'painters' : 'painting'} in ${name}`}
           </h1>
           <Lede className="mt-4">

@@ -47,7 +47,7 @@ function DetailList({ heading, items }: { heading: string; items?: readonly stri
   if (!items || items.length === 0) return null;
   return (
     <div>
-      <h2 className="mb-3 font-display text-xl tracking-tight">{heading}</h2>
+      <h2 className="mb-3 font-display text-xl">{heading}</h2>
       <ul className="flex flex-col gap-2 text-ink-soft">
         {items.map((item) => (
           <li key={item} className="flex gap-3">
@@ -97,7 +97,7 @@ export function ProjectArticle({ project, sector, relatedServices = [], settings
           <p className="mb-3 text-xs font-semibold uppercase tracking-label text-brand-600">
             {project.location}
           </p>
-          <h1 className="max-w-4xl font-display text-4xl leading-tight tracking-tight sm:text-5xl">
+          <h1 className="max-w-4xl font-display text-4xl leading-tight sm:text-5xl">
             {project.title}
           </h1>
         </Container>
@@ -120,13 +120,13 @@ export function ProjectArticle({ project, sector, relatedServices = [], settings
           <div className="grid gap-12 lg:grid-cols-[1fr_17rem]">
             <div className="flex flex-col gap-10">
               <div>
-                <h2 className="mb-3 font-display text-xl tracking-tight">The challenge</h2>
+                <h2 className="mb-3 font-display text-xl">The challenge</h2>
                 <p className="max-w-prose text-ink-soft">{project.challenge}</p>
               </div>
 
               {project.initialCondition && (
                 <div>
-                  <h2 className="mb-3 font-display text-xl tracking-tight">Initial condition</h2>
+                  <h2 className="mb-3 font-display text-xl">Initial condition</h2>
                   <p className="max-w-prose text-ink-soft">{project.initialCondition}</p>
                 </div>
               )}
@@ -136,7 +136,7 @@ export function ProjectArticle({ project, sector, relatedServices = [], settings
 
               {project.coatingSystem && (
                 <div>
-                  <h2 className="mb-3 font-display text-xl tracking-tight">Coating system</h2>
+                  <h2 className="mb-3 font-display text-xl">Coating system</h2>
                   <p className="max-w-prose text-ink-soft">{project.coatingSystem}</p>
                 </div>
               )}
@@ -246,7 +246,7 @@ export function ProjectArticle({ project, sector, relatedServices = [], settings
       <CtaBand
         heading="Similar site, similar constraints?"
         body="Tell us what needs painting and when we are allowed on site."
-        cta={{ label: 'Request a site assessment', href: '/contact-us/#commercial' }}
+        cta={{ label: 'Get a free site assessment', href: '/contact-us/#assessment' }}
         phone={settings.phone}
       />
     </>

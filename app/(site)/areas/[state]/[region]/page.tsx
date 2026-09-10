@@ -117,9 +117,7 @@ export default async function RegionPage({ params }: Props) {
       <Section tone="sunken" className="py-10" reveal={false}>
         <Container width="wide">
           <Eyebrow>{vic ? 'Victoria' : 'Queensland'}</Eyebrow>
-          <h1 className="font-display text-4xl tracking-tight sm:text-5xl">
-            {heading(regionDef, vic)}
-          </h1>
+          <h1 className="font-display text-4xl sm:text-5xl">{heading(regionDef, vic)}</h1>
           <Lede className="mt-4">
             {vic
               ? `${localities.length} suburbs across ${groups.length} ${groups.length === 1 ? 'council' : 'councils'}, serviced from our Bayswater North base.`
