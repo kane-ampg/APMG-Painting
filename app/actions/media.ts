@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { requireAdmin } from '@/lib/auth/admin';
+import { listLocalMedia } from '@/lib/media/local-library';
 import { processImage } from '@/lib/media/process';
 import type { MediaRow } from '@/lib/media/to-media-ref';
 import { publicUrlFor } from '@/lib/media/url';
@@ -25,7 +26,10 @@ const FOLDERS = new Set(['projects', 'work', 'blog', 'hero']);
 
 export async function listMedia(): Promise<MediaRow[]> {
   await requireAdmin();
-  if (isLocalPreview()) return [];
+  // No database, no `media` table — but the repository's own photographs are
+  // sitting in `public/images/`, and an empty library would make every
+  // screen that shows one look broken rather than unconfigured.
+  if (isLocalPreview()) return listLocalMedia();
   const supabase = await createServerSupabase();
   const { data, error } = await supabase
     .from('media')
